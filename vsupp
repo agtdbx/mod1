@@ -1,0 +1,2410 @@
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:malloc
+   fun:_dl_find_object_update
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen_implementation
+   fun:dlopen@@GLIBC_2.34
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XimOpenIM
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcDefaultMapModifiers
+   fun:XSetLocaleModifiers
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddLoader
+   fun:_XlcInitLoader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddLoader
+   fun:_XlcInitLoader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddLoader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   fun:_XlcResolveLocaleName
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   fun:drmModeGetResources
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:XInitThreads
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:XInitThreads
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:XInitThreads
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:drmSLInsert
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:drmSLCreate
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:drmSLCreate
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:drmSLCreate
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   fun:drmSLCreate
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XrmInternalStringToQuark
+   fun:XrmInitialize
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8LocaleConverters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_close_worker.part.0.isra.0
+   fun:_dl_close_worker
+   fun:_dl_close
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlclose@@GLIBC_2.34
+   obj:/usr/lib/x86_64-linux-gnu/libglfw.so.3.3
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   fun:drmModeGetPlaneResources
+   fun:drmModeAtomicAddProperty
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateDefaultCharSet
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddCharSet
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateDefaultCharSet
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:add_to_global_resize
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen_implementation
+   fun:dlopen@@GLIBC_2.34
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:strdup
+   fun:_dl_load_cache_lookup
+   fun:_dl_map_object
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   fun:drmModeObjectGetProperties
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:strdup
+   fun:_dl_load_cache_lookup
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_XlcCreateDefaultCharSet
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:drmSLInsert
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateDefaultCharSet
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddCharSet
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateDefaultCharSet
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   fun:realloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:calloc
+   fun:_dl_check_map_versions
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen_implementation
+   fun:dlopen@@GLIBC_2.34
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_XlcCreateDefaultCharSet
+   fun:_XlcAddCT
+   fun:_XlcInitCTInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:calloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XrmInternalStringToQuark
+   fun:XrmInitialize
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:_XrmInternalStringToQuark
+   fun:_XlcGetLocaleDataBase
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcCreateLC
+   fun:_XlcUtf8Loader
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:XrmGetStringDatabase
+   fun:glfwInit
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:_XrmInternalStringToQuark
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XlcOpenConverter
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
+   fun:_XimProtoOpenIM
+   fun:_XimOpenIM
+   fun:glfwInit
+   fun:main
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:calloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:openaux
+   fun:_dl_catch_exception
+   fun:_dl_map_object_deps
+   fun:dl_open_worker_begin
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libdrm.so.2.4.0
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+   obj:/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so.555.42.06
+}

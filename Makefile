@@ -35,7 +35,7 @@ WHITE		= \e[1;37m
 #-- COMPTER UTILS -------------------------------------------------------------
 NB_COMPILE	:= 1
 ifndef RECURSION
-TO_COMPILE	:= $(shell make -n RECURSION=42 | grep compile | wc -l)
+TO_COMPILE	:= $(shell var=$$(make -n RECURSION=42 | grep compile | wc -l); if [ $$var -eq 0 ]; then echo 1; else echo $$var; fi;)
 else
 TO_COMPILE	:= 1
 endif
@@ -49,7 +49,7 @@ $(DIRS):
 $(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(DIRS)
 	@if [ $(NB_COMPILE) -eq 1 ]; then echo "$(BLUE)Compiliation of $(TO_COMPILE) sources $(NOC)"; fi
 	$(eval PERCENTAGE=$(shell expr $(NB_COMPILE)00 "/" $(TO_COMPILE)))
-	@printf "  %i%% - $(PURPLE)compile $<$(NOC)\n" $(PERCENTAGE)
+	@printf "  %3i%% - $(PURPLE)compile $<$(NOC)\n" $(PERCENTAGE)
 	@$(CC) $(CXXFLAGS) -o $@ -c $< $(OPENGL_FLAGS)
 	$(eval NB_COMPILE=$(shell expr $(NB_COMPILE) + 1))
 
@@ -58,7 +58,8 @@ $(NAME): $(OBJS)
 	@$(CC) $(CXXFLAGS) -o $@ $^ $(OPENGL_FLAGS)
 	@echo "$(GREEN)Done !$(NOC)"
 
-all: $(NAME)
+all:
+	@make -j4 $(NAME)
 
 clean:
 	@echo "$(RED)Remove objects$(NOC)"
@@ -69,7 +70,7 @@ fclean: clean
 	@rm -rf $(BUILD_DIR)
 
 re: fclean
-	@make
+	@make -j4 $(NAME)
 
 run: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"

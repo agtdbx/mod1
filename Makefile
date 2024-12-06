@@ -87,6 +87,10 @@ runvalall: $(NAME)
 	@valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$<
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
-.PHONY: all clean fclean re run runval runvalall
+install:
+	@echo "$(BLUE)You need to have sudo permission$(NOC)"
+	@sudo apt-get install libglew-dev
+
+.PHONY: all clean fclean re run runval runvalall install
 
 -include $(DEPS)

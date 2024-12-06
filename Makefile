@@ -7,6 +7,7 @@ MAKEFLAGS		:= --no-print-directory
 NAME		:= mod1
 SRCS_DIR	:= srcs
 BUILD_DIR	:= .build
+NB_THREAD	:= 4
 
 #-- FILES ---------------------------------------------------------------------
 SRCS	:= srcs/main.cpp
@@ -59,7 +60,7 @@ $(NAME): $(OBJS)
 	@echo "$(GREEN)Done !$(NOC)"
 
 all:
-	@make -j4 $(NAME)
+	@make -j$(NB_THREAD) $(NAME)
 
 clean:
 	@echo "$(RED)Remove objects$(NOC)"
@@ -70,7 +71,7 @@ fclean: clean
 	@rm -rf $(BUILD_DIR)
 
 re: fclean
-	@make -j4 $(NAME)
+	@make -j$(NB_THREAD) $(NAME)
 
 run: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"

@@ -10,7 +10,14 @@ BUILD_DIR	:= .build
 NB_THREAD	:= 4
 
 #-- FILES ---------------------------------------------------------------------
-SRCS	:= srcs/main.cpp
+SRCS	:=	srcs/engine/maths/Random.cpp \
+			srcs/engine/maths/Vec3.cpp \
+			srcs/engine/maths/Vec2.cpp \
+			srcs/engine/inputs/Mouse.cpp \
+			srcs/engine/inputs/Key.cpp \
+			srcs/engine/inputs/InputManager.cpp \
+			srcs/main.cpp \
+
 OBJS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.o}
 DEPS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.d}
 DIRS	:= $(sort $(shell dirname $(OBJS)))
@@ -21,22 +28,23 @@ CXXFLAGS		:= -I$(SRCS_DIR)
 OPENGL_FLAGS	:= -lglfw -lGLEW -lGL
 
 #-- COLORS --------------------------------------------------------------------
-NOC			= \e[0m
-BOLD		= \e[1m
-UNDERLINE	= \e[4m
-BLACK		= \e[1;30m
-RED			= \e[1m\e[38;5;196m
-GREEN		= \e[1m\e[38;5;76m
-YELLOW		= \e[1m\e[38;5;220m
-BLUE		= \e[1m\e[38;5;33m
-PURPLE		= \e[1;35m
-CYAN		= \e[1;36m
-WHITE		= \e[1;37m
+NOC			:= \e[0m
+BOLD		:= \e[1m
+UNDERLINE	:= \e[4m
+BLACK		:= \e[1;30m
+RED			:= \e[1m\e[38;5;196m
+GREEN		:= \e[1m\e[38;5;76m
+YELLOW		:= \e[1m\e[38;5;220m
+BLUE		:= \e[1m\e[38;5;33m
+PURPLE		:= \e[1;35m
+CYAN		:= \e[1;36m
+WHITE		:= \e[1;37m
 
 #-- COMPTER UTILS -------------------------------------------------------------
 NB_COMPILE	:= 1
+NB_OBJS		:= $(words $(OBJS))
 ifndef RECURSION
-TO_COMPILE	:= $(shell var=$$(make -n RECURSION=42 | grep compile | wc -l); if [ $$var -eq 0 ]; then echo 1; else echo $$var; fi;)
+TO_COMPILE	:= $(shell var=$$(make -n RECURSION=42 | grep compile | wc -l); if [ $$var -eq 0 ]; then echo $(NB_OBJS); else echo $$var; fi;)
 else
 TO_COMPILE	:= 1
 endif
@@ -49,7 +57,7 @@ $(DIRS):
 
 $(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(DIRS)
 	@if [ $(NB_COMPILE) -eq 1 ]; then echo "$(BLUE)Compiliation of $(TO_COMPILE) sources $(NOC)"; fi
-	$(eval PERCENTAGE=$(shell expr $(NB_COMPILE)00 "/" $(TO_COMPILE)))
+	$(eval PERCENTAGE=$(shell expr $(NB_COMPILE)00 '/' $(TO_COMPILE)))
 	@printf "  %3i%% - $(PURPLE)compile $<$(NOC)\n" $(PERCENTAGE)
 	@$(CC) $(CXXFLAGS) -o $@ -c $< $(OPENGL_FLAGS)
 	$(eval NB_COMPILE=$(shell expr $(NB_COMPILE) + 1))
@@ -90,7 +98,7 @@ runvalall: $(NAME)
 
 install:
 	@echo "$(BLUE)You need to have sudo permission$(NOC)"
-	@sudo apt-get install libglew-dev
+	@sudo apt-get install libglfw3 libglfw3-dev libglew-dev
 
 .PHONY: all clean fclean re run runval runvalall install
 

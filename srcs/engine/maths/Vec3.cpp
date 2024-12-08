@@ -18,7 +18,7 @@ Vec3::Vec3(const double x, const double y, const double z)
 {
 	this->x = x;
 	this->y = y;
-	this->y = y;
+	this->z = z;
 }
 
 

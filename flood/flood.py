@@ -62,7 +62,11 @@ while len(next_points) > 0:
 			dist = math.sqrt((ox - nx)**2 + (oy - ny)**2)
 			if dist == 0:
 				continue
-			val = max(0, oz**2 - dist**2)
+
+			val = oz**2 - dist**2
+			val = max(0, val)
+
+
 			val /= oz**2
 			val = val**3
 			new_val = val * oz

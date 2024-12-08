@@ -1,0 +1,11 @@
+WIN_W = 1600
+WIN_H = 900
+
+MAX_MAP_W = 10
+MAX_MAP_H = 10
+MAP_DETAIL = 10
+
+PARAM_POINTS = [
+	(5, 5),
+	(8, 2)
+]

@@ -24,7 +24,7 @@ DIRS	:= $(sort $(shell dirname $(OBJS)))
 
 #-- COMPILATION ---------------------------------------------------------------
 CC				:= g++
-CXXFLAGS		:= -I$(SRCS_DIR)
+CXXFLAGS		:= -I$(SRCS_DIR) -MP -MMD
 OPENGL_FLAGS	:= -lglfw -lGLEW -lGL
 
 #-- COLORS --------------------------------------------------------------------

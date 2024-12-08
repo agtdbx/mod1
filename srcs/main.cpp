@@ -81,9 +81,9 @@ int	main(int c, char **v)
 		throw std::invalid_argument("Error : Wrong number of argument.");
 
 	std::vector<Vec3> point_list = parse(v[1]);
-	std::cout << point_list[0] << std::endl;
-	std::cout << point_list[1] << std::endl;
-	std::cout << point_list[2] << std::endl;
+	// std::cout << point_list[0] << std::endl;
+	// std::cout << point_list[1] << std::endl;
+	// std::cout << point_list[2] << std::endl;
 
 
 	// Init opengl

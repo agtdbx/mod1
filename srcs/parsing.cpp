@@ -6,7 +6,7 @@
 /*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/09 00:00:57 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/09 00:40:44 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ std::vector<Vec3> parse(char *name)
 	std::string file_name = std::string(name);
     std::ifstream file;
 	std::vector<Vec3> point_list;
-	
+	if (file_name.size() <= 5 || file_name.substr(file_name.size() - 5) != std::string(".mod1") || file_name[file_name.size() - 6] == '/')
+		throw std::invalid_argument("Error : File extension incorrrect.");
 	file.open(file_name);
 	if (file.is_open())
 	{

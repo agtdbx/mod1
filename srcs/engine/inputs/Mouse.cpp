@@ -29,7 +29,6 @@ Mouse::~Mouse()
 
 }
 
-
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
@@ -44,7 +43,28 @@ double	Mouse::getScroll(void)
 	return (this->scroll);
 }
 
+
+bool	Mouse::getVisible(void)
+{
+	return (this->visible);
+}
+
 //---- Setters -----------------------------------------------------------------
+
+void	Mouse::setScroll(double scroll)
+{
+	this->scroll = scroll;
+}
+
+
+void	Mouse::setVisible(GLFWwindow *window, bool visible)
+{
+	this->visible = visible;
+	if (visible)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	else
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
 
 //---- Operators ---------------------------------------------------------------
 

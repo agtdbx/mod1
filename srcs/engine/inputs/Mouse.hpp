@@ -15,6 +15,10 @@ public:
 
 	Vec2	getPos(void);
 	double	getScroll(void);
+	bool	getVisible(void);
+
+	void	setScroll(double scroll);
+	void	setVisible(GLFWwindow *window, bool visible);
 
 	Mouse	&operator=(const Mouse &obj);
 
@@ -23,6 +27,7 @@ public:
 private:
 	Vec2	pos;
 	double	scroll;
+	bool	visible;
 };
 
 #endif

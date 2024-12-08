@@ -1,10 +1,32 @@
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
 
+double	scroll = 0.0;
+
 // Error callback function for GLFW
 void	print_opengl_error(int error, const char* description)
 {
 	std::cerr << "Opengl error : " << description << std::endl;
+}
+
+
+int	quit_as_error(GLFWwindow* window, std::string msg)
+{
+	std::cerr << msg << std::endl;
+
+	if (window)
+		glfwDestroyWindow(window);
+	glfwTerminate();
+
+	return (1);
+}
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	(void)window;
+	(void)xoffset;
+	scroll = yoffset;
 }
 
 
@@ -14,6 +36,8 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 	glfwPollEvents();
 
 	inputManager->update(window);
+	inputManager->mouse.setScroll(scroll);
+	scroll = 0.0;
 }
 
 
@@ -30,6 +54,11 @@ void	computation(InputManager *inputManager)
 	// Check mouse left click
 	if (inputManager->mouse.left.isPressed())
 		std::cout << "mouse left click on " << inputManager->mouse.getPos() << std::endl;
+
+	if (inputManager->mouse.getScroll() < 0.0)
+		std::cout << "mouse scroll down" << std::endl;
+	if (inputManager->mouse.getScroll() > 0.0)
+		std::cout << "mouse scroll up" << std::endl;
 }
 
 
@@ -48,34 +77,27 @@ void	draw(GLFWwindow* window)
 int	main(void)
 {
 	// Init opengl
-	if (!glfwInit()) {
-		std::cerr << "Failed to initialize GLFW!" << std::endl;
-		return (1);
-	}
+	if (!glfwInit())
+		return (quit_as_error(NULL, "Failed to initialize GLFW !"));
 
 	// Set opengl print error function
 	glfwSetErrorCallback(print_opengl_error);
 
 	// Create window
 	GLFWwindow* window = glfwCreateWindow(WIN_W, WIN_H, WIN_TITLE, nullptr, nullptr);
-	if (!window) {
-		std::cerr << "Failed to create GLFW window!" << std::endl;
-		glfwTerminate();
-		return (1);
-	}
+	if (!window)
+		return (quit_as_error(NULL, "Failed to create window !"));
 
 	// Setup opengl context
 	glfwMakeContextCurrent(window);
 
 	// Init GLEW (OpenGL Extension Wrangler)
-	if (glewInit() != GLEW_OK) {
-		std::cerr << "Failed to initialize GLEW!" << std::endl;
-		glfwDestroyWindow(window);
-		glfwTerminate();
-		return (1);
-	}
+	if (glewInit() != GLEW_OK)
+		return (quit_as_error(NULL, "Failed to initialize GLEW !"));
 
+	// Set input management
 	InputManager	inputManager;
+	glfwSetScrollCallback(window, scroll_callback);
 
 	// Set the OpenGL viewport size
 	glViewport(0, 0, WIN_W, WIN_H);

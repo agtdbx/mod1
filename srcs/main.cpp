@@ -45,8 +45,18 @@ void	draw(GLFWwindow* window)
 
 
 // Initialize OpenGL, create a window, and render a color
-int	main(void)
+int	main(int c, char **v)
 {
+	//parsing
+	if (c != 2)
+		throw std::invalid_argument("Error : Wrong number of argument.");
+
+	std::vector<Vec3> point_list = parse(v[1]);
+	std::cout << point_list[0] << std::endl;
+	std::cout << point_list[1] << std::endl;
+	std::cout << point_list[2] << std::endl;
+
+
 	// Init opengl
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW!" << std::endl;

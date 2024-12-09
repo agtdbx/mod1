@@ -84,17 +84,17 @@ re: fclean
 
 run: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@./$<
+	@./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 runval: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@valgrind --suppressions=vsupp ./$<
+	@valgrind --suppressions=vsupp ./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 runvalall: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$<
+	@valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 install:

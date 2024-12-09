@@ -43,7 +43,6 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 	// Give info about how get vertice to draw triange with gpu
 	// (vertice array id, nb vertice, need to normalize point, size of array, thing for weird cast)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
-	// Select vertice array
 	glEnableVertexAttribArray(0);
 
 	// Delete base shader because there are useless now

@@ -131,8 +131,8 @@ int	main(int c, char **v)
 	glfwMakeContextCurrent(window);
 
 	// To change how opengl render triangle (fill / line)
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Init GLEW (OpenGL Extension Wrangler)
 	if (glewInit() != GLEW_OK)

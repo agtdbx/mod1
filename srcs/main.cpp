@@ -69,7 +69,8 @@ void	draw(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Draw triangle
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	// glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	// Display the new image
 	glfwSwapBuffers(window);
@@ -80,9 +81,14 @@ bool	setup_scene(void)
 {
 	// Create vertice
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
+		0.5f,  0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left
+	};
+	unsigned int indices[] = {  // note that we start from 0!
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
 	};
 
 
@@ -96,9 +102,15 @@ bool	setup_scene(void)
 	glGenBuffers(1, &VBO);
 	// Set the new allocated buffer as array one
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
 	// Copy vertice into gpu buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Allocate buffer for indices
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 
 	// vertex shader
 	const char *vertexShaderSource =
@@ -172,9 +184,9 @@ bool	setup_scene(void)
 		return (false);
 	}
 
-	// Give info about our vertex to gpu
+	// Give info about how get vertice to draw triange with gpu
 	// (vertice array id, nb vertice, need to normalize point, size of array, thing for weird cast)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
 	// Select vertice array
 	glEnableVertexAttribArray(0);
 
@@ -184,6 +196,10 @@ bool	setup_scene(void)
 	// Delete base shader because there are useless now
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	// To change how opengl render triangle (fill / line)
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	return (true);
 }

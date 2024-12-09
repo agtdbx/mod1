@@ -10,15 +10,17 @@ BUILD_DIR	:= .build
 NB_THREAD	:= 4
 
 #-- FILES ---------------------------------------------------------------------
-SRCS	:=	srcs/engine/maths/Random.cpp \
-			srcs/engine/maths/Vec3.cpp \
-			srcs/engine/maths/Vec2.cpp \
-			srcs/engine/inputs/Mouse.cpp \
+SRCS	:=	srcs/engine/inputs/InputManager.cpp \
 			srcs/engine/inputs/Key.cpp \
-			srcs/engine/inputs/InputManager.cpp \
-			srcs/parsing.cpp \
-			srcs/mesh/interpolate.cpp \
+			srcs/engine/inputs/Mouse.cpp \
+			srcs/engine/maths/Random.cpp \
+			srcs/engine/maths/Vec2.cpp \
+			srcs/engine/maths/Vec3.cpp \
+			srcs/engine/render/Mesh.cpp \
+			srcs/engine/render/Shader.cpp \
 			srcs/main.cpp \
+			srcs/mesh/interpolate.cpp \
+			srcs/parsing.cpp \
 
 OBJS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.o}
 DEPS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.d}
@@ -26,7 +28,7 @@ DIRS	:= $(sort $(shell dirname $(OBJS)))
 
 #-- COMPILATION ---------------------------------------------------------------
 CC				:= g++
-CXXFLAGS		:= -I$(SRCS_DIR) -MP -MMD
+CXXFLAGS		:= -I$(SRCS_DIR) -MP -MMD -g
 OPENGL_FLAGS	:= -lglfw -lGLEW -lGL
 
 #-- COLORS --------------------------------------------------------------------
@@ -85,17 +87,17 @@ re: fclean
 
 run: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@./$<
+	@./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 runval: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@valgrind --suppressions=vsupp ./$<
+	@valgrind --error-limit=no --suppressions=vsupp ./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 runvalall: $(NAME)
 	@echo "$(BLUE)start $(NAME) !$(NOC)"
-	@valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$<
+	@valgrind --error-limit=no --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$< map/testmap.mod1
 	@echo "$(BLUE)bye bye :)$(NOC)"
 
 install:

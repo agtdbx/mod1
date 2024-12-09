@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interpolate.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 11:00:06 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/09 13:41:17 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/09 20:07:01 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,14 +74,14 @@ std::vector<std::vector<double>> interpolate(std::vector<Vec3> point_list)
 		}
 	}
 
-	for (int y = 0; y < MAP_SIZE; y++)
-	{
-		for (int x = 0; x < MAP_SIZE; x++)
-		{
-			std::cout << heighmap[y][x] << " ";
-		}
-		std::cout << std::endl;
-	}
+	// for (int y = 0; y < MAP_SIZE; y++)
+	// {
+	// 	for (int x = 0; x < MAP_SIZE; x++)
+	// 	{
+	// 		std::cout << heighmap[y][x] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 	return heighmap;
 }
 

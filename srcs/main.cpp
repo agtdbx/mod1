@@ -1,5 +1,9 @@
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
+#include <engine/render/Shader.hpp>
+#include <engine/render/Mesh.hpp>
+#include <fstream>
+#include <sstream>
 
 double	scroll = 0.0;
 
@@ -12,7 +16,7 @@ void	print_opengl_error(int error, const char* description)
 
 int	quit_as_error(GLFWwindow* window, std::string msg)
 {
-	std::cerr << msg << std::endl;
+	std::cerr << "Error : " << msg << std::endl;
 
 	if (window)
 		glfwDestroyWindow(window);
@@ -62,14 +66,35 @@ void	computation(InputManager *inputManager)
 }
 
 
-void	draw(GLFWwindow* window)
+void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// Draw mesh
+	mesh->draw(shader);
+
 	// Display the new image
 	glfwSwapBuffers(window);
+}
+
+
+Mesh	createMesh(void)
+{
+	std::vector<Vec3>	vertices;
+	vertices.push_back(Vec3(0.5f,  0.5f, 0.0f));  // top right
+	vertices.push_back(Vec3(0.5f, -0.5f, 0.0f));  // bottom right
+	vertices.push_back(Vec3(-0.5f, -0.5f, 0.0f)); // bottom left
+	vertices.push_back(Vec3(-0.5f,  0.5f, 0.0f)); // top left
+
+	std::vector<t_tri_id>	indices;
+	indices.push_back((t_tri_id){0, 1, 3}); // first triangle
+	indices.push_back((t_tri_id){1, 2, 3}); // second triangle
+
+	Mesh	mesh(vertices, indices);
+
+	return (mesh);
 }
 
 
@@ -78,8 +103,7 @@ int	main(int c, char **v)
 {
 	//parsing
 	if (c != 2)
-		return (quit_as_error(NULL, "Error : Wrong number of argument."));
-
+		return (quit_as_error(NULL, "Wrong number of argument"));
 
 	std::vector<Vec3> point_list;
 	try
@@ -92,10 +116,9 @@ int	main(int c, char **v)
 	}
 	interpolate(point_list);
 
-
 	// Init opengl
 	if (!glfwInit())
-		return (quit_as_error(NULL, "Failed to initialize GLFW !"));
+		return (quit_as_error(NULL, "Failed to initialize GLFW"));
 
 	// Set opengl print error function
 	glfwSetErrorCallback(print_opengl_error);
@@ -103,14 +126,18 @@ int	main(int c, char **v)
 	// Create window
 	GLFWwindow* window = glfwCreateWindow(WIN_W, WIN_H, WIN_TITLE, nullptr, nullptr);
 	if (!window)
-		return (quit_as_error(NULL, "Failed to create window !"));
+		return (quit_as_error(NULL, "Failed to create window"));
 
 	// Setup opengl context
 	glfwMakeContextCurrent(window);
 
+	// To change how opengl render triangle (fill / line)
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	// Init GLEW (OpenGL Extension Wrangler)
 	if (glewInit() != GLEW_OK)
-		return (quit_as_error(NULL, "Failed to initialize GLEW !"));
+		return (quit_as_error(window, "Failed to initialize GLEW"));
 
 	// Set input management
 	InputManager	inputManager;
@@ -118,6 +145,18 @@ int	main(int c, char **v)
 
 	// Set the OpenGL viewport size
 	glViewport(0, 0, WIN_W, WIN_H);
+
+	Shader	shader;
+	try
+	{
+		shader = Shader("data/shaders/basic.vs", "data/shaders/basic.fs");
+	}
+	catch (std::exception &e)
+	{
+		return (quit_as_error(NULL, e.what()));
+	}
+
+	Mesh	mesh = createMesh();
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
@@ -129,7 +168,7 @@ int	main(int c, char **v)
 
 		computation(&inputManager);
 
-		draw(window);
+		draw(window, &shader, &mesh);
 	}
 
 	// Clean up and terminate

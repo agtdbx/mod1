@@ -2,3 +2,5 @@ mod1
 .build
 .vscode
 __pycache__
+build
+release

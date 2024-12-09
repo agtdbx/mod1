@@ -17,6 +17,7 @@ SRCS	:=	srcs/engine/maths/Random.cpp \
 			srcs/engine/inputs/Key.cpp \
 			srcs/engine/inputs/InputManager.cpp \
 			srcs/parsing.cpp \
+			srcs/mesh/interpolate.cpp \
 			srcs/main.cpp \
 
 OBJS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.o}

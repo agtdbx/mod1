@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/09 00:40:44 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/09 11:12:53 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,16 @@ std::vector<Vec3> parse(char *name)
 					{
 						if (!isdigit(str[i]))
 							throw std::invalid_argument("Error : point cordonate need to pe represented as digit.");
-						if (str.size() - i > 4)
-							throw std::invalid_argument("Error : Number for point coordonate can't be upper than 9999.");
+						if (str.size() - i > 3)
+							throw std::invalid_argument("Error : Number for point coordonate can't be upper than 999.");
 					}
 					
 				}
 
 			}
 			Vec3 vec = Vec3(atoi(string_list[0].c_str()), atoi(string_list[1].c_str()), atoi(string_list[2].c_str()));
+			if (vec.z > MAX_HEIGHT)
+				throw std::invalid_argument("Error : Z coordonate for point can't be upper than 210.");
 			point_list.push_back(vec);
 		}
 	}

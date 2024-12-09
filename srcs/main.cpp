@@ -90,9 +90,7 @@ int	main(int c, char **v)
 	{
 		return (quit_as_error(NULL, e.what()));
 	}
-	// std::cout << point_list[0] << std::endl;
-	// std::cout << point_list[1] << std::endl;
-	// std::cout << point_list[2] << std::endl;
+	interpolate(point_list);
 
 
 	// Init opengl

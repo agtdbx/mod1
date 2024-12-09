@@ -3,41 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/09 00:40:44 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/09 18:06:07 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
 #include <fstream>
 
-static std::vector<std::string>    split(std::string const s, char c)
+static std::vector<std::string> split(std::string const s, char c)
 {
-    int                            i, j;
-    std::vector<std::string>    res;
+	int							i, j;
+	std::vector<std::string>	res;
 
-    i = 0;
-    while (s[i] != '\0')
-    {
-        while (s[i] == c)
-            i++;
-        if (s[i] == '\0')
-            break ;
-        j = 0;
-        while (s[i + j] != c && s[i + j] != '\0')
-            j++;
-        res.push_back(s.substr(i, j));
-        i += j;
-    }
-    return (res);
+	i = 0;
+	while (s[i] != '\0')
+	{
+		while (s[i] == c)
+			i++;
+		if (s[i] == '\0')
+			break ;
+		j = 0;
+		while (s[i + j] != c && s[i + j] != '\0')
+			j++;
+		res.push_back(s.substr(i, j));
+		i += j;
+	}
+	return (res);
 }
 
 std::vector<Vec3> parse(char *name)
 {
 	std::string file_name = std::string(name);
-    std::ifstream file;
+	std::ifstream file;
 	std::vector<Vec3> point_list;
 	if (file_name.size() <= 5 || file_name.substr(file_name.size() - 5) != std::string(".mod1") || file_name[file_name.size() - 6] == '/')
 		throw std::invalid_argument("Error : File extension incorrrect.");
@@ -66,7 +66,7 @@ std::vector<Vec3> parse(char *name)
 						if (str.size() - i > 4)
 							throw std::invalid_argument("Error : Number for point coordonate can't be upper than 9999.");
 					}
-					
+
 				}
 
 			}

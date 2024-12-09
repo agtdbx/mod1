@@ -1,5 +1,9 @@
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
+#include <engine/render/Shader.hpp>
+#include <engine/render/Mesh.hpp>
+#include <fstream>
+#include <sstream>
 
 double	scroll = 0.0;
 
@@ -62,146 +66,35 @@ void	computation(InputManager *inputManager)
 }
 
 
-void	draw(GLFWwindow* window)
+void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Draw triangle
-	// glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	// Draw mesh
+	mesh->draw(shader);
 
 	// Display the new image
 	glfwSwapBuffers(window);
 }
 
 
-bool	setup_scene(void)
+Mesh	createMesh(void)
 {
-	// Create vertice
-	float vertices[] = {
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left
-	};
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
+	std::vector<Vec3>	vertices;
+	vertices.push_back(Vec3(0.5f,  0.5f, 0.0f));  // top right
+	vertices.push_back(Vec3(0.5f, -0.5f, 0.0f));  // bottom right
+	vertices.push_back(Vec3(-0.5f, -0.5f, 0.0f)); // bottom left
+	vertices.push_back(Vec3(-0.5f,  0.5f, 0.0f)); // top left
 
+	std::vector<t_tri_id>	indices;
+	indices.push_back((t_tri_id){0, 1, 3}); // first triangle
+	indices.push_back((t_tri_id){1, 2, 3}); // second triangle
 
-	// Allocate memory for vertice array into gpu
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	Mesh	mesh(vertices, indices);
 
-	// Allocate memory into gpu
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	// Set the new allocated buffer as array one
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// Copy vertice into gpu buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Allocate buffer for indices
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-
-	// vertex shader
-	const char *vertexShaderSource =
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
-
-	// Create vertex shader
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// Put shader code into variable
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	// And compile it
-	glCompileShader(vertexShader);
-
-	// Check if shader compilation succeed
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if(!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cerr << "Vertex shader compilation failed\n" << infoLog << std::endl;
-		return (false);
-	}
-
-	// Create fragment shader
-	const char *fragmentShaderSource =
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{\n"
-		"    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-		"}\0";
-
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	// Check if shader compilation succeed
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-	if(!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cerr << "Fragment shader compilation failed\n" << infoLog << std::endl;
-		return (false);
-	}
-
-	// Create shader program
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-
-	// Link vertex and fragment shader to shader program
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-
-	// Link shader to gpu
-	glLinkProgram(shaderProgram);
-
-	// Check if link
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if(!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cerr << "Shader program linking failed\n" << infoLog << std::endl;
-		return (false);
-	}
-
-	// Give info about how get vertice to draw triange with gpu
-	// (vertice array id, nb vertice, need to normalize point, size of array, thing for weird cast)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
-	// Select vertice array
-	glEnableVertexAttribArray(0);
-
-	// Select the program shader as active one
-	glUseProgram(shaderProgram);
-
-	// Delete base shader because there are useless now
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	// To change how opengl render triangle (fill / line)
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	return (true);
+	return (mesh);
 }
 
 
@@ -212,7 +105,6 @@ int	main(int c, char **v)
 	if (c != 2)
 		return (quit_as_error(NULL, "Wrong number of argument"));
 
-
 	std::vector<Vec3> point_list;
 	try
 	{
@@ -222,10 +114,6 @@ int	main(int c, char **v)
 	{
 		return (quit_as_error(NULL, e.what()));
 	}
-	// std::cout << point_list[0] << std::endl;
-	// std::cout << point_list[1] << std::endl;
-	// std::cout << point_list[2] << std::endl;
-
 
 	// Init opengl
 	if (!glfwInit())
@@ -242,6 +130,10 @@ int	main(int c, char **v)
 	// Setup opengl context
 	glfwMakeContextCurrent(window);
 
+	// To change how opengl render triangle (fill / line)
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	// Init GLEW (OpenGL Extension Wrangler)
 	if (glewInit() != GLEW_OK)
 		return (quit_as_error(window, "Failed to initialize GLEW"));
@@ -253,9 +145,17 @@ int	main(int c, char **v)
 	// Set the OpenGL viewport size
 	glViewport(0, 0, WIN_W, WIN_H);
 
-	// Setup the scene
-	if (!setup_scene())
-		return (quit_as_error(window, "Bad scene setup"));
+	Shader	shader;
+	try
+	{
+		shader = Shader("data/shaders/basic.vs", "data/shaders/basic.fs");
+	}
+	catch (std::exception &e)
+	{
+		return (quit_as_error(NULL, e.what()));
+	}
+
+	Mesh	mesh = createMesh();
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
@@ -267,7 +167,7 @@ int	main(int c, char **v)
 
 		computation(&inputManager);
 
-		draw(window);
+		draw(window, &shader, &mesh);
 	}
 
 	// Clean up and terminate

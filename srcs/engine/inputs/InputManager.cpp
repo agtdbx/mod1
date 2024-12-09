@@ -1,4 +1,4 @@
-#include "InputManager.hpp"
+#include <engine/inputs/InputManager.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------

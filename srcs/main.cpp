@@ -157,12 +157,12 @@ int	main(int c, char **v)
 	Shader	shader;
 	try
 	{
-		// shader = Shader("data/shaders/basic.vs",
-		// 				"data/shaders/red.fs");
-		// shader = Shader("data/shaders/colors.vs",
-		// 				"data/shaders/colors.fs");
-		shader = Shader("data/shaders/texture.vs",
-						"data/shaders/texture.fs");
+		// shader.load("data/shaders/basic.vs",
+		// 			"data/shaders/red.fs");
+		// shader.load("data/shaders/colors.vs",
+		// 			"data/shaders/colors.fs");
+		shader.load("data/shaders/texture.vs",
+					"data/shaders/texture.fs");
 	}
 	catch (std::exception &e)
 	{

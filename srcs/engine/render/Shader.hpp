@@ -20,7 +20,8 @@ public:
 
 	Shader	&operator=(const Shader &obj);
 
-	void	use();
+	void	load(std::string vShaderPath, std::string fShaderPath);
+	void	use(void);
 
 private:
 	unsigned int	id, VAO, VBO, EBO;

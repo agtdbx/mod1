@@ -18,49 +18,12 @@ Shader::Shader(void)
 
 Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 {
-	this->allocateMemory();
+	this->id = -1;
+	this->VAO = -1;
+	this->VBO = -1;
+	this->EBO = -1;
 
-	unsigned int vertexShader = this->getVertexShader(vShaderPath);
-	unsigned int fragmentShader = this->getFragmentShader(fShaderPath);
-
-	// Create shader program
-	this->id = glCreateProgram();
-
-	// Link vertex and fragment shader to shader program
-	glAttachShader(this->id, vertexShader);
-	glAttachShader(this->id, fragmentShader);
-
-	// Link shader to gpu
-	glLinkProgram(this->id);
-
-	int success;
-	// Check if link
-	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
-	if(!success) {
-		char infoLog[512];
-		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
-		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Shader program linking failed : " + infoString);
-	}
-
-
-	// Give info about how get vertice to draw triange with gpu
-	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
-	// Point position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
-
-	// Point color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	// Point texture
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	// Delete base shader because there are useless now
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	this->load(vShaderPath, fShaderPath);
 }
 
 
@@ -130,7 +93,65 @@ Shader	&Shader::operator=(const Shader &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-void	Shader::use()
+void	Shader::load(std::string vShaderPath, std::string fShaderPath)
+{
+	if (this->VAO >= 0)
+		glDeleteVertexArrays(1, &this->VAO);
+	this->VAO = -1;
+	if (this->VBO >= 0)
+		glDeleteBuffers(1, &this->VBO);
+	this->VBO = -1;
+	if (this->EBO >= 0)
+		glDeleteBuffers(1, &this->EBO);
+	this->EBO = -1;
+
+	this->allocateMemory();
+
+	unsigned int vertexShader = this->getVertexShader(vShaderPath);
+	unsigned int fragmentShader = this->getFragmentShader(fShaderPath);
+
+	// Create shader program
+	this->id = glCreateProgram();
+
+	// Link vertex and fragment shader to shader program
+	glAttachShader(this->id, vertexShader);
+	glAttachShader(this->id, fragmentShader);
+
+	// Link shader to gpu
+	glLinkProgram(this->id);
+
+	int success;
+	// Check if link
+	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
+	if(!success) {
+		char infoLog[512];
+		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
+		std::string	infoString(infoLog);
+		throw new std::invalid_argument("Shader program linking failed : " + infoString);
+	}
+
+
+	// Give info about how get vertice to draw triange with gpu
+	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
+	// Point position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+	glEnableVertexAttribArray(0);
+
+	// Point color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// Point texture
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	// Delete base shader because there are useless now
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+}
+
+
+void	Shader::use(void)
 {
 	if (this->id < 0)
 		return ;

@@ -140,7 +140,7 @@ void	Mesh::draw(Shader *shader)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
 
 	shader->use();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, nbIndices, GL_UNSIGNED_INT, 0);
 }
 
 

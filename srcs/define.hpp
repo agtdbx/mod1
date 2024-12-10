@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/09 13:15:53 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/10 11:22:57 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define WIN_W 1600
 # define WIN_H 900
 # define WIN_TITLE "mod1"
-# define MAP_SIZE 100
+# define MAP_SIZE 99
 # define MAX_HEIGHT 210
 
 std::vector<Vec3> parse(char *name);

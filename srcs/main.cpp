@@ -86,11 +86,44 @@ Mesh	createMesh(void)
 	vertices.push_back(Vec3(0.5f,  0.5f, 0.0f));  // top right
 	vertices.push_back(Vec3(0.5f, -0.5f, 0.0f));  // bottom right
 	vertices.push_back(Vec3(-0.5f, -0.5f, 0.0f)); // bottom left
-	vertices.push_back(Vec3(-0.5f,  0.5f, 0.0f)); // top left
+	vertices.push_back(Vec3(-0.5f,  0.5f, 0.9f)); // top left
+	vertices.push_back(Vec3(-0.8f,  -0.8f, 0.9f)); // top left
 
 	std::vector<t_tri_id>	indices;
 	indices.push_back((t_tri_id){0, 1, 3}); // first triangle
 	indices.push_back((t_tri_id){1, 2, 3}); // second triangle
+	indices.push_back((t_tri_id){4, 2, 3}); // third triangle
+
+	Mesh	mesh(vertices, indices);
+
+	return (mesh);
+}
+
+Mesh	createMeshTest(std::vector<std::vector<double> > heighmap)
+{
+	std::vector<Vec3>	vertices;
+
+	for (double y = 0; y < MAP_SIZE; y++)
+	{
+		for (double x = 0; x < MAP_SIZE; x++)
+		{
+			vertices.push_back(Vec3((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10)));
+			// std::cout << " New point : " << Vec3((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10)) << std::endl;
+		}
+	}
+
+
+	std::vector<t_tri_id>	indices;
+	for (unsigned y = 0; y < MAP_SIZE - 1; y++)
+	{
+		for (unsigned x = 0; x < MAP_SIZE - 1; x++)
+		{
+			indices.push_back((t_tri_id){y * MAP_SIZE + x, y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x});
+			indices.push_back((t_tri_id){y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x, (y + 1) * MAP_SIZE + x + 1});
+			std::cout << " create triangle with point " << y * MAP_SIZE + x << ", "  <<  y * MAP_SIZE + x + 1 << ", "  << (y + 1) * MAP_SIZE + x
+			<< " and  " << y * MAP_SIZE + x + 1 << ", "  << (y + 1) * MAP_SIZE + x << ", "  << (y + 1) * MAP_SIZE + x + 1 << std::endl;
+		}
+	}
 
 	Mesh	mesh(vertices, indices);
 
@@ -114,7 +147,8 @@ int	main(int c, char **v)
 	{
 		return (quit_as_error(NULL, e.what()));
 	}
-	interpolate(point_list);
+	std::vector<std::vector<double> > heighmap = interpolate(point_list);
+	
 
 	// Init opengl
 	if (!glfwInit())
@@ -132,8 +166,8 @@ int	main(int c, char **v)
 	glfwMakeContextCurrent(window);
 
 	// To change how opengl render triangle (fill / line)
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Init GLEW (OpenGL Extension Wrangler)
 	if (glewInit() != GLEW_OK)
@@ -156,7 +190,8 @@ int	main(int c, char **v)
 		return (quit_as_error(NULL, e.what()));
 	}
 
-	Mesh	mesh = createMesh();
+	Mesh	mesh = createMeshTest(heighmap);
+	// Mesh	mesh = createMesh();
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {

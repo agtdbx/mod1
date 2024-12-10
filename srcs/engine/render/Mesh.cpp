@@ -1,12 +1,12 @@
 #include <engine/render/Mesh.hpp>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 #include <cmath>
+
+#include <define.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -176,12 +176,22 @@ void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::
 
 	shader->use();
 
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
-	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 0.0f));
+	glm::mat4 model = glm::mat4(1.0f);
+	// model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-	unsigned int transformLoc = glGetUniformLocation(shader->getShaderId(), "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+	glm::mat4 view = glm::mat4(1.0f);
+	// note that we're translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WIN_W/(float)WIN_H, 0.1f, 100.0f);
+
+	int modelLoc = glGetUniformLocation(shader->getShaderId(), "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	int viewLoc = glGetUniformLocation(shader->getShaderId(), "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	int projLoc = glGetUniformLocation(shader->getShaderId(), "proj");
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(shader->getVAOId());

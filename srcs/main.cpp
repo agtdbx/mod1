@@ -161,8 +161,10 @@ int	main(int c, char **v)
 		// 			"data/shaders/red.fs");
 		// shader.load("data/shaders/colors.vs",
 		// 			"data/shaders/colors.fs");
-		shader.load("data/shaders/texture.vs",
-					"data/shaders/texture.fs");
+		// shader.load("data/shaders/texture.vs",
+		// 			"data/shaders/texture.fs");
+		shader.load("data/shaders/perceptive.vs",
+					"data/shaders/colors.fs");
 	}
 	catch (std::exception &e)
 	{

@@ -3,7 +3,7 @@
 
 # include <vector>
 
-# include <engine/maths/Vec3.hpp>
+# include <model/Point.hpp>
 # include <engine/render/Shader.hpp>
 
 typedef struct s_tri_id
@@ -18,7 +18,7 @@ class Mesh
 {
 public:
 	Mesh(void);
-	Mesh(std::vector<Vec3> &vertices, std::vector<t_tri_id> &indices);
+	Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices);
 	Mesh(const Mesh &obj);
 	~Mesh();
 

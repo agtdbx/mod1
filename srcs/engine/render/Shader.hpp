@@ -13,6 +13,8 @@ public:
 	Shader(const Shader &obj);
 	~Shader();
 
+	unsigned int	getShaderId(void);
+
 	Shader	&operator=(const Shader &obj);
 
 	void	use();

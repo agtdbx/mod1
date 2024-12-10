@@ -82,15 +82,19 @@ void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh)
 
 Mesh	createMesh(void)
 {
-	std::vector<Vec3>	vertices;
-	vertices.push_back(Vec3(0.5f,  0.5f, 0.0f));  // top right
-	vertices.push_back(Vec3(0.5f, -0.5f, 0.0f));  // bottom right
-	vertices.push_back(Vec3(-0.5f, -0.5f, 0.0f)); // bottom left
-	vertices.push_back(Vec3(-0.5f,  0.5f, 0.0f)); // top left
+	std::vector<Point>	vertices;
+	// vertices.push_back(Point(0.5f,  0.5f, 0.0f));  // top right
+	// vertices.push_back(Point(0.5f, -0.5f, 0.0f));  // bottom right
+	// vertices.push_back(Point(-0.5f, -0.5f, 0.0f)); // bottom left
+	// vertices.push_back(Point(-0.5f,  0.5f, 0.0f)); // top left
+	vertices.push_back(Point(0.5, -0.5, 0.0, 1.0f, 0.0f, 0.0f));  // bottom right
+	vertices.push_back(Point(-0.5, -0.5, 0.0, 0.0f, 1.0f, 0.0f));  // bottom left
+	vertices.push_back(Point(0.0,  0.5, 0.0, 0.0f, 0.0f, 1.0f));  // top
 
 	std::vector<t_tri_id>	indices;
-	indices.push_back((t_tri_id){0, 1, 3}); // first triangle
-	indices.push_back((t_tri_id){1, 2, 3}); // second triangle
+	// indices.push_back((t_tri_id){0, 1, 3}); // first triangle
+	// indices.push_back((t_tri_id){1, 2, 3}); // second triangle
+	indices.push_back((t_tri_id){0, 1, 2}); // triangle
 
 	Mesh	mesh(vertices, indices);
 
@@ -149,7 +153,10 @@ int	main(int c, char **v)
 	Shader	shader;
 	try
 	{
-		shader = Shader("data/shaders/basic.vs", "data/shaders/basic.fs");
+		// shader = Shader("data/shaders/basic.vs",
+		// 				"data/shaders/red.fs");
+		shader = Shader("data/shaders/colors.vs",
+						"data/shaders/colors.fs");
 	}
 	catch (std::exception &e)
 	{

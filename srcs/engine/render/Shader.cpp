@@ -40,10 +40,16 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 		throw new std::invalid_argument("Shader program linking failed : " + infoString);
 	}
 
+
 	// Give info about how get vertice to draw triange with gpu
-	// (vertice array id, nb vertice, need to normalize point, size of array, thing for weird cast)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
+	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
+	// Point position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
+
+	// Point color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Delete base shader because there are useless now
 	glDeleteShader(vertexShader);
@@ -66,6 +72,11 @@ Shader::~Shader()
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
+
+unsigned int	Shader::getShaderId(void)
+{
+	return (this->id);
+}
 
 //---- Setters -----------------------------------------------------------------
 
@@ -123,7 +134,7 @@ unsigned int	Shader::getVertexShader(std::string shaderPath)
 
 	file.open(shaderPath);
 	if (!file.is_open())
-		throw new std::invalid_argument("Vertex shader file not found");
+		throw std::invalid_argument("Vertex shader file not found");
 	stream << file.rdbuf();
 	shaderCode = stream.str();
 	file.close();
@@ -147,7 +158,7 @@ unsigned int	Shader::getVertexShader(std::string shaderPath)
 		char infoLog[512];
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Vertex shader compilation failed : " + infoString);
+		throw std::invalid_argument("Vertex shader compilation failed : " + infoString);
 	}
 
 	return (vertexShader);
@@ -163,7 +174,7 @@ unsigned int	Shader::getFragmentShader(std::string shaderPath)
 
 	file.open(shaderPath);
 	if (!file.is_open())
-		throw new std::invalid_argument("Fragment shader file not found");
+		throw std::invalid_argument("Fragment shader file not found");
 	stream << file.rdbuf();
 	shaderCode = stream.str();
 	file.close();
@@ -184,7 +195,7 @@ unsigned int	Shader::getFragmentShader(std::string shaderPath)
 		char infoLog[512];
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Fragment shader compilation failed : " + infoString);
+		throw std::invalid_argument("Fragment shader compilation failed : " + infoString);
 	}
 
 	return (fragmentShader);

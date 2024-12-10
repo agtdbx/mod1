@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
+#include <cmath>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -16,19 +17,24 @@ Mesh::Mesh(void)
 }
 
 
-Mesh::Mesh(std::vector<Vec3> &vertices, std::vector<t_tri_id> &indices)
+Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 {
-	this->nbVertices = vertices.size() * 3;
+	this->nbVertices = vertices.size() * 6;
 	this->vertices = new float[this->nbVertices];
 
 	if (this->vertices == NULL)
 		throw new std::invalid_argument("Mesh vertrices alloc failed");
 
-	for (int i = 0; i < this->nbVertices; i += 3)
+	int	id;
+	for (int i = 0; i < this->nbVertices; i += 6)
 	{
-		this->vertices[i] = vertices[i / 3].x;
-		this->vertices[i + 1] = vertices[i / 3].y;
-		this->vertices[i + 2] = vertices[i / 3].z;
+		id = i / 6;
+		this->vertices[i] = vertices[id].pos.x;
+		this->vertices[i + 1] = vertices[id].pos.y;
+		this->vertices[i + 2] = vertices[id].pos.z;
+		this->vertices[i + 3] = vertices[id].r;
+		this->vertices[i + 4] = vertices[id].g;
+		this->vertices[i + 5] = vertices[id].b;
 	}
 
 	this->nbIndices = indices.size() * 3;
@@ -140,7 +146,7 @@ void	Mesh::draw(Shader *shader)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
 
 	shader->use();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
 }
 
 

@@ -19,7 +19,8 @@ SRCS	:=	srcs/engine/inputs/InputManager.cpp \
 			srcs/engine/render/Mesh.cpp \
 			srcs/engine/render/Shader.cpp \
 			srcs/main.cpp \
-			srcs/mesh/interpolate.cpp \
+			srcs/model/interpolate.cpp \
+			srcs/model/Point.cpp \
 			srcs/parsing.cpp \
 
 OBJS	:= ${SRCS:$(SRCS_DIR)/%.cpp=$(BUILD_DIR)/%.o}

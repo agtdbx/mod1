@@ -22,22 +22,24 @@ Mesh::Mesh(void)
 
 Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 {
-	this->nbVertices = vertices.size() * 6;
+	this->nbVertices = vertices.size() * 8;
 	this->vertices = new float[this->nbVertices];
 
 	if (this->vertices == NULL)
 		throw new std::invalid_argument("Mesh vertrices alloc failed");
 
 	int	id;
-	for (int i = 0; i < this->nbVertices; i += 6)
+	for (int i = 0; i < this->nbVertices; i += 8)
 	{
-		id = i / 6;
+		id = i / 8;
 		this->vertices[i] = vertices[id].pos.x;
 		this->vertices[i + 1] = vertices[id].pos.y;
 		this->vertices[i + 2] = vertices[id].pos.z;
 		this->vertices[i + 3] = vertices[id].r;
 		this->vertices[i + 4] = vertices[id].g;
 		this->vertices[i + 5] = vertices[id].b;
+		this->vertices[i + 6] = vertices[id].imgx;
+		this->vertices[i + 7] = vertices[id].imgy;
 	}
 
 	this->nbIndices = indices.size() * 3;
@@ -149,6 +151,33 @@ void	Mesh::draw(Shader *shader)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
 
 	shader->use();
+
+	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
+}
+
+
+void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName)
+{
+	unsigned int	texture;
+
+	if (this->vertices == NULL || this ->indices == NULL)
+		return ;
+
+	try
+	{
+		texture = textureManager->getTexture(textureName);
+	}
+	catch (std::exception &e)
+	{
+		return ;
+	}
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
+
+	shader->use();
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(shader->getVAOId());
 	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
 }
 

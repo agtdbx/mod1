@@ -1,9 +1,12 @@
+#include <fstream>
+#include <sstream>
+
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
 #include <engine/render/Shader.hpp>
 #include <engine/render/Mesh.hpp>
-#include <fstream>
-#include <sstream>
+#include <engine/render/TextureManager.hpp>
+
 
 double	scroll = 0.0;
 
@@ -66,14 +69,15 @@ void	computation(InputManager *inputManager)
 }
 
 
-void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh)
+void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh, TextureManager *textureManager)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Draw mesh
-	mesh->draw(shader);
+	// mesh->draw(shader);
+	mesh->drawWithTexture(shader, textureManager, "dirt");
 
 	// Display the new image
 	glfwSwapBuffers(window);
@@ -87,9 +91,9 @@ Mesh	createMesh(void)
 	// vertices.push_back(Point(0.5f, -0.5f, 0.0f));  // bottom right
 	// vertices.push_back(Point(-0.5f, -0.5f, 0.0f)); // bottom left
 	// vertices.push_back(Point(-0.5f,  0.5f, 0.0f)); // top left
-	vertices.push_back(Point(0.5, -0.5, 0.0, 1.0f, 0.0f, 0.0f));  // bottom right
-	vertices.push_back(Point(-0.5, -0.5, 0.0, 0.0f, 1.0f, 0.0f));  // bottom left
-	vertices.push_back(Point(0.0,  0.5, 0.0, 0.0f, 0.0f, 1.0f));  // top
+	vertices.push_back(Point(0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0));  // bottom right
+	vertices.push_back(Point(-0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0));  // bottom left
+	vertices.push_back(Point(0.0,  0.5, 0.0, 0.0, 0.0, 1.0, 0.5, 1.0));  // top
 
 	std::vector<t_tri_id>	indices;
 	// indices.push_back((t_tri_id){0, 1, 3}); // first triangle
@@ -155,15 +159,27 @@ int	main(int c, char **v)
 	{
 		// shader = Shader("data/shaders/basic.vs",
 		// 				"data/shaders/red.fs");
-		shader = Shader("data/shaders/colors.vs",
-						"data/shaders/colors.fs");
+		// shader = Shader("data/shaders/colors.vs",
+		// 				"data/shaders/colors.fs");
+		shader = Shader("data/shaders/texture.vs",
+						"data/shaders/texture.fs");
 	}
 	catch (std::exception &e)
 	{
-		return (quit_as_error(NULL, e.what()));
+		return (quit_as_error(window, e.what()));
 	}
 
 	Mesh	mesh = createMesh();
+	TextureManager	textureManager;
+
+	try
+	{
+		textureManager.addTexture("dirt", "data/textures/dirt.png");
+	}
+	catch (std::exception &e)
+	{
+		return (quit_as_error(window, e.what()));
+	}
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
@@ -175,7 +191,7 @@ int	main(int c, char **v)
 
 		computation(&inputManager);
 
-		draw(window, &shader, &mesh);
+		draw(window, &shader, &mesh, &textureManager);
 	}
 
 	// Clean up and terminate

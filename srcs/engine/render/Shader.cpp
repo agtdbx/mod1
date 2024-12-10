@@ -10,6 +10,9 @@
 Shader::Shader(void)
 {
 	this->id = -1;
+	this->VAO = -1;
+	this->VBO = -1;
+	this->EBO = -1;
 }
 
 
@@ -44,12 +47,16 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 	// Give info about how get vertice to draw triange with gpu
 	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
 	// Point position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
 	// Point color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	// Point texture
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	// Delete base shader because there are useless now
 	glDeleteShader(vertexShader);
@@ -60,13 +67,21 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 Shader::Shader(const Shader &obj)
 {
 	this->id = obj.id;
+	this->VAO = obj.VAO;
+	this->VBO = obj.VBO;
+	this->EBO = obj.EBO;
 }
 
 //---- Destructor --------------------------------------------------------------
 
 Shader::~Shader()
 {
-
+	if (this->VAO >= 0)
+		glDeleteVertexArrays(1, &this->VAO);
+	if (this->VBO >= 0)
+		glDeleteBuffers(1, &this->VBO);
+	if (this->EBO >= 0)
+		glDeleteBuffers(1, &this->EBO);
 }
 
 
@@ -76,6 +91,24 @@ Shader::~Shader()
 unsigned int	Shader::getShaderId(void)
 {
 	return (this->id);
+}
+
+
+unsigned int	Shader::getVAOId(void)
+{
+	return (this->VAO);
+}
+
+
+unsigned int	Shader::getVBOId(void)
+{
+	return (this->VBO);
+}
+
+
+unsigned int	Shader::getEBOId(void)
+{
+	return (this->EBO);
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -88,6 +121,9 @@ Shader	&Shader::operator=(const Shader &obj)
 		return (*this);
 
 	this->id = obj.id;
+	this->VAO = obj.VAO;
+	this->VBO = obj.VBO;
+	this->EBO = obj.EBO;
 
 	return (*this);
 }
@@ -108,21 +144,18 @@ void	Shader::use()
 void	Shader::allocateMemory(void)
 {
 	// Allocate memory for vertice array into gpu
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	glGenVertexArrays(1, &this->VAO);
+	glBindVertexArray(this->VAO);
 
 	// Allocate memory into gpu
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &this->VBO);
 	// Set the new allocated buffer as array one
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
 
 	// Allocate buffer for indices
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glGenBuffers(1, &this->EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 }
 
 

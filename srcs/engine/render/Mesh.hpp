@@ -5,6 +5,7 @@
 
 # include <model/Point.hpp>
 # include <engine/render/Shader.hpp>
+# include <engine/render/TextureManager.hpp>
 
 typedef struct s_tri_id
 {
@@ -25,6 +26,7 @@ public:
 	Mesh	&operator=(const Mesh &obj);
 
 	void	draw(Shader *shader);
+	void	drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName);
 	void	print(void);
 
 private:

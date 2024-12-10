@@ -3,18 +3,18 @@ import random
 
 MAP_SIZE = 100
 MAX_HEIGHT = 100
-POINTS = [(50, 50, 50)]
+# POINTS = [(50, 50, 50)]
 # POINTS = [(50, 50, 42), (0, 0, 10), (30, 40, 25)]
-# POINTS = [(50, 50, 42),
-# 		  (0, 0, 10),
-# 		  (30, 40, 25),
-# 		  (80, 70, 15),
-# 		  (10, 80, 32),
-# 		  (15, 80, 32),
-# 		  (20, 80, 32),
-# 		  (25, 80, 32),
-# 		  (35, 10, 5),
-# 		  (90, 15, 29)]
+POINTS = [(50, 50, 42),
+		  (0, 0, 10),
+		  (30, 40, 25),
+		  (80, 70, 15),
+		  (10, 80, 32),
+		  (15, 80, 32),
+		  (20, 80, 32),
+		  (25, 80, 32),
+		  (35, 10, 5),
+		  (90, 15, 29)]
 
 # Create map
 heighmap = [[0.0] * MAP_SIZE for _ in range(MAP_SIZE)]
@@ -54,10 +54,10 @@ for y in range(MAP_SIZE):
 			new_val = val * pz
 
 			possible_heights.append(new_val)
-		
+
 		if len(possible_heights) == 0:
 			continue
-		
+
 		new_val = max(possible_heights)
 		heighmap[y][x] = new_val
 

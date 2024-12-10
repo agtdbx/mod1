@@ -4,7 +4,9 @@ EXECUTABLE_NAME		:= mod1
 DEFAULT_MAP			:= map/testmap.mod1
 
 
-all: build
+all: $(EXECUTABLE_NAME)
+
+$(EXECUTABLE_NAME): build
 	ninja -C $(MESON_CONFIG_DIR)
 	ninja install -C $(MESON_CONFIG_DIR) >/dev/null
 

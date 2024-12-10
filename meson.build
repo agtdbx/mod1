@@ -3,28 +3,28 @@ project('mod1', 'cpp',
   default_options : ['warning_level=1', 'cpp_std=c++14'])
 
 
-
-conf_data = configuration_data()
-conf_data.set('DATA_PATH', get_option('prefix') + '/data')
-
-
-
-
 executable('mod1',
-          'srcs/engine/maths/Random.cpp',
-          'srcs/engine/maths/Vec3.cpp',
-          'srcs/engine/maths/Vec2.cpp',
-          'srcs/engine/inputs/Mouse.cpp',
-          'srcs/engine/inputs/Key.cpp',
           'srcs/engine/inputs/InputManager.cpp',
-          'srcs/parsing.cpp',
+          'srcs/engine/inputs/Key.cpp',
+          'srcs/engine/inputs/Mouse.cpp',
+          'srcs/engine/maths/Random.cpp',
+          'srcs/engine/maths/Vec2.cpp',
+          'srcs/engine/maths/Vec3.cpp',
+          'srcs/engine/render/Mesh.cpp',
+          'srcs/engine/render/Shader.cpp',
           'srcs/main.cpp',
-		   build_rpath: '.',
-           dependencies : [
+          'srcs/model/interpolate.cpp',
+          'srcs/model/Point.cpp',
+          'srcs/parsing.cpp',
+          build_rpath: '.',
+            dependencies : [
               dependency('glfw3'),
               dependency('glew'),
-              ],
-			include_directories: include_directories('srcs'),
-           install : true)
+              dependency('glm'),
+            ],
+          include_directories: include_directories('srcs'),
+          install : true)
 
 install_subdir('data', install_dir:'.')
+install_subdir('map', install_dir:'.')
+install_data('vsupp', install_dir:'.')

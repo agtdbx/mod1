@@ -4,3 +4,5 @@ mod1
 __pycache__
 build
 release
+subprojects/glm-*
+subprojects/packagecache

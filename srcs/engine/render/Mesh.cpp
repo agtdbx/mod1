@@ -1,8 +1,5 @@
 #include <engine/render/Mesh.hpp>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 #include <cmath>
 
@@ -17,6 +14,7 @@ Mesh::Mesh(void)
 	this->indices = NULL;
 	this->nbVertices = 0;
 	this->nbIndices = 0;
+	this->model = glm::mat4(1.0f);
 }
 
 
@@ -57,6 +55,7 @@ Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 		this->indices[i + 1] = indices[i / 3].p2;
 		this->indices[i + 2] = indices[i / 3].p3;
 	}
+	this->model = glm::mat4(1.0f);
 }
 
 
@@ -82,6 +81,7 @@ Mesh::Mesh(const Mesh &obj)
 
 	for (int i = 0; i < this->nbIndices; i++)
 		this->indices[i] = obj.indices[i];
+	this->model = obj.model;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -137,10 +137,30 @@ Mesh	&Mesh::operator=(const Mesh &obj)
 	for (int i = 0; i < this->nbIndices; i++)
 		this->indices[i] = obj.indices[i];
 
+	this->model = obj.model;
+
 	return (*this);
 }
 
 //**** PUBLIC METHODS **********************************************************
+
+void	Mesh::translate(glm::vec3 translation)
+{
+	this->model = glm::translate(this->model, translation);
+}
+
+
+void	Mesh::rotate(glm::vec3 rotation, float degrees)
+{
+	this->model = glm::rotate(this->model, glm::radians(degrees), rotation);
+}
+
+
+void	Mesh::scale(glm::vec3 scale)
+{
+	this->model = glm::scale(this->model, scale);
+}
+
 
 void	Mesh::draw(Shader *shader)
 {
@@ -176,18 +196,14 @@ void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::
 
 	shader->use();
 
-	glm::mat4 model = glm::mat4(1.0f);
-	// model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
 	glm::mat4 view = glm::mat4(1.0f);
 	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
 
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WIN_W/(float)WIN_H, 0.1f, 100.0f);
 
 	int modelLoc = glGetUniformLocation(shader->getShaderId(), "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->model));
 	int viewLoc = glGetUniformLocation(shader->getShaderId(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	int projLoc = glGetUniformLocation(shader->getShaderId(), "proj");

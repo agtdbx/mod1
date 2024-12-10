@@ -6,6 +6,9 @@
 # include <model/Point.hpp>
 # include <engine/render/Shader.hpp>
 # include <engine/render/TextureManager.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 typedef struct s_tri_id
 {
@@ -25,6 +28,10 @@ public:
 
 	Mesh	&operator=(const Mesh &obj);
 
+	void	translate(glm::vec3 translation);
+	void	rotate(glm::vec3 rotation, float degrees);
+	void	scale(glm::vec3 scale);
+
 	void	draw(Shader *shader);
 	void	drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName);
 	void	print(void);
@@ -33,6 +40,7 @@ private:
 	float			*vertices;
 	unsigned int	*indices;
 	int				nbVertices, nbIndices;
+	glm::mat4		model;
 };
 
 #endif

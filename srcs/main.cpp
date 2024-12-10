@@ -7,7 +7,6 @@
 #include <engine/render/Mesh.hpp>
 #include <engine/render/TextureManager.hpp>
 
-
 double	scroll = 0.0;
 
 // Error callback function for GLFW
@@ -48,28 +47,56 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 }
 
 
-void	computation(InputManager *inputManager)
+void	computation(InputManager *inputManager, Mesh *mesh)
 {
-	// Check e key
-	if (inputManager->e.isPressed())
-		std::cout << "key e is pressed" << std::endl;
-	if (inputManager->e.isDown())
-		std::cout << "key e is down" << std::endl;
-	if (inputManager->e.isReleased())
-		std::cout << "key e is released" << std::endl;
+	static double	lastTime = 0.0;
+	double			currentTime;
+	double			delta;
+
+	currentTime = glfwGetTime();
+	delta = currentTime - lastTime;
+	lastTime = currentTime;
+
+	// Mesh translation
+	if (inputManager->w.isDown() || inputManager->z.isDown())
+		mesh->translate(glm::vec3(0.0f, delta, 0.0f));
+	if (inputManager->s.isDown())
+		mesh->translate(glm::vec3(0.0f, -delta, 0.0f));
+	if (inputManager->a.isDown() || inputManager->q.isDown())
+		mesh->translate(glm::vec3(-delta, 0.0f, 0.0f));
+	if (inputManager->d.isDown())
+		mesh->translate(glm::vec3(delta, 0.0f, 0.0f));
+
+	// Mesh rotation
+	if (inputManager->up.isDown())
+		mesh->rotate(glm::vec3(-1.0f, 0.0f, 0.0f), delta * 21.0f);
+	if (inputManager->down.isDown())
+		mesh->rotate(glm::vec3(1.0f, 0.0f, 0.0f), delta * 21.0f);
+	if (inputManager->left.isDown())
+		mesh->rotate(glm::vec3(0.0f, -1.0f, 0.0f), delta * 21.0f);
+	if (inputManager->right.isDown())
+		mesh->rotate(glm::vec3(0.0f, 1.0f, 0.0f), delta * 21.0f);
+
+	// Mesh scaling
+	if (inputManager->mouse.getScroll() > 0.0)
+	{
+		float	factor = 1.0f + delta;
+		mesh->scale(glm::vec3(factor, factor, factor));
+	}
+	if (inputManager->mouse.getScroll() < 0.0)
+	{
+		float	factor = 1.0f - delta;
+		mesh->scale(glm::vec3(factor, factor, factor));
+	}
 
 	// Check mouse left click
 	if (inputManager->mouse.left.isPressed())
 		std::cout << "mouse left click on " << inputManager->mouse.getPos() << std::endl;
 
-	if (inputManager->mouse.getScroll() < 0.0)
-		std::cout << "mouse scroll down" << std::endl;
-	if (inputManager->mouse.getScroll() > 0.0)
-		std::cout << "mouse scroll up" << std::endl;
 }
 
 
-void	draw(GLFWwindow* window, Shader *shader, Mesh *mesh, TextureManager *textureManager)
+void	draw(GLFWwindow* window, Mesh *mesh, Shader *shader, TextureManager *textureManager)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
@@ -191,9 +218,9 @@ int	main(int c, char **v)
 		if (inputManager.escape.isPressed())
 			break;
 
-		computation(&inputManager);
+		computation(&inputManager, &mesh);
 
-		draw(window, &shader, &mesh, &textureManager);
+		draw(window, &mesh, &shader, &textureManager);
 	}
 
 	// Clean up and terminate

@@ -8,7 +8,7 @@ class InputManager
 {
 public:
 	Mouse	mouse;
-	Key		escape, e;
+	Key		escape, w, z, a, q, s, d, up, down, left, right;
 
 	InputManager(void);
 	InputManager(const InputManager &obj);

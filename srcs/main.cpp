@@ -162,11 +162,11 @@ Mesh	createMeshTest(std::vector<std::vector<double> > heighmap)
 			{
 				if (int(x) % 2 == 0)
 				{
-					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue,  0.0, 0.0));
+					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue,  1.0, 0.0));
 				}
 				else
 				{
-					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 0.0));
+					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 0.0));
 				}
 			}
 			// vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), double(x/ MAP_SIZE), double(y / MAP_SIZE), 0.0, 1.0, 0.0));
@@ -199,11 +199,11 @@ Mesh	createMeshTest(std::vector<std::vector<double> > heighmap)
 			{
 				if (int(x) % 2 == 0)
 				{
-					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 1.0));
+					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 1.0));
 				}
 				else
 				{
-					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 1.0));
+					vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 1.0));
 				}
 			}
 			// vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (heighmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), double(x/ MAP_SIZE), double(y / MAP_SIZE), 0.0, 1.0, 0.0));

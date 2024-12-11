@@ -31,6 +31,7 @@ private:
 	glm::vec3	position, front, up, right;
 	float		pitch, yaw, roll;
 
+	void		computeRotation(void);
 	void		computeView(void);
 };
 

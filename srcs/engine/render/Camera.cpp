@@ -7,20 +7,19 @@
 
 Camera::Camera(void)
 {
-	glm::vec3	up = glm::vec3(0.0f, 1.0f, 0.0f);
-
 	this->projection = glm::perspective(glm::radians(45.0f),
 										(float)WIN_W/(float)WIN_H, 0.1f, 100.0f);
 
 	this->pitch = 0.0f;
-	this->yaw = 0.0f;
+	this->yaw = -90.0f;
 	this->roll = 0.0f;
 	this->position = glm::vec3(0.0f, 0.0f, 3.0f);
 
 	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f));
-	this->right = glm::normalize(glm::cross(up, this->front));
+	this->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->front));
 	this->up = glm::normalize(glm::cross(this->front, this->right));
 
+	this->computeRotation();
 	this->computeView();
 }
 
@@ -107,6 +106,15 @@ void	Camera::moveRight(float speed)
 void	Camera::rotateX(float degrees)
 {
 	this->pitch += degrees;
+
+	if (pitch > 89.0f){
+		pitch = 89.0f;
+	}
+	if (pitch < -89.0f){
+		pitch = -89.0f;
+	}
+
+	this->computeRotation();
 	this->computeView();
 }
 
@@ -114,6 +122,7 @@ void	Camera::rotateX(float degrees)
 void	Camera::rotateY(float degrees)
 {
 	this->yaw += degrees;
+	this->computeRotation();
 	this->computeView();
 }
 
@@ -121,17 +130,26 @@ void	Camera::rotateY(float degrees)
 void	Camera::rotateZ(float degrees)
 {
 	this->roll += degrees;
+	this->computeRotation();
 	this->computeView();
 }
 
 //**** PRIVATE METHODS *********************************************************
 
+void	Camera::computeRotation(void)
+{
+	this->front.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw));
+	this->front.y = sin(glm::radians(this->pitch));
+	this->front.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
+	this->front = glm::normalize(this->front);
+
+	this->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->front));
+	this->up = glm::normalize(glm::cross(this->front, this->right));
+}
+
+
 void	Camera::computeView(void)
 {
-	this->front.x = glm::radians(this->pitch) * cos(glm::radians(this->yaw));
-	this->front.y = glm::radians(this->pitch);
-	this->front.z = glm::radians(this->pitch) * sin(glm::radians(this->yaw));
-
 	this->view = glm::lookAt(this->position,
 							this->position + this->front,
 							this->up);

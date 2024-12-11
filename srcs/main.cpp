@@ -79,13 +79,13 @@ void	computation(InputManager *inputManager, Camera *camera)
 
 	// // Camera rotation
 	if (inputManager->up.isDown())
-		camera->rotateX(delta * 21.0f);
+		camera->rotateX(CAMERA_ROTATION_SPEED * delta);
 	if (inputManager->down.isDown())
-		camera->rotateX(-delta * 21.0f);
+		camera->rotateX(-CAMERA_ROTATION_SPEED * delta);
 	if (inputManager->left.isDown())
-		camera->rotateY(-delta * 21.0f);
+		camera->rotateY(-CAMERA_ROTATION_SPEED * delta);
 	if (inputManager->right.isDown())
-		camera->rotateY(delta * 21.0f);
+		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
 	// // Camera scaling
 	// if (inputManager->mouse.getScroll() > 0.0)

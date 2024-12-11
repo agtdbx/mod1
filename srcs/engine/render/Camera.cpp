@@ -8,14 +8,15 @@
 Camera::Camera(void)
 {
 	this->projection = glm::perspective(glm::radians(45.0f),
-										(float)WIN_W/(float)WIN_H, 0.1f, 100.0f);
+										(float)WIN_W/(float)WIN_H,
+										CAMERA_MIN_VIEW_DIST, CAMERA_MAX_VIEW_DIST);
 
 	this->pitch = 0.0f;
-	this->yaw = -90.0f;
+	this->yaw = 0.0f;
 	this->roll = 0.0f;
-	this->position = glm::vec3(0.0f, 0.0f, 3.0f);
+	this->position = glm::vec3(0.0f, 15.0f, 30.0f);
 
-	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f));
+	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
 	this->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->front));
 	this->up = glm::normalize(glm::cross(this->front, this->right));
 

@@ -17,6 +17,9 @@ InputManager::InputManager(void)
 	this->down = Key(GLFW_KEY_DOWN);
 	this->left = Key(GLFW_KEY_LEFT);
 	this->right = Key(GLFW_KEY_RIGHT);
+	this->space = Key(GLFW_KEY_SPACE);
+	this->lshift = Key(GLFW_KEY_LEFT_SHIFT);
+	this->lcontrol = Key(GLFW_KEY_LEFT_CONTROL);
 }
 
 
@@ -34,6 +37,9 @@ InputManager::InputManager(const InputManager &obj)
 	this->down = obj.down;
 	this->left = obj.left;
 	this->right = obj.right;
+	this->space = obj.space;
+	this->lshift = obj.lshift;
+	this->lcontrol = obj.lcontrol;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -68,6 +74,9 @@ InputManager	&InputManager::operator=(const InputManager &obj)
 	this->down = obj.down;
 	this->left = obj.left;
 	this->right = obj.right;
+	this->space = obj.space;
+	this->lshift = obj.lshift;
+	this->lcontrol = obj.lcontrol;
 
 	return (*this);
 }
@@ -89,6 +98,9 @@ void	InputManager::update(GLFWwindow *window)
 	this->down.update(window);
 	this->left.update(window);
 	this->right.update(window);
+	this->space.update(window);
+	this->lshift.update(window);
+	this->lcontrol.update(window);
 }
 
 //**** PRIVATE METHODS *********************************************************

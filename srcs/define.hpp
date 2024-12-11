@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/10 12:07:32 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/11 13:05:20 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # define WIN_TITLE "mod1"
 # define MAP_SIZE 100
 # define MAX_HEIGHT 210
+# define CAMERA_SPEED 1.0
+# define CAMERA_SPRINT_FACTOR 2.5
 
 std::vector<Vec3> parse(char *name);
 std::vector<std::vector<double>> interpolate(std::vector<Vec3> point_list);

@@ -48,41 +48,50 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 }
 
 
-void	computation(InputManager *inputManager, Mesh *mesh)
+void	computation(InputManager *inputManager, Camera *camera)
 {
 	static double	lastTime = 0.0;
-	double			currentTime;
-	double			delta;
+	double			currentTime, delta, cameraSpeed;
 
 	currentTime = glfwGetTime();
 	delta = currentTime - lastTime;
 	lastTime = currentTime;
 
-	// Mesh translation
+	cameraSpeed = CAMERA_SPEED * delta;
+	if (inputManager->lcontrol.isDown())
+		cameraSpeed *= CAMERA_SPRINT_FACTOR;
+
+	// Camera translation
 	if (inputManager->w.isDown() || inputManager->z.isDown())
-		mesh->translate(glm::vec3(0.0f, delta, 0.0f));
-	if (inputManager->s.isDown())
-		mesh->translate(glm::vec3(0.0f, -delta, 0.0f));
+		camera->moveFront(cameraSpeed);
+	else if (inputManager->s.isDown())
+		camera->moveFront(-cameraSpeed);
+
 	if (inputManager->a.isDown() || inputManager->q.isDown())
-		mesh->translate(glm::vec3(-delta, 0.0f, 0.0f));
-	if (inputManager->d.isDown())
-		mesh->translate(glm::vec3(delta, 0.0f, 0.0f));
+		camera->moveRight(cameraSpeed);
+	else if (inputManager->d.isDown())
+		camera->moveRight(-cameraSpeed);
 
-	// Mesh rotation
+	if (inputManager->space.isDown())
+		camera->moveUp(cameraSpeed);
+	else if (inputManager->lshift.isDown())
+		camera->moveUp(-cameraSpeed);
+
+	// // Camera rotation
 	if (inputManager->up.isDown())
-		mesh->rotate(glm::vec3(-1.0f, 0.0f, 0.0f), delta * 21.0f);
+		camera->rotateX(delta * 21.0f);
 	if (inputManager->down.isDown())
-		mesh->rotate(glm::vec3(1.0f, 0.0f, 0.0f), delta * 21.0f);
+		camera->rotateX(-delta * 21.0f);
 	if (inputManager->left.isDown())
-		mesh->rotate(glm::vec3(0.0f, -1.0f, 0.0f), delta * 21.0f);
+		camera->rotateY(-delta * 21.0f);
 	if (inputManager->right.isDown())
-		mesh->rotate(glm::vec3(0.0f, 1.0f, 0.0f), delta * 21.0f);
+		camera->rotateY(delta * 21.0f);
 
-	// Mesh scaling
-	if (inputManager->mouse.getScroll() > 0.0)
-		mesh->scale(1.0f + delta * 10.0f);
-	if (inputManager->mouse.getScroll() < 0.0)
-		mesh->scale(1.0f - delta * 10.0f);
+	// // Camera scaling
+	// if (inputManager->mouse.getScroll() > 0.0)
+	// 	mesh->scale(1.0f + delta * 10.0f);
+	// if (inputManager->mouse.getScroll() < 0.0)
+	// 	mesh->scale(1.0f - delta * 10.0f);
 
 	// Check mouse left click
 	if (inputManager->mouse.left.isPressed())
@@ -323,7 +332,7 @@ int	main(int c, char **v)
 		if (inputManager.escape.isPressed())
 			break;
 
-		computation(&inputManager, &mesh);
+		computation(&inputManager, &camera);
 
 		draw(window, &camera, &mesh, &shader, &textureManager);
 	}

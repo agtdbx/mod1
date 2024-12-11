@@ -19,8 +19,19 @@ public:
 
 	Camera	&operator=(const Camera &obj);
 
+	void	moveFront(float speed);
+	void	moveUp(float speed);
+	void	moveRight(float speed);
+	void	rotateX(float degrees);
+	void	rotateY(float degrees);
+	void	rotateZ(float degrees);
+
 private:
 	glm::mat4	view, projection;
+	glm::vec3	position, front, up, right;
+	float		pitch, yaw, roll;
+
+	void		computeView(void);
 };
 
 #endif

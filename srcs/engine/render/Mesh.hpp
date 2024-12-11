@@ -2,13 +2,14 @@
 # define MESH_HPP
 
 # include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 # include <model/Point.hpp>
 # include <engine/render/Shader.hpp>
 # include <engine/render/TextureManager.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+# include <engine/render/Camera.hpp>
 
 typedef struct s_tri_id
 {
@@ -32,8 +33,7 @@ public:
 	void	rotate(glm::vec3 rotation, float degrees);
 	void	scale(float scale);
 
-	void	draw(Shader *shader);
-	void	drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName);
+	void	draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName);
 	void	print(void);
 
 private:

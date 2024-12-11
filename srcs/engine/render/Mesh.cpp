@@ -190,21 +190,7 @@ void	Mesh::scale(float scale)
 }
 
 
-void	Mesh::draw(Shader *shader)
-{
-	if (this->vertices == NULL || this ->indices == NULL)
-		return ;
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
-
-	shader->use();
-
-	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
-}
-
-
-void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName)
+void	Mesh::draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName)
 {
 	unsigned int	texture;
 
@@ -224,18 +210,12 @@ void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::
 
 	shader->use();
 
-	glm::mat4 view = glm::mat4(1.0f);
-	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
-
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)WIN_W/(float)WIN_H, 0.1f, 100.0f);
-
 	int modelLoc = glGetUniformLocation(shader->getShaderId(), "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->model));
 	int viewLoc = glGetUniformLocation(shader->getShaderId(), "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->getView()));
 	int projLoc = glGetUniformLocation(shader->getShaderId(), "proj");
-	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->getProjection()));
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(shader->getVAOId());

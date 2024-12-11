@@ -6,6 +6,7 @@
 #include <engine/render/Shader.hpp>
 #include <engine/render/Mesh.hpp>
 #include <engine/render/TextureManager.hpp>
+# include <engine/render/Camera.hpp>
 
 double	scroll = 0.0;
 
@@ -90,15 +91,14 @@ void	computation(InputManager *inputManager, Mesh *mesh)
 }
 
 
-void	draw(GLFWwindow* window, Mesh *mesh, Shader *shader, TextureManager *textureManager)
+void	draw(GLFWwindow* window, Camera *camera, Mesh *mesh, Shader *shader, TextureManager *textureManager)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Draw mesh
-	// mesh->draw(shader);
-	mesh->drawWithTexture(shader, textureManager, "dirt");
+	mesh->draw(camera, shader, textureManager, "dirt");
 
 	// Display the new image
 	glfwSwapBuffers(window);
@@ -304,6 +304,8 @@ int	main(int c, char **v)
 	Mesh	mesh = createMeshTest(heightmap);
 	TextureManager	textureManager;
 
+	Camera	camera;
+
 	try
 	{
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
@@ -323,7 +325,7 @@ int	main(int c, char **v)
 
 		computation(&inputManager, &mesh);
 
-		draw(window, &mesh, &shader, &textureManager);
+		draw(window, &camera, &mesh, &shader, &textureManager);
 	}
 
 	// Clean up and terminate

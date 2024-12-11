@@ -79,15 +79,9 @@ void	computation(InputManager *inputManager, Mesh *mesh)
 
 	// Mesh scaling
 	if (inputManager->mouse.getScroll() > 0.0)
-	{
-		float	factor = 1.0f + delta * 10.0f;
-		mesh->scale(glm::vec3(factor, factor, factor));
-	}
+		mesh->scale(1.0f + delta * 10.0f);
 	if (inputManager->mouse.getScroll() < 0.0)
-	{
-		float	factor = 1.0f - delta * 10.0f;
-		mesh->scale(glm::vec3(factor, factor, factor));
-	}
+		mesh->scale(1.0f - delta * 10.0f);
 
 	// Check mouse left click
 	if (inputManager->mouse.left.isPressed())

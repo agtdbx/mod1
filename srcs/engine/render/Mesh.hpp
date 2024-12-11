@@ -30,17 +30,20 @@ public:
 
 	void	translate(glm::vec3 translation);
 	void	rotate(glm::vec3 rotation, float degrees);
-	void	scale(glm::vec3 scale);
+	void	scale(float scale);
 
 	void	draw(Shader *shader);
 	void	drawWithTexture(Shader *shader, TextureManager *textureManager, std::string textureName);
 	void	print(void);
 
 private:
-	float			*vertices;
+	float			*vertices, degrees_x, degrees_y, degrees_z, scaleFactor;
 	unsigned int	*indices;
 	int				nbVertices, nbIndices;
+	glm::vec3		translation;
 	glm::mat4		model;
+
+	void	computeModelMatrix(void);
 };
 
 #endif

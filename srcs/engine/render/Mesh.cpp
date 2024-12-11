@@ -14,7 +14,12 @@ Mesh::Mesh(void)
 	this->indices = NULL;
 	this->nbVertices = 0;
 	this->nbIndices = 0;
-	this->model = glm::mat4(1.0f);
+	this->translation = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->degrees_x = 0.0f;
+	this->degrees_y = 0.0f;
+	this->degrees_z = 0.0f;
+	this->scaleFactor = 1.0f;
+	this->computeModelMatrix();
 }
 
 
@@ -55,7 +60,13 @@ Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 		this->indices[i + 1] = indices[i / 3].p2;
 		this->indices[i + 2] = indices[i / 3].p3;
 	}
-	this->model = glm::mat4(1.0f);
+
+	this->translation = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->degrees_x = 0.0f;
+	this->degrees_y = 0.0f;
+	this->degrees_z = 0.0f;
+	this->scaleFactor = 1.0f;
+	this->computeModelMatrix();
 }
 
 
@@ -81,7 +92,13 @@ Mesh::Mesh(const Mesh &obj)
 
 	for (int i = 0; i < this->nbIndices; i++)
 		this->indices[i] = obj.indices[i];
-	this->model = obj.model;
+
+	this->translation = obj.translation;
+	this->degrees_x = obj.degrees_x;
+	this->degrees_y = obj.degrees_y;
+	this->degrees_z = obj.degrees_z;
+	this->scaleFactor = obj.scaleFactor;
+	this->computeModelMatrix();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -137,7 +154,12 @@ Mesh	&Mesh::operator=(const Mesh &obj)
 	for (int i = 0; i < this->nbIndices; i++)
 		this->indices[i] = obj.indices[i];
 
-	this->model = obj.model;
+	this->translation = obj.translation;
+	this->degrees_x = obj.degrees_x;
+	this->degrees_y = obj.degrees_y;
+	this->degrees_z = obj.degrees_z;
+	this->scaleFactor = obj.scaleFactor;
+	this->computeModelMatrix();
 
 	return (*this);
 }
@@ -146,19 +168,25 @@ Mesh	&Mesh::operator=(const Mesh &obj)
 
 void	Mesh::translate(glm::vec3 translation)
 {
-	this->model = glm::translate(this->model, translation);
+	this->translation += translation;
+	this->computeModelMatrix();
 }
 
 
 void	Mesh::rotate(glm::vec3 rotation, float degrees)
 {
-	this->model = glm::rotate(this->model, glm::radians(degrees), rotation);
+	rotation *= degrees;
+	this->degrees_x += rotation.x;
+	this->degrees_y += rotation.y;
+	this->degrees_z += rotation.z;
+	this->computeModelMatrix();
 }
 
 
-void	Mesh::scale(glm::vec3 scale)
+void	Mesh::scale(float scale)
 {
-	this->model = glm::scale(this->model, scale);
+	this->scaleFactor *= scale;
+	this->computeModelMatrix();
 }
 
 
@@ -228,3 +256,15 @@ void	Mesh::print(void)
 }
 
 //**** PRIVATE METHODS *********************************************************
+
+void	Mesh::computeModelMatrix(void)
+{
+	this->model = glm::mat4(1.0f);
+
+	this->model = glm::scale(this->model, glm::vec3(this->scaleFactor, this->scaleFactor, this->scaleFactor));
+	this->model = glm::translate(this->model, this->translation);
+	// if (this->degrees != 0.0f)
+	this->model = glm::rotate(this->model, glm::radians(this->degrees_x), glm::vec3(1.0f, 0.0f, 0.0f));
+	this->model = glm::rotate(this->model, glm::radians(this->degrees_y), glm::vec3(0.0f, 1.0f, 0.0f));
+	this->model = glm::rotate(this->model, glm::radians(this->degrees_z), glm::vec3(0.0f, 0.0f, 1.0f));
+}

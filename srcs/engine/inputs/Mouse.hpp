@@ -10,6 +10,7 @@ public:
 	Key	left, middle, right;
 
 	Mouse(void);
+	Mouse(GLFWwindow* window);
 	Mouse(const Mouse &obj);
 	~Mouse();
 
@@ -17,7 +18,6 @@ public:
 	double	getScroll(void);
 	bool	getVisible(void);
 
-	void	setScroll(double scroll);
 	void	setVisible(GLFWwindow *window, bool visible);
 
 	Mouse	&operator=(const Mouse &obj);

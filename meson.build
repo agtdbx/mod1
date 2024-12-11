@@ -5,6 +5,7 @@ project('mod1', 'cpp',
 add_global_arguments('-g', language : 'cpp')
 
 executable('mod1',
+          'srcs/engine/OpenGLContext.cpp',
           'srcs/engine/inputs/InputManager.cpp',
           'srcs/engine/inputs/Key.cpp',
           'srcs/engine/inputs/Mouse.cpp',
@@ -16,15 +17,15 @@ executable('mod1',
           'srcs/engine/render/Shader.cpp',
           'srcs/engine/render/TextureManager.cpp',
           'srcs/main.cpp',
-          'srcs/model/interpolate.cpp',
           'srcs/model/Point.cpp',
+          'srcs/model/Terrain.cpp',
           'srcs/parsing.cpp',
           build_rpath: '.',
-            dependencies : [
-              dependency('glfw3'),
-              dependency('glew'),
-              dependency('glm'),
-            ],
+          dependencies : [
+            dependency('glfw3'),
+            dependency('glew'),
+            dependency('glm'),
+          ],
           include_directories: include_directories('srcs'),
           install : true)
 

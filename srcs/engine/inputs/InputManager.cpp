@@ -6,40 +6,22 @@
 InputManager::InputManager(void)
 {
 	this->mouse = Mouse();
-	this->escape = Key(GLFW_KEY_ESCAPE);
-	this->w = Key(GLFW_KEY_W);
-	this->z = Key(GLFW_KEY_Z);
-	this->a = Key(GLFW_KEY_A);
-	this->q = Key(GLFW_KEY_Q);
-	this->s = Key(GLFW_KEY_S);
-	this->d = Key(GLFW_KEY_D);
-	this->up = Key(GLFW_KEY_UP);
-	this->down = Key(GLFW_KEY_DOWN);
-	this->left = Key(GLFW_KEY_LEFT);
-	this->right = Key(GLFW_KEY_RIGHT);
-	this->space = Key(GLFW_KEY_SPACE);
-	this->lshift = Key(GLFW_KEY_LEFT_SHIFT);
-	this->lcontrol = Key(GLFW_KEY_LEFT_CONTROL);
+	this->initKeys();
 }
+
+
+InputManager::InputManager(GLFWwindow* window)
+{
+	this->mouse = Mouse(window);
+	this->initKeys();
+}
+
 
 
 InputManager::InputManager(const InputManager &obj)
 {
 	this->mouse = obj.mouse;
-	this->escape = obj.escape;
-	this->w = obj.w;
-	this->z = obj.z;
-	this->a = obj.a;
-	this->q = obj.q;
-	this->s = obj.s;
-	this->d = obj.d;
-	this->up = obj.up;
-	this->down = obj.down;
-	this->left = obj.left;
-	this->right = obj.right;
-	this->space = obj.space;
-	this->lshift = obj.lshift;
-	this->lcontrol = obj.lcontrol;
+	this->copyKeys(obj);
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -63,20 +45,7 @@ InputManager	&InputManager::operator=(const InputManager &obj)
 		return (*this);
 
 	this->mouse = obj.mouse;
-	this->escape = obj.escape;
-	this->w = obj.w;
-	this->z = obj.z;
-	this->a = obj.a;
-	this->q = obj.q;
-	this->s = obj.s;
-	this->d = obj.d;
-	this->up = obj.up;
-	this->down = obj.down;
-	this->left = obj.left;
-	this->right = obj.right;
-	this->space = obj.space;
-	this->lshift = obj.lshift;
-	this->lcontrol = obj.lcontrol;
+	this->copyKeys(obj);
 
 	return (*this);
 }
@@ -104,3 +73,40 @@ void	InputManager::update(GLFWwindow *window)
 }
 
 //**** PRIVATE METHODS *********************************************************
+
+void	InputManager::initKeys(void)
+{
+	this->escape = Key(GLFW_KEY_ESCAPE);
+	this->w = Key(GLFW_KEY_W);
+	this->z = Key(GLFW_KEY_Z);
+	this->a = Key(GLFW_KEY_A);
+	this->q = Key(GLFW_KEY_Q);
+	this->s = Key(GLFW_KEY_S);
+	this->d = Key(GLFW_KEY_D);
+	this->up = Key(GLFW_KEY_UP);
+	this->down = Key(GLFW_KEY_DOWN);
+	this->left = Key(GLFW_KEY_LEFT);
+	this->right = Key(GLFW_KEY_RIGHT);
+	this->space = Key(GLFW_KEY_SPACE);
+	this->lshift = Key(GLFW_KEY_LEFT_SHIFT);
+	this->lcontrol = Key(GLFW_KEY_LEFT_CONTROL);
+}
+
+
+void	InputManager::copyKeys(const InputManager &obj)
+{
+	this->escape = obj.escape;
+	this->w = obj.w;
+	this->z = obj.z;
+	this->a = obj.a;
+	this->q = obj.q;
+	this->s = obj.s;
+	this->d = obj.d;
+	this->up = obj.up;
+	this->down = obj.down;
+	this->left = obj.left;
+	this->right = obj.right;
+	this->space = obj.space;
+	this->lshift = obj.lshift;
+	this->lcontrol = obj.lcontrol;
+}

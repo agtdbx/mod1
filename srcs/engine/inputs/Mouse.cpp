@@ -1,5 +1,17 @@
 #include <engine/inputs/Mouse.hpp>
 
+//**** STATIC VARIABLES ********************************************************
+static double	mouseScroll = 0.0;
+
+//**** STATIC FUNCTIONS ********************************************************
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	(void)window;
+	(void)xoffset;
+	mouseScroll = yoffset;
+}
+
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
@@ -10,6 +22,17 @@ Mouse::Mouse(void)
 	this->right = Key(GLFW_MOUSE_BUTTON_RIGHT);
 	this->pos = Vec2(0, 0);
 	this->scroll = 0;
+}
+
+
+Mouse::Mouse(GLFWwindow* window)
+{
+	this->left = Key(GLFW_MOUSE_BUTTON_LEFT);
+	this->middle = Key(GLFW_MOUSE_BUTTON_MIDDLE);
+	this->right = Key(GLFW_MOUSE_BUTTON_RIGHT);
+	this->pos = Vec2(0, 0);
+	this->scroll = 0;
+	glfwSetScrollCallback(window, scroll_callback);
 }
 
 
@@ -51,12 +74,6 @@ bool	Mouse::getVisible(void)
 
 //---- Setters -----------------------------------------------------------------
 
-void	Mouse::setScroll(double scroll)
-{
-	this->scroll = scroll;
-}
-
-
 void	Mouse::setVisible(GLFWwindow *window, bool visible)
 {
 	this->visible = visible;
@@ -85,6 +102,9 @@ void	Mouse::update(GLFWwindow *window)
 	this->right.updateForMouse(window);
 
 	glfwGetCursorPos(window, &this->pos.x, &this->pos.y);
+
+	this->scroll = mouseScroll;
+	mouseScroll = 0.0;
 }
 
 //**** PRIVATE METHODS *********************************************************

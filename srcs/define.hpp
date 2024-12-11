@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/11 14:08:18 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/11 16:41:08 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 # include <engine/maths/Vec3.hpp>
 # include <engine/maths/Vec2.hpp>
 
-
 # define WIN_W 1600
 # define WIN_H 900
 # define WIN_TITLE "mod1"
@@ -29,9 +28,9 @@
 # define CAMERA_SPEED 1.0
 # define CAMERA_SPRINT_FACTOR 2.5
 # define CAMERA_ROTATION_SPEED 42.0
+# define TERRAIN_PRECISION 0.01
 
-std::vector<Vec3> parse(char *name);
-std::vector<std::vector<double>> interpolate(std::vector<Vec3> point_list);
+std::vector<Vec3>					parse(char *name);
 
 
 #endif

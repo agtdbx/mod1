@@ -6,7 +6,7 @@
 /*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/09 20:05:51 by gugus            ###   ########.fr       */
+/*   Updated: 2024/12/11 16:41:47 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ std::vector<Vec3> parse(char *name)
 				throw std::invalid_argument("Error : invalid number of argument for a point.");
 			for (std::string str : string_list)
 			{
-				for ( int i = 0; i < str.size(); i++)
+				int	size = str.size();
+				for (int i = 0; i < size; i++)
 				{
 					if (str[i] != '0')
 					{

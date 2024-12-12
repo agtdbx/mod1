@@ -36,10 +36,12 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shader.load("data/shaders/perceptive.vs",
-					"data/shaders/colors.fs");
+		// shader.load("data/shaders/perceptive.vs",
+		// 			"data/shaders/colors.fs");
 		// shader.load("data/shaders/perceptive-texture.vs",
 		// 			"data/shaders/perceptive-texture.fs");
+		shader.load("data/shaders/perceptive-light.vs",
+					"data/shaders/colors.fs");
 	}
 	catch (std::exception &e)
 	{
@@ -88,6 +90,8 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 
 void	computation(InputManager *inputManager, Camera *camera)
 {
+	static std::vector<double> deltas;
+	static double	timePrintFps = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
@@ -95,9 +99,27 @@ void	computation(InputManager *inputManager, Camera *camera)
 	delta = currentTime - lastTime;
 	lastTime = currentTime;
 
+	timePrintFps += delta;
+	deltas.push_back(delta);
+	if (timePrintFps >= PRINT_FPS_TIME)
+	{
+		timePrintFps -= PRINT_FPS_TIME;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		std::cout << "fps : " << 1.0 / avg << std::endl;
+	}
+
 	cameraSpeed = CAMERA_SPEED * delta;
 	if (inputManager->lcontrol.isDown())
 		cameraSpeed *= CAMERA_SPRINT_FACTOR;
+
+	// Camera info
+	if (inputManager->t.isPressed())
+		camera->printInfo();
 
 	// Camera translation
 	if (inputManager->w.isDown() || inputManager->z.isDown())

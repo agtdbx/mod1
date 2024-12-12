@@ -14,6 +14,8 @@ public:
 	Camera(const Camera &obj);
 	~Camera();
 
+	glm::vec3	getPosition(void);
+	glm::vec3	getDirection(void);
 	glm::mat4	getView(void);
 	glm::mat4	getProjection(void);
 
@@ -25,6 +27,8 @@ public:
 	void	rotateX(float degrees);
 	void	rotateY(float degrees);
 	void	rotateZ(float degrees);
+
+	void	printInfo(void);
 
 private:
 	glm::mat4	view, projection;

@@ -56,17 +56,17 @@ public:
 std::ostream&	operator<<(std::ostream& os, const Vec3 &vec3);
 
 // Vector vector operator
-inline Vec3		operator+(const Vec3 &v1, const Vec3 &v2);
-inline Vec3		operator-(const Vec3 &v1, const Vec3 &v2);
+Vec3			operator+(const Vec3 &v1, const Vec3 &v2);
+Vec3			operator-(const Vec3 &v1, const Vec3 &v2);
 
 // Vector number operator
-inline Vec3		operator*(const Vec3 &vec3, const double number);
-inline Vec3		operator*(const double number, const Vec3 &vec3);
-inline Vec3		operator/(const Vec3 &vec3, const double number);
+Vec3			operator*(const Vec3 &vec3, const double number);
+Vec3			operator*(const double number, const Vec3 &vec3);
+Vec3			operator/(const Vec3 &vec3, const double number);
 
 // Vector vector functions
-inline double	vec3Dot(const Vec3 &v1, const Vec3 &v2);
-inline Vec3		vec3Cross(const Vec3 &v1, const Vec3 &v2);
+double			vec3Dot(const Vec3 &v1, const Vec3 &v2);
+Vec3			vec3Cross(const Vec3 &v1, const Vec3 &v2);
 
 // Define Point3 as Vec3 for code clarity
 using Point3 = Vec3;

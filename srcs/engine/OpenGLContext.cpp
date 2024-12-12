@@ -47,6 +47,7 @@ OpenGLContext::OpenGLContext(void)
 
 	// Set the OpenGL viewport size
 	glViewport(0, 0, this->winW, this->winH);
+	glfwSwapInterval(0);
 
 	glEnable(GL_DEPTH_TEST);
 }

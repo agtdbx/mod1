@@ -228,17 +228,41 @@ void	Terrain::createMesh(void)
 	// }
 
 	unsigned int	id_tl, id_tr, id_dl, id_dr;
-	double			r, g, b, height;
+	// double			r, g, b, height;
+	double			height;
+	Vec3			p1, p2, p3, A, B, normal;
 
 	for (double y = 0; y < MAP_SIZE; y++)
 	{
 		for (double x = 0; x < MAP_SIZE; x++)
 		{
 			height = this->heightmap[y][x];
-			r = x / (double)MAP_SIZE;
-			g = height / (double)MAX_HEIGHT;
-			b = y / (double)MAP_SIZE;
-			vertices.push_back(Point(x, height, y, r, g, b));
+
+			// Compute basic color
+			// r = x / (double)MAP_SIZE;
+			// g = height / (double)MAX_HEIGHT;
+			// b = y / (double)MAP_SIZE;
+
+			// Compute normal
+			if (y == MAP_SIZE -1 || x == MAP_SIZE - 1)
+			{
+				normal = Vec3(0, 1, 0);
+			}
+			else
+			{
+				p1 = Vec3(x, height, y);
+				p2 = Vec3(x + 1, this->heightmap[y][x + 1], y);
+				p3 = Vec3(x, this->heightmap[y + 1][x], y + 1);
+
+				A = p2 - p1;
+				B = p3 - p1;
+
+				normal = A.cross(B);
+				normal.normalize();
+			}
+
+			// vertices.push_back(Point(x, height, y, r, g, b));
+			vertices.push_back(Point(x, height, y, normal.x, normal.y, normal.z));
 		}
 	}
 

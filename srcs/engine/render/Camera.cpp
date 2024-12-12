@@ -7,14 +7,14 @@
 
 Camera::Camera(void)
 {
-	this->projection = glm::perspective(glm::radians(45.0f),
+	this->projection = glm::perspective(glm::radians(CAMERA_FOV),
 										(float)WIN_W/(float)WIN_H,
 										CAMERA_MIN_VIEW_DIST, CAMERA_MAX_VIEW_DIST);
 
-	this->pitch = 0.0f;
-	this->yaw = 0.0f;
+	this->position = glm::vec3(-127.0f, 75.0f, 103.0f);
+	this->pitch = -15.463547f;
+	this->yaw = -0.144872f;
 	this->roll = 0.0f;
-	this->position = glm::vec3(0.0f, 15.0f, 30.0f);
 
 	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
 	this->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->front));
@@ -48,6 +48,18 @@ Camera::~Camera()
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
+
+glm::vec3	Camera::getPosition(void)
+{
+	return (this->position);
+}
+
+
+glm::vec3	Camera::getDirection(void)
+{
+	return (this->front);
+}
+
 
 glm::mat4	Camera::getView(void)
 {
@@ -133,6 +145,15 @@ void	Camera::rotateZ(float degrees)
 	this->roll += degrees;
 	this->computeRotation();
 	this->computeView();
+}
+
+
+void	Camera::printInfo(void)
+{
+	printf("pos : %f, %f, %f\n", this->position.x, this->position.y, this->position.z);
+	printf("dir : %f, %f, %f\n", this->front.x, this->front.y, this->front.z);
+	printf("axis : %f, %f, %f\n", this->pitch, this->yaw, this->roll);
+	printf("\n");
 }
 
 //**** PRIVATE METHODS *********************************************************

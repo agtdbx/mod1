@@ -8,7 +8,7 @@ class InputManager
 {
 public:
 	Mouse	mouse;
-	Key		escape, w, z, a, q, s, d, up, down, left, right, space, lshift, lcontrol;
+	Key		escape, w, z, a, q, s, d, up, down, left, right, space, lshift, lcontrol, t;
 
 	InputManager(void);
 	InputManager(GLFWwindow* window);

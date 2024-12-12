@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/12 14:06:22 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/12 14:47:56 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@
 # include <engine/maths/Vec3.hpp>
 # include <engine/maths/Vec2.hpp>
 
-// # define WIN_W 1600
-// # define WIN_H 900
-# define WIN_W 1920
-# define WIN_H 1080
+# define WIN_W 1600
+# define WIN_H 900
+// # define WIN_W 1920
+// # define WIN_H 1080
 # define WIN_TITLE "mod1"
-# define MAP_SIZE 999
+# define MAX_XY 580
 # define MAX_HEIGHT 210
+# define MAP_SIZE 1000
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
 # define CAMERA_MAX_VIEW_DIST 10000.0f

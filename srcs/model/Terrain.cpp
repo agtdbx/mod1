@@ -229,6 +229,15 @@ void	Terrain::createMesh(void)
 
 	unsigned int	id_tl, id_tr, id_dl, id_dr;
 	double			r, g, b, height;
+	Vec3			A, B;
+
+	/*
+	So for a triangle p1, p2, p3, if the vector A = p2 - p1 and the vector B = p3 - p1 then the normal N = A x B and can be calculated by:
+
+	Nx = Ay * Bz - Az * By
+	Ny = Az * Bx - Ax * Bz
+	Nz = Ax * By - Ay * Bx
+	*/
 
 	for (double y = 0; y < MAP_SIZE; y++)
 	{

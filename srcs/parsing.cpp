@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/11 16:41:47 by gugus            ###   ########.fr       */
+/*   Updated: 2024/12/12 15:00:28 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,12 @@ std::vector<Vec3> parse(char *name)
 	std::string file_name = std::string(name);
 	std::ifstream file;
 	std::vector<Vec3> point_list;
+	Vec3	offset;
 	if (file_name.size() <= 5 || file_name.substr(file_name.size() - 5) != std::string(".mod1") || file_name[file_name.size() - 6] == '/')
 		throw std::invalid_argument("Error : File extension incorrrect.");
+
+	offset = Vec3(MAX_HEIGHT, MAX_HEIGHT, 0.0);
+
 	file.open(file_name);
 	if (file.is_open())
 	{
@@ -72,8 +76,13 @@ std::vector<Vec3> parse(char *name)
 
 			}
 			Vec3 vec = Vec3(atoi(string_list[0].c_str()), atoi(string_list[1].c_str()), atoi(string_list[2].c_str()));
+			if (vec.x > MAX_XY)
+				throw std::invalid_argument("Error : X coordonate for point can't be higher than " + std::to_string(MAX_XY));
+			if (vec.y > MAX_XY)
+				throw std::invalid_argument("Error : Y coordonate for point can't be higher than " + std::to_string(MAX_XY));
 			if (vec.z > MAX_HEIGHT)
-				throw std::invalid_argument("Error : Z coordonate for point can't be upper than 210.");
+				throw std::invalid_argument("Error : Z coordonate for point can't be upper than " + std::to_string(MAX_HEIGHT));
+			vec += offset;
 			point_list.push_back(vec);
 		}
 	}

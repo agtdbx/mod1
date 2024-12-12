@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/12 15:24:57 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/12 16:40:34 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
 # define CAMERA_MAX_VIEW_DIST 10000.0f
-# define CAMERA_SPEED 10.0
+# define CAMERA_SPEED 20.0
 # define CAMERA_SPRINT_FACTOR 10.0
 # define CAMERA_ROTATION_SPEED 42.0
 # define TERRAIN_PRECISION 0.01

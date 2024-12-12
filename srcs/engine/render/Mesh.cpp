@@ -210,6 +210,16 @@ void	Mesh::drawWithTexture(Shader *shader, TextureManager *textureManager, std::
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
 
 	glBindTexture(GL_TEXTURE_2D, texture);
+
+	float radius = 1.0f;
+	float camX = 0;
+	float camY = cos(glfwGetTime()) * radius;
+	float camZ = 1;
+	glm::mat4 viewCam;
+	viewCam = glm::lookAt(glm::vec3(camX, camY, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3
+	(0.0, 1.0, 0.0));
+	glUniformMatrix4fv(glGetUniformLocation(shader->getShaderId(), "view"), 1, GL_FALSE, &viewCam[0][0]);
+
 	glBindVertexArray(shader->getVAOId());
 	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
 }

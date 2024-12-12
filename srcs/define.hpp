@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/11 17:07:31 by gugus            ###   ########.fr       */
+/*   Updated: 2024/12/12 17:20:40 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@
 # define CAMERA_SPRINT_FACTOR 2.5
 # define CAMERA_ROTATION_SPEED 42.0
 # define TERRAIN_PRECISION 0.01
+# define WATER_GRAVITY 0.01
+# define COLLISION_DAMPLING 0.7
+# define WATER_DROP_SIZE 0.1
+# define SMOOTHING_RADIUS 1
+# define WATER_DROP_MASS 1
 
 std::vector<Vec3>					parse(char *name);
 

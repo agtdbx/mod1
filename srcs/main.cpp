@@ -9,13 +9,13 @@
 #include <engine/render/Camera.hpp>
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
+#include <model/WaterManager.hpp>
 
 void	events(GLFWwindow* window, InputManager *inputManager);
 void	computation(InputManager *inputManager, Camera *camera);
 void	draw(GLFWwindow* window, Camera *camera,
 				Terrain *terrain, Shader *shader,
-				TextureManager *textureManager);
-
+				TextureManager *textureManager, WaterManager *waterManager );
 
 int	main(int argc, char **argv)
 {
@@ -30,6 +30,7 @@ int	main(int argc, char **argv)
 	Terrain			terrain;
 	Shader			shader;
 	TextureManager	textureManager;
+	WaterManager	waterManager;
 	Camera			camera;
 	try
 	{
@@ -45,6 +46,14 @@ int	main(int argc, char **argv)
 		std::cerr << "Error : " << e.what() << std::endl;
 		return (1);
 	}
+	for (double i = 0; i < 100; i += 0.5)
+	{
+		for (double j = 30; j < 40; j += 0.5)
+		{
+			waterManager.addWaterDrop(Water(Vec3(10, j, i), Vec3(0, 0, 0), WATER_GRAVITY));
+		}
+	}
+	// Water water = Water(Vec3(20, 30, 30), Vec3(0, 0, 0), WATER_GRAVITY);
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window)) {
@@ -56,7 +65,12 @@ int	main(int argc, char **argv)
 
 		computation(&inputManager, &camera);
 
-		draw(context.window, &camera, &terrain, &shader, &textureManager);
+		//fluid calculation
+		waterManager.updatePosition();
+
+		//drawing map
+		draw(context.window, &camera, &terrain, &shader, &textureManager, &waterManager);
+
 	}
 
 	return (0);
@@ -116,7 +130,7 @@ void	computation(InputManager *inputManager, Camera *camera)
 
 void	draw(GLFWwindow* window, Camera *camera,
 			Terrain *terrain, Shader *shader,
-			TextureManager *textureManager)
+			TextureManager *textureManager, WaterManager *waterManager )
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
@@ -124,6 +138,7 @@ void	draw(GLFWwindow* window, Camera *camera,
 
 	// Draw mesh
 	terrain->renderMesh(camera, shader, textureManager, "dirt");
+	waterManager->draw(camera, shader, textureManager, "dirt");
 
 	// Display the new image
 	glfwSwapBuffers(window);

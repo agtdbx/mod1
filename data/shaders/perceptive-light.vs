@@ -17,7 +17,7 @@ void main()
 	float nb = dot(cameraDir, normal);
 	if (nb > 0)
 	{
-		float c = posPoint.y / 210.0;
+		float c = posPoint.y / 50.0;
 		ourColor = vec3(c, 1.0, c) * nb;
 	}
 	else

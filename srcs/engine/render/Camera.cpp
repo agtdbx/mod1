@@ -11,9 +11,9 @@ Camera::Camera(void)
 										(float)WIN_W/(float)WIN_H,
 										CAMERA_MIN_VIEW_DIST, CAMERA_MAX_VIEW_DIST);
 
-	this->position = glm::vec3(-691.0f, 304.0f, 492.0f);
-	this->pitch = -6.317865f;
-	this->yaw = 0.034562f;
+	this->position = glm::vec3(-127.0f, 75.0f, 103.0f);
+	this->pitch = -15.463547f;
+	this->yaw = -0.144872f;
 	this->roll = 0.0f;
 
 	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));

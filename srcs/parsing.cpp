@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/12 15:00:28 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/12 18:12:40 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ std::vector<Vec3> parse(char *name)
 					{
 						if (!isdigit(str[i]))
 							throw std::invalid_argument("Error : point cordonate need to pe represented as digit.");
-						if (str.size() - i > 3)
-							throw std::invalid_argument("Error : Number for point coordonate can't be upper than 999.");
+						if (str.size() - i > 2)
+							throw std::invalid_argument("Error : Number for point coordonate can't be upper than 99.");
 					}
 
 				}

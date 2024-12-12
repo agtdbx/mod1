@@ -26,6 +26,8 @@ public:
 	void	rotateY(float degrees);
 	void	rotateZ(float degrees);
 
+	void	printCoordonates(void);
+
 private:
 	glm::mat4	view, projection;
 	glm::vec3	position, front, up, right;

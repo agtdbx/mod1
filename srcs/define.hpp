@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/11 17:07:31 by gugus            ###   ########.fr       */
+/*   Updated: 2024/12/12 14:06:22 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@
 # define WIN_W 1920
 # define WIN_H 1080
 # define WIN_TITLE "mod1"
-# define MAP_SIZE 100
+# define MAP_SIZE 999
 # define MAX_HEIGHT 210
+# define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
-# define CAMERA_MAX_VIEW_DIST 210.0f
-# define CAMERA_DISTANCE_VIEW 100
+# define CAMERA_MAX_VIEW_DIST 10000.0f
 # define CAMERA_SPEED 10.0
-# define CAMERA_SPRINT_FACTOR 2.5
+# define CAMERA_SPRINT_FACTOR 10.0
 # define CAMERA_ROTATION_SPEED 42.0
 # define TERRAIN_PRECISION 0.01
 

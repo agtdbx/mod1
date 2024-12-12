@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/12 16:40:34 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/12 17:13:15 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <GL/glew.h>
 # include <GLFW/glfw3.h>
 # include <vector>
+
 # include <engine/maths/Vec3.hpp>
 # include <engine/maths/Vec2.hpp>
 
@@ -35,6 +36,7 @@
 # define CAMERA_SPRINT_FACTOR 10.0
 # define CAMERA_ROTATION_SPEED 42.0
 # define TERRAIN_PRECISION 0.01
+# define PRINT_FPS_TIME 1.0
 
 std::vector<Vec3>	parse(char *name);
 

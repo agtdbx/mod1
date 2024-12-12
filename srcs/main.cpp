@@ -76,12 +76,28 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 
 void	computation(InputManager *inputManager, Camera *camera)
 {
+	static std::vector<double> deltas;
+	static double	timePrintFps = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
 	currentTime = glfwGetTime();
 	delta = currentTime - lastTime;
 	lastTime = currentTime;
+
+	timePrintFps += delta;
+	deltas.push_back(delta);
+	if (timePrintFps >= PRINT_FPS_TIME)
+	{
+		timePrintFps -= PRINT_FPS_TIME;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		std::cout << "fps : " << 1.0 / avg << std::endl;
+	}
 
 	cameraSpeed = CAMERA_SPEED * delta;
 	if (inputManager->lcontrol.isDown())

@@ -1,10 +1,13 @@
 import pygame as pg
+import math
 import time
 import sys
 
 from pygame.math import Vector2 as vec2
 
-from define import WIN_W, WIN_H, NB_WATER, WATER_RADIUS, GRAVITY
+from define import  WIN_W, WIN_H, GRAVITY, NB_WATER, WATER_RADIUS,\
+                    WATER_EFFECT_RADIUS2, WATER_EFFECT_STRENGH,\
+                    WATER_FRICTION_RATIO
 from terrain import Terrain
 from water import Water
 
@@ -27,6 +30,7 @@ class Game:
         self.last = time.time()
         self.deltas = []
         self.fpsPrintTime = 0
+        self.waitInput = 0
 
         self.on_focus = True
 
@@ -34,6 +38,10 @@ class Game:
 
         self.terrain = Terrain()
 
+        self.gravity = True
+        # self.gravity = False
+
+        self.nbWater = NB_WATER
         self.waters = []
         for i in range(NB_WATER):
             x = WATER_RADIUS + (WATER_RADIUS * 2) * i
@@ -92,19 +100,66 @@ class Game:
         delta = tmp - self.last
         self.last = tmp
 
+        # Print fps
         self.deltas.append(delta)
         self.fpsPrintTime += delta
         if self.fpsPrintTime >= 1:
             self.fpsPrintTime -= 1
             avg = sum(self.deltas) / len(self.deltas)
-            print(f"fps : {1.0 / avg:.2f}")
+            self.deltas.clear()
+            print(f"fps : {1.0 / avg:7.2f} | water {self.nbWater:4}")
 
-        for i in range(NB_WATER):
-            self.waters[i].applyForce(vec2(0, 1), GRAVITY)
+        # Add water
+        self.waitInput = max(0, self.waitInput - delta)
+        if self.mouseState[0] and self.waitInput == 0:
+            self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
+            self.nbWater += 1
+            self.waitInput = 0.2
+        elif self.mouseState[1] and self.waitInput == 0:
+            self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
+            self.nbWater += 1
+        elif self.mouseState[2] and self.waitInput == 0:
+            self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
+            self.nbWater += 1
+            self.waitInput = 0.05
+        elif self.keyboardState[pg.K_SPACE] and self.waitInput == 0:
+            self.gravity = not self.gravity
+            self.waitInput = 0.2
 
-        for water in self.waters:
-            water.tick(delta, self.terrain.get_lines())
+        # Water simulation
+        for i in range(self.nbWater):
+            water: Water = self.waters[i]
+            for j in range(self.nbWater):
+                otherWater: Water = self.waters[j]
+                if i == j:
+                    continue
 
+                dirX = otherWater.pos.x - water.pos.x
+                dirY = otherWater.pos.y - water.pos.y
+
+                dist = dirX**2 + dirY**2
+
+                if dist > WATER_EFFECT_RADIUS2:
+                    continue
+
+                force = (1 - (dist / WATER_EFFECT_RADIUS2)) * WATER_EFFECT_STRENGH
+                if dist != 0:
+                    dir = vec2(dirX, dirY) / math.sqrt(dist)
+                else:
+                    dir = vec2(1, 0)
+                forcePerWater = force / 2
+                water.speed *= WATER_FRICTION_RATIO
+
+                otherWater.applyForce(dir, forcePerWater)
+                water.applyForce(-dir, forcePerWater)
+
+        if self.gravity:
+            for water in self.waters:
+                water.applyForce(vec2(0, 1), GRAVITY)
+                water.tick(delta, self.terrain.get_lines())
+        else:
+            for water in self.waters:
+                water.tick(delta, self.terrain.get_lines())
 
 
     def render(self):

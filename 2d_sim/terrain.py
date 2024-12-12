@@ -80,7 +80,7 @@ class Terrain:
         for i in range(0, len(self.points) - 1):
             p1 = vec2(self.points[i])
             p2 = vec2(self.points[i + 1])
-            tmp = p2 - p1
+            tmp = p1 - p2
             n = vec2(-tmp.y, tmp.x).normalize()
             line = (p1, p2, n)
             self.lines.append(line)
@@ -116,4 +116,8 @@ class Terrain:
     def draw(self, window):
         for line in self.lines:
             pg.draw.line(window, MAP_COLOR, line[0], line[1])
+            mid = (line[0] - line[1]) / 2 + line[1]
+            nmid = mid + line[2] * 10
+            pg.draw.line(window, (255, 0, 0), mid, nmid)
+
 

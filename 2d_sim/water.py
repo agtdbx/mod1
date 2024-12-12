@@ -49,7 +49,7 @@ class Water:
 
             # Reflection
             if n.dot(self.dir) >= 0:
-                n *= -1
+                n = n.copy() * -1
 
             divider = self.dir.dot(self.dir)
             if divider == 0:
@@ -69,7 +69,7 @@ class Water:
 
         self.pos = newpos
         self.speed *= AIR_FRICTION_RATIO
-        if self.speed < 0.1:
+        if self.speed < 1:
             self.speed = 0
             self.dir = vec2(0, 0)
 

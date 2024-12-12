@@ -116,9 +116,30 @@ Mesh::~Mesh()
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
-
 //---- Setters -----------------------------------------------------------------
 
+void Mesh::setVertices(std::vector<Point> & vertices)
+{
+	this->nbVertices = vertices.size() * 8;
+	this->vertices = new float[this->nbVertices];
+
+	if (this->vertices == NULL)
+		throw new std::invalid_argument("Mesh vertrices alloc failed");
+
+	int	id;
+	for (int i = 0; i < this->nbVertices; i += 8)
+	{
+		id = i / 8;
+		this->vertices[i] = vertices[id].pos.x;
+		this->vertices[i + 1] = vertices[id].pos.y;
+		this->vertices[i + 2] = vertices[id].pos.z;
+		this->vertices[i + 3] = vertices[id].r;
+		this->vertices[i + 4] = vertices[id].g;
+		this->vertices[i + 5] = vertices[id].b;
+		this->vertices[i + 6] = vertices[id].imgx;
+		this->vertices[i + 7] = vertices[id].imgy;
+	}
+}
 //---- Operators ---------------------------------------------------------------
 
 Mesh	&Mesh::operator=(const Mesh &obj)

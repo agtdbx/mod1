@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 13:55:30 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/12 17:20:21 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/12 18:39:10 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 class Water 
 {
 private:
-
+	std::vector<Point>		vertices;
 	Vec3 position;
 	Vec3 velocity;
 	double gravity;

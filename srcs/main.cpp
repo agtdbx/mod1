@@ -55,6 +55,16 @@ int	main(int argc, char **argv)
 			waterManager.addWaterDrop(Water(Vec3(10, j, i), Vec3(0, 0, 0), WATER_GRAVITY));
 		}
 	}
+	// for (double i = 0; i < 100; i += 0.5)
+	// {
+	// 	for (double j = 30; j < 40; j += 0.5)
+	// 	{
+	// 		for (double k = 0; k < 100; k += 0.5)
+	// 		{
+	// 			waterManager.addWaterDrop(Water(Vec3(k, j, i), Vec3(0, 0, 0), WATER_GRAVITY));
+	// 		}
+	// 	}
+	// }
 	// Water water = Water(Vec3(20, 30, 30), Vec3(0, 0, 0), WATER_GRAVITY);
 
 	// Main loop

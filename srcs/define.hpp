@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/12 14:47:56 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/12 15:24:57 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 # define CAMERA_ROTATION_SPEED 42.0
 # define TERRAIN_PRECISION 0.01
 
-std::vector<Vec3>					parse(char *name);
+std::vector<Vec3>	parse(char *name);
 
 
 #endif

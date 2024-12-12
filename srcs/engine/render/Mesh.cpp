@@ -205,8 +205,8 @@ void	Mesh::draw(Camera *camera, Shader *shader, TextureManager *textureManager, 
 	{
 		return ;
 	}
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_DYNAMIC_DRAW);
 
 	shader->use();
 
@@ -216,6 +216,8 @@ void	Mesh::draw(Camera *camera, Shader *shader, TextureManager *textureManager, 
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->getView()));
 	int projLoc = glGetUniformLocation(shader->getShaderId(), "proj");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->getProjection()));
+	int cameraPosLoc = glGetUniformLocation(shader->getShaderId(), "cameraPos");
+	glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera->getPosition()));
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(shader->getVAOId());

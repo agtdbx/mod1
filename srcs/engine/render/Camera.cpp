@@ -49,6 +49,18 @@ Camera::~Camera()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
+glm::vec3	Camera::getPosition(void)
+{
+	return (this->position);
+}
+
+
+glm::vec3	Camera::getDirection(void)
+{
+	return (this->front);
+}
+
+
 glm::mat4	Camera::getView(void)
 {
 	return (this->view);
@@ -136,10 +148,12 @@ void	Camera::rotateZ(float degrees)
 }
 
 
-void	Camera::printCoordonates(void)
+void	Camera::printInfo(void)
 {
 	printf("pos : %f, %f, %f\n", this->position.x, this->position.y, this->position.z);
-	printf("dir : %f, %f, %f\n", this->pitch, this->yaw, this->roll);
+	printf("dir : %f, %f, %f\n", this->front.x, this->front.y, this->front.z);
+	printf("axis : %f, %f, %f\n", this->pitch, this->yaw, this->roll);
+	printf("\n");
 }
 
 //**** PRIVATE METHODS *********************************************************

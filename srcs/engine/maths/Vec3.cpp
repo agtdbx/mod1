@@ -236,9 +236,10 @@ double	Vec3::dot(const Vec3 &vec3) const
 Vec3	Vec3::cross(const Vec3 &vec3) const
 {
 	return (Vec3((this->y * vec3.z) - (this->z * vec3.y),
-					(this->z * vec3.x) - (this->x - vec3.z),
+					(this->z * vec3.x) - (this->x * vec3.z),
 					(this->x * vec3.y) - (this->y * vec3.x)));
 }
+
 
 double	Vec3::distanceWith(const Vec3 &vec3) const
 {
@@ -333,29 +334,29 @@ std::ostream&	operator<<(std::ostream &os, const Vec3 &vec3)
 
 //---- Vector vector operator --------------------------------------------------
 
-inline Vec3		operator+(const Vec3 &v1, const Vec3 &v2)
+Vec3		operator+(const Vec3 &v1, const Vec3 &v2)
 {
 	return (Vec3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z));
 }
 
 
-inline Vec3		operator-(const Vec3 &v1, const Vec3 &v2)
+Vec3		operator-(const Vec3 &v1, const Vec3 &v2)
 {
 	return (Vec3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z));
 }
 
 //---- Vector number operator --------------------------------------------------
-inline Vec3		operator*(const Vec3 &vec3, const double number)
+Vec3		operator*(const Vec3 &vec3, const double number)
 {
 	return (Vec3(vec3.x * number, vec3.y * number, vec3.z * number));
 }
 
-inline Vec3		operator*(const double number, const Vec3 &vec3)
+Vec3		operator*(const double number, const Vec3 &vec3)
 {
 	return (Vec3(vec3.x * number, vec3.y * number, vec3.z * number));
 }
 
-inline Vec3		operator/(const Vec3 &vec3, const double number)
+Vec3		operator/(const Vec3 &vec3, const double number)
 {
 	if (number == 0.0)
 		return (Vec3());
@@ -368,13 +369,13 @@ inline Vec3		operator/(const Vec3 &vec3, const double number)
 //**** FUNCTIONS ***************************************************************
 //---- Vector vector functions -------------------------------------------------
 
-inline double	Vec3Dot(const Vec3 &v1, const Vec3 &v2)
+double	Vec3Dot(const Vec3 &v1, const Vec3 &v2)
 {
 	return ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z));
 }
 
 
-inline Vec3	Vec3Cross(const Vec3 &v1, const Vec3 &v2)
+Vec3	Vec3Cross(const Vec3 &v1, const Vec3 &v2)
 {
 	return (Vec3((v1.y * v2.z) - (v1.z * v2.y),
 					(v1.z * v2.x) - (v1.x - v2.z),

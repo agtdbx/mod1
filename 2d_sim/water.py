@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 
 from pygame.math import Vector2 as vec2
 from define import WATER_RADIUS, WATER_COLOR, WIN_W, WIN_H, AIR_FRICTION_RATIO
@@ -24,7 +25,15 @@ class Water:
         newpos = self.pos + self.dir * self.speed * delta
 
         for line in lines:
-            pass
+            p1, p2, n = line
+            if not line_circle_collision(p1.x, p1.y, p2.x, p2.y,
+                                         self.pos.x, self.pos.y, WATER_RADIUS):
+                continue
+
+            newpos = self.pos
+            self.dir = vec2(0, 0)
+            self.speed = 0
+            break
 
         # Collision with window
         newpos.x = max(WATER_RADIUS, min(WIN_W - WATER_RADIUS, newpos.x))
@@ -41,42 +50,41 @@ class Water:
         pg.draw.circle(win, WATER_COLOR, self.pos, WATER_RADIUS)
 
 
-def line_circle_collision(x1, y1, x2, y2, cx, cy, r):
-# // is either end INSIDE the circle?
-# // if so, return true immediately
-# boolean inside1 = pointCircle(x1,y1, cx,cy,r);
-# boolean inside2 = pointCircle(x2,y2, cx,cy,r);
-# if (inside1 || inside2) return true;
+def line_circle_collision(x1, y1, x2, y2, cx, cy, r) -> bool:
+    OPx = x1 - cx
+    OPy = y1 - cy
+    distOP = math.sqrt(OPx**2 + OPy**2)
 
-# // get length of the line
-# float distX = x1 - x2;
-# float distY = y1 - y2;
-# float len = sqrt( (distX*distX) + (distY*distY) );
+    OQx = x2 - cx
+    OQy = y2 - cy
+    distOQ = math.sqrt(OQx**2 + OQy**2)
 
-# // get dot product of the line and circle
-# float dot = ( ((cx-x1)*(x2-x1)) + ((cy-y1)*(y2-y1)) ) / pow(len,2);
+    if distOP > distOQ:
+        maxDist = distOP
+        minDist = distOQ
+    else:
+        maxDist = distOQ
+        minDist = distOP
 
-# // find the closest point on the line
-# float closestX = x1 + (dot * (x2-x1));
-# float closestY = y1 + (dot * (y2-y1));
+    if maxDist < r:
+        return False
 
-# // is this point actually on the line segment?
-# // if so keep going, but if not, return false
-# boolean onSegment = linePoint(x1,y1,x2,y2, closestX,closestY);
-# if (!onSegment) return false;
+    PQx = x2 - x1
+    PQy = y2 - y1
+    distPQ = math.sqrt(PQx**2 + PQy**2)
 
-# // optionally, draw a circle at the closest
-# // point on the line
-# fill(255,0,0);
-# noStroke();
-# ellipse(closestX, closestY, 20, 20);
+    QPx = x1 - x2
+    QPy = y1 - y2
 
-# // get distance to closest point
-# distX = closestX - cx;
-# distY = closestY - cy;
-# float distance = sqrt( (distX*distX) + (distY*distY) );
+    OPdotQP = OPx * QPx + OPy * QPy
 
-# if (distance <= r) {
-# return true;
-# }
-# return false;
+    if OPdotQP > 0:
+        OQdotPQ = OQx * PQx + OQy * PQy
+        if OQdotPQ > 0:
+            tri_area = abs(cx * QPy + x1 * OQy + x2 * (cy - y1)) * 0.5
+            minDist = (2 * tri_area) / distPQ
+
+    if minDist <= r and maxDist >= r:
+        return True
+
+    return False

@@ -22,9 +22,11 @@ class Game:
         self.win = pg.display.set_mode(self.winSize, pg.RESIZABLE)
 
         self.clock = pg.time.Clock() # The clock be used to limit our fps
-        self.fps = 60
+        self.fps = 0
 
         self.last = time.time()
+        self.deltas = []
+        self.fpsPrintTime = 0
 
         self.on_focus = True
 
@@ -33,9 +35,13 @@ class Game:
         self.terrain = Terrain()
 
         self.waters = []
-        for x in range(NB_WATER):
-            self.waters.append(Water(WATER_RADIUS + (WATER_RADIUS + 5) * x,
-                                     WATER_RADIUS))
+        for i in range(NB_WATER):
+            x = WATER_RADIUS + (WATER_RADIUS * 2) * i
+            y = WATER_RADIUS
+            while x >= WIN_W:
+                x -= WIN_W
+                y += WATER_RADIUS * 2
+            self.waters.append(Water(x, y))
 
 
     def run(self):
@@ -86,13 +92,19 @@ class Game:
         delta = tmp - self.last
         self.last = tmp
 
+        self.deltas.append(delta)
+        self.fpsPrintTime += delta
+        if self.fpsPrintTime >= 1:
+            self.fpsPrintTime -= 1
+            avg = sum(self.deltas) / len(self.deltas)
+            print(f"fps : {1.0 / avg:.2f}")
+
         for i in range(NB_WATER):
             self.waters[i].applyForce(vec2(0, 1), GRAVITY)
 
         for water in self.waters:
             water.tick(delta, self.terrain.get_lines())
 
-        pg.display.set_caption("fps : {:.2f}".format(self.clock.get_fps()))
 
 
     def render(self):

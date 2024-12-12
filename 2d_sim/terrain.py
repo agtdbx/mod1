@@ -1,16 +1,18 @@
 import pygame as pg
 
 from pygame.math import Vector2 as vec2
-from define import WIN_W, WIN_H, MAX_MAP_W, MAX_MAP_H, MAP_DETAIL, PARAM_POINTS, MAP_COLOR
+from define import  WIN_W, WIN_H, MAX_MAP_W, MAX_MAP_H, MAP_DETAIL,\
+                    PARAM_POINTS, MAP_COLOR
 
 class Terrain:
     def __init__(self):
         self.size = MAX_MAP_W * MAP_DETAIL
-        self.draw_w = WIN_W / self.size
+        self.draw_w = WIN_W / (self.size - 1)
         self.draw_h = (WIN_H - 50) / MAX_MAP_H
         self.parse_params(PARAM_POINTS)
         self.generate_points()
         self.generate_lines()
+        self.merge_lines()
 
 
     def parse_params(self, params):
@@ -79,9 +81,32 @@ class Terrain:
             p1 = vec2(self.points[i])
             p2 = vec2(self.points[i + 1])
             tmp = p2 - p1
-            n = vec2(-tmp.y, tmp.x)
+            n = vec2(-tmp.y, tmp.x).normalize()
             line = (p1, p2, n)
             self.lines.append(line)
+
+
+    def merge_lines(self):
+        print(f"nb lines : {len(self.lines)}")
+
+        lines = []
+        currLine = None
+        for line in self.lines:
+            if currLine == None:
+                currLine = line
+                continue
+
+            if currLine[2] != line[2]:
+                lines.append(currLine)
+                currLine = line
+                continue
+
+            currLine = (currLine[0], line[1], currLine[2])
+
+        lines.append(currLine)
+        self.lines = lines
+
+        print(f"nb lines : {len(self.lines)}")
 
 
     def get_lines(self) -> list:

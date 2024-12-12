@@ -1,6 +1,7 @@
 import pygame as pg
 
-from define import WIN_W, WIN_H, MAX_MAP_W, MAX_MAP_H, MAP_DETAIL, PARAM_POINTS
+from pygame.math import Vector2 as vec2
+from define import WIN_W, WIN_H, MAX_MAP_W, MAX_MAP_H, MAP_DETAIL, PARAM_POINTS, MAP_COLOR
 
 class Terrain:
     def __init__(self):
@@ -8,15 +9,8 @@ class Terrain:
         self.draw_w = WIN_W / self.size
         self.draw_h = (WIN_H - 50) / MAX_MAP_H
         self.parse_params(PARAM_POINTS)
-
-
-    def generate_points(self):
-        self.points = []
-
-        for i in range(0, len(self.heightmap)):
-            x = int(i * self.draw_w)
-            y = WIN_H - 20 - (self.heightmap[i][0] * self.draw_h)
-            self.points.append((x, y))
+        self.generate_points()
+        self.generate_lines()
 
 
     def parse_params(self, params):
@@ -69,10 +63,32 @@ class Terrain:
 
             next_points = new_points.copy()
 
-        self.generate_points()
+
+    def generate_points(self):
+        self.points = []
+
+        for i in range(0, len(self.heightmap)):
+            x = int(i * self.draw_w)
+            y = WIN_H - 20 - (self.heightmap[i][0] * self.draw_h)
+            self.points.append((x, y))
+
+
+    def generate_lines(self):
+        self.lines = []
+        for i in range(0, len(self.points) - 1):
+            p1 = vec2(self.points[i])
+            p2 = vec2(self.points[i + 1])
+            tmp = p2 - p1
+            n = vec2(-tmp.y, tmp.x)
+            line = (p1, p2, n)
+            self.lines.append(line)
+
+
+    def get_lines(self) -> list:
+        return self.lines
 
 
     def draw(self, window):
-        for i in range(1, len(self.points)):
-            pg.draw.line(window, (200, 200, 200), self.points[i - 1], self.points[i])
+        for line in self.lines:
+            pg.draw.line(window, MAP_COLOR, line[0], line[1])
 

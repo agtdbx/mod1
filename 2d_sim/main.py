@@ -4,8 +4,9 @@ import sys
 
 from pygame.math import Vector2 as vec2
 
-from define import WIN_W, WIN_H
+from define import WIN_W, WIN_H, NB_WATER, WATER_RADIUS, GRAVITY
 from terrain import Terrain
+from water import Water
 
 class Game:
     def __init__(self):
@@ -30,6 +31,11 @@ class Game:
         self.runMainLoop = True
 
         self.terrain = Terrain()
+
+        self.waters = []
+        for x in range(NB_WATER):
+            self.waters.append(Water(WATER_RADIUS + (WATER_RADIUS + 5) * x,
+                                     WATER_RADIUS))
 
 
     def run(self):
@@ -80,6 +86,12 @@ class Game:
         delta = tmp - self.last
         self.last = tmp
 
+        for i in range(NB_WATER):
+            self.waters[i].applyForce(vec2(0, 1), GRAVITY)
+
+        for water in self.waters:
+            water.tick(delta, self.terrain.get_lines())
+
         pg.display.set_caption("fps : {:.2f}".format(self.clock.get_fps()))
 
 
@@ -91,6 +103,9 @@ class Game:
         self.win.fill((0, 0, 0))
 
         self.terrain.draw(self.win)
+
+        for water in self.waters:
+            water.draw(self.win)
 
         # We update the drawing.
         # Before the function call, any changes will be not visible

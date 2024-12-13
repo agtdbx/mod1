@@ -2,7 +2,7 @@ import pygame as pg
 
 from pygame.math import Vector2 as vec2
 from define import  WIN_W, WIN_H, MAX_MAP_W, MAX_MAP_H, MAP_DETAIL,\
-                    PARAM_POINTS, MAP_COLOR
+                    PARAM_POINTS, MAP_COLOR, MAP_SPLIT_SIZE
 
 class Terrain:
     def __init__(self):
@@ -12,7 +12,8 @@ class Terrain:
         self.parse_params(PARAM_POINTS)
         self.generate_points()
         self.generate_lines()
-        self.merge_lines()
+        # self.merge_lines()
+        self.split_lines()
 
 
     def parse_params(self, params):
@@ -109,8 +110,24 @@ class Terrain:
         print(f"nb lines : {len(self.lines)}")
 
 
+    def split_lines(self):
+        self.splited_lines = []
+        self.nb_splited_lines = WIN_W // MAP_SPLIT_SIZE + 1
+        for i in range(self.nb_splited_lines):
+            lines = []
+            for line in self.lines:
+                if line[0].x >= (i - 2) * MAP_SPLIT_SIZE and\
+                    line[1].x <= (i + 3) * MAP_SPLIT_SIZE:
+                    lines.append(line)
+            self.splited_lines.append(lines)
+
+
     def get_lines(self) -> list:
         return self.lines
+
+
+    def get_split_lines(self, x: float) -> list:
+        return self.splited_lines[int(x / MAP_SPLIT_SIZE)]
 
 
     def draw(self, window):

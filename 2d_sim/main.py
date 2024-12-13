@@ -6,8 +6,8 @@ import sys
 from pygame.math import Vector2 as vec2
 
 from define import  WIN_W, WIN_H, GRAVITY, NB_WATER, WATER_RADIUS,\
-                    WATER_EFFECT_RADIUS2, WATER_EFFECT_STRENGH,\
-                    WATER_FRICTION_RATIO
+                    WATER_EFFECT_RADIUS, WATER_EFFECT_RADIUS2,\
+                    WATER_EFFECT_STRENGH, WATER_FRICTION_RATIO
 from terrain import Terrain
 from water import Water
 
@@ -50,6 +50,9 @@ class Game:
                 x -= WIN_W
                 y += WATER_RADIUS * 2
             self.waters.append(Water(x, y))
+        self.waterTiles = []
+        self.waterTilesW = WIN_W // WATER_EFFECT_RADIUS + 1
+        self.waterTilesH = WIN_H // WATER_EFFECT_RADIUS + 1
 
 
     def run(self):
@@ -126,11 +129,50 @@ class Game:
             self.gravity = not self.gravity
             self.waitInput = 0.2
 
+        # Generate tiles
+        self.waterTiles.clear()
+        for y in range(self.waterTilesH):
+            lineTile = []
+            for x in range(self.waterTilesW):
+                lineTile.append([])
+            self.waterTiles.append(lineTile)
+
+        # Put every water in there tiles
+        for i in range(self.nbWater):
+            water: Water = self.waters[i]
+            tx = int(water.pos.x // WATER_EFFECT_RADIUS)
+            ty = int(water.pos.y // WATER_EFFECT_RADIUS)
+            self.waterTiles[ty][tx].append((water, i))
+
+            canLeft = (tx > 0)
+            canRight = (tx < self.waterTilesW - 1)
+            canUp = (ty > 0)
+            canDown = (ty < self.waterTilesH - 1)
+
+            if canLeft:
+                self.waterTiles[ty][tx - 1].append((water, i))
+            if canRight:
+                self.waterTiles[ty][tx + 1].append((water, i))
+            if canUp:
+                self.waterTiles[ty - 1][tx].append((water, i))
+            if canDown:
+                self.waterTiles[ty + 1][tx].append((water, i))
+            if canLeft and canUp:
+                self.waterTiles[ty - 1][tx - 1].append((water, i))
+            if canLeft and canDown:
+                self.waterTiles[ty + 1][tx - 1].append((water, i))
+            if canRight and canUp:
+                self.waterTiles[ty - 1][tx + 1].append((water, i))
+            if canRight and canDown:
+                self.waterTiles[ty + 1][tx + 1].append((water, i))
+
         # Water simulation
         for i in range(self.nbWater):
             water: Water = self.waters[i]
-            for j in range(self.nbWater):
-                otherWater: Water = self.waters[j]
+            tx = int(water.pos.x // WATER_EFFECT_RADIUS)
+            ty = int(water.pos.y // WATER_EFFECT_RADIUS)
+
+            for otherWater, j in self.waterTiles[ty][tx]:
                 if i == j:
                     continue
 
@@ -142,7 +184,7 @@ class Game:
                 if dist > WATER_EFFECT_RADIUS2:
                     continue
 
-                force = (1 - (dist / WATER_EFFECT_RADIUS2)) * WATER_EFFECT_STRENGH
+                force = (1 - ((dist**2) / (WATER_EFFECT_RADIUS2**2))) * WATER_EFFECT_STRENGH
                 if dist != 0:
                     dir = vec2(dirX, dirY) / math.sqrt(dist)
                 else:
@@ -153,13 +195,14 @@ class Game:
                 otherWater.applyForce(dir, forcePerWater)
                 water.applyForce(-dir, forcePerWater)
 
+        # Tick waters
         if self.gravity:
             for water in self.waters:
                 water.applyForce(vec2(0, 1), GRAVITY)
-                water.tick(delta, self.terrain.get_lines())
+                water.tick(delta, self.terrain.get_split_lines(water.pos.x))
         else:
             for water in self.waters:
-                water.tick(delta, self.terrain.get_lines())
+                water.tick(delta, self.terrain.get_split_lines(water.pos.x))
 
 
     def render(self):

@@ -7,7 +7,9 @@ from pygame.math import Vector2 as vec2
 
 from define import  WIN_W, WIN_H, GRAVITY, NB_WATER, WATER_RADIUS,\
                     WATER_EFFECT_RADIUS, WATER_EFFECT_RADIUS2,\
-                    WATER_EFFECT_STRENGH, WATER_FRICTION_RATIO,\
+                    WATER_EFFECT_REPULS_RADIUS, WATER_EFFECT_REPULS_RADIUS2,\
+                    WATER_EFFECT_ATTRACT_STRENGH, WATER_EFFECT_REPULS_STRENGH,\
+                    WATER_EFFECT_ATTRACT_RADIUS2, WATER_FRICTION_RATIO,\
                     MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE
 from terrain import Terrain
 from water import Water
@@ -146,8 +148,6 @@ class Game:
                 dir /= math.sqrt(lenght)
                 water.applyForce(dir, MOUSE_FORCE)
 
-
-
         # Generate tiles
         self.waterTiles.clear()
         for y in range(self.waterTilesH):
@@ -203,11 +203,16 @@ class Game:
                 if dist > WATER_EFFECT_RADIUS2:
                     continue
 
-                force = (1 - ((dist**2) / (WATER_EFFECT_RADIUS2**2))) * WATER_EFFECT_STRENGH
                 if dist != 0:
                     dir = vec2(dirX, dirY) / math.sqrt(dist)
                 else:
                     dir = vec2(1, 0)
+                if dist > WATER_EFFECT_REPULS_RADIUS2:
+                    dist -= WATER_EFFECT_REPULS_RADIUS2
+                    dir = -dir
+                    force = (1 - ((dist**3) / (WATER_EFFECT_ATTRACT_RADIUS2**3))) * WATER_EFFECT_ATTRACT_STRENGH
+                else:
+                    force = (1 - ((dist**2) / (WATER_EFFECT_REPULS_RADIUS2**2))) * WATER_EFFECT_REPULS_STRENGH
                 forcePerWater = force / 2
                 water.speed *= WATER_FRICTION_RATIO
 

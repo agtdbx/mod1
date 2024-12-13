@@ -7,9 +7,9 @@ import sys
 from pygame.math import Vector2 as vec2
 
 from define import  WIN_W, WIN_H, NB_WATER, WATER_BEGIN_SPACE,\
-                    WATER_RADIUS, WATER_COLOR, WATER_INFLUENCE_RADIUS
+                    WATER_RADIUS, WATER_COLOR, WATER_SMOOTHING_RADIUS, GRAVITY
 # from terrain import Terrain
-from water import updateWater, computeDensity, computePropertyGradient
+from water import updateWater, calculateDensity, calculatePressureForce
 
 class Game:
     def __init__(self):
@@ -39,29 +39,33 @@ class Game:
         # self.terrain = Terrain()
 
         self.nbWater = NB_WATER
-        self.waterPosition = []
-        self.waterVelocity = []
-        self.waterDensity = []
+        self.waterPositions = []
+        self.waterVelocities = []
+        self.waterDensities = []
 
         if NB_WATER > 0:
             # waterPerRow = int(math.sqrt(NB_WATER))
-            # waterPerCol = (NB_WATER - 1) / waterPerRow + 1
-            # startX = WIN_W / 2 - (-waterPerRow + WATER_RADIUS * 2 * WATER_BEGIN_SPACE) / 1.35
+            # width = waterPerRow * WATER_RADIUS * 2 +\
+            #         (waterPerRow - 1) * WATER_BEGIN_SPACE
+            # startX = WIN_W / 2 - width / 2
+            # startY = WATER_RADIUS + WATER_BEGIN_SPACE
             # for i in range(NB_WATER):
-            #     x = startX + (i % waterPerRow - waterPerRow + WATER_RADIUS * 2) * WATER_BEGIN_SPACE
-            #     y = (i // waterPerRow - waterPerCol + WATER_RADIUS * 2) * WATER_BEGIN_SPACE
+            #     x = startX + (i % waterPerRow) *\
+            #             (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
+            #     y = startY + (i // waterPerRow) *\
+            #             (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
 
-            #     self.waterPosition.append(vec2(x, y))
-            #     self.waterVelocity.append(vec2(0, 0))
-            #     self.waterDensity.append(0)
+            #     self.waterPositions.append(vec2(x, y))
+            #     self.waterVelocities.append(vec2(0, 0))
+            #     self.waterDensities.append(0)
 
-            for i in range(NB_WATER):
+            for _ in range(NB_WATER):
                 x = random.randint(WATER_RADIUS, WIN_W - WATER_RADIUS - 1)
                 y = random.randint(WATER_RADIUS, WIN_H - WATER_RADIUS - 1)
 
-                self.waterPosition.append(vec2(x, y))
-                self.waterVelocity.append(vec2(0, 0))
-                self.waterDensity.append(0)
+                self.waterPositions.append(vec2(x, y))
+                self.waterVelocities.append(vec2(0, 0))
+                self.waterDensities.append(0)
 
 
     def run(self):
@@ -120,26 +124,45 @@ class Game:
             self.deltas.clear()
             print(f"fps : {1.0 / avg:7.2f} | water {self.nbWater:4}")
 
-        for i in range(self.nbWater):
-            self.waterDensity[i] = computeDensity(i, self.waterPosition, self.nbWater)
+        # if self.waitInput > 0:
+        #     self.waitInput = max(0, self.waitInput - delta)
+        # else:
+        #     if self.mouseState[0]:
+        #         density = calculateDensity(vec2(self.mousePos),
+        #                                    self.waterPositions)
+        #         print(f"density : {density}")
+        #         self.waitInput = 0.2
 
-
+        # =========================================================
         # Simulate and draw water
-        for i in range(self.nbWater):
-            pos = self.waterPosition[i]
-            velocity = self.waterVelocity[i]
+        # =========================================================
+        delta *= 10 # To speed up the simulation
 
-            gradient = computePropertyGradient(i, self.waterPosition, self.waterDensity, self.nbWater)
+        # Apply gravity and compute densities
+        for i in range(self.nbWater):
+            pos = self.waterPositions[i]
+            # self.waterVelocities[i] += vec2(0, 1) * GRAVITY * delta
+            self.waterDensities[i] = calculateDensity(pos, self.waterPositions)
+
+        # Calculate and apply pressure
+        for i in range(self.nbWater):
+            pos = self.waterPositions[i]
+            pressureForce = calculatePressureForce(i, self.waterPositions,
+                                                   self.waterDensities)
+            pressureAcceleration = pressureForce / self.waterDensities[i]
+            self.waterVelocities[i] = pressureAcceleration * delta
+
+        # Update positions with screen collision
+        for i in range(self.nbWater):
+            pos = self.waterPositions[i]
+            velocity = self.waterVelocities[i]
+
             pos, velocity = updateWater(pos, velocity, delta)
 
             pg.draw.circle(self.win, WATER_COLOR, pos, WATER_RADIUS)
 
-            self.waterPosition[i] = pos
-            self.waterVelocity[i] = velocity
-
-            p1 = pos
-            p2 = p1 + gradient.normalize() * 20
-            pg.draw.line(self.win, (255, 0, 0), p1, p2)
+        # pg.draw.circle(self.win, (255, 0, 0), self.mousePos,
+        #                WATER_SMOOTHING_RADIUS, 1)
 
         # We update the drawing.
         # Before the function call, any changes will be not visible

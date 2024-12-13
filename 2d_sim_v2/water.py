@@ -1,22 +1,17 @@
+import random
 import math
 
 from pygame.math import Vector2 as vec2
-from define import  GRAVITY, COLLISION_ENERGY_KEEP, WATER_RADIUS2, WATER_MASS,\
+from define import  COLLISION_ENERGY_KEEP,\
                     WATER_MIN_X, WATER_MAX_X, WATER_MIN_Y, WATER_MAX_Y,\
-                    WATER_INFLUENCE_RADIUS, WATER_INFLUENCE_RADIUS2,\
-                    WATER_INFLUENCE_VOLUME, WATER_INFLUENCE_SCALE
+                    WATER_SMOOTHING_RADIUS, WATER_SMOOTHING_RADIUS2, WATER_MASS,\
+                    WATER_SMOOTHING_VOLUME, TARGET_DENSITY, PRESSURE_MULTIPLIER,\
+                    WATER_SMOOTHING_SCALE
 
 def updateWater(pos: vec2, velocity: vec2, delta: float) -> tuple[vec2, vec2]:
-    # velocity += vec2(0, 1) * GRAVITY * delta
     pos += velocity * delta
 
     # Collision with the screen
-    collisionWithWindow(pos, velocity)
-
-    return (pos, velocity)
-
-
-def collisionWithWindow(pos: vec2, velocity: vec2):
     if pos.x < WATER_MIN_X:
         pos.x = WATER_MIN_X
         velocity.x *= -1 * COLLISION_ENERGY_KEEP
@@ -30,60 +25,78 @@ def collisionWithWindow(pos: vec2, velocity: vec2):
         pos.y = WATER_MAX_Y
         velocity.y *= -1 * COLLISION_ENERGY_KEEP
 
-
-def smoothInfluence(dst2: float) -> float:
-    value = max(0, WATER_INFLUENCE_RADIUS2 - dst2)
-    return value * value * value / WATER_INFLUENCE_VOLUME
+    return (pos, velocity)
 
 
-def smoothInfluenceDerivate(dst: float) -> float:
-    if dst > WATER_INFLUENCE_RADIUS:
+def smoothingKernel(dst: float) -> float:
+    if dst > WATER_SMOOTHING_RADIUS:
+        return 0
+    return (WATER_SMOOTHING_RADIUS - dst)**2 / WATER_SMOOTHING_VOLUME
+
+
+def smoothingKernelDerivate(dst: float) -> float:
+    if dst >= WATER_SMOOTHING_RADIUS:
         return 0
 
-    f = WATER_INFLUENCE_RADIUS2 - dst**2
-    return WATER_INFLUENCE_SCALE * dst * f**2
+    return (dst - WATER_SMOOTHING_RADIUS) * WATER_SMOOTHING_SCALE
 
 
-def computeDensity(id: int, waterPositions: list[vec2], nbWater: int) -> float:
+def calculateDensity(point: vec2, positions: list[vec2]) -> float:
     density = 0
 
-    pos = waterPositions[id]
-
-    for j in range(nbWater):
-        if j == id:
-            continue
-        waterPos = waterPositions[j]
-        dst2 = (waterPos - pos).length_squared()
-        influence = smoothInfluence(dst2)
-        density += influence * WATER_MASS
+    for i in range(len(positions)):
+        dst = (positions[i] - point).magnitude()
+        influence = smoothingKernel(dst)
+        density += WATER_MASS * influence
 
     return density
 
 
-def computePropertyGradient(id: int, waterPositions: list[vec2], waterDensity: list[float], nbWater: int) -> vec2:
-    propertyGradient = vec2(0, 0)
+# def calculateProperty(point: vec2, positions: list[vec2]) -> float:
+#     property = 0
 
-    pos = waterPositions[id]
+#     for i in range(len(positions)):
+#         dst = (positions[i] - point).magnitude()
+#         influence = smoothingKernel(dst)
+#         density = calculateDensity(point, positions)
+#         property += influence * WATER_MASS / density
 
-    for j in range(nbWater):
-        if j == id:
-            continue
-        waterPos = waterPositions[j]
-        dir = waterPos - pos
-        dst = dir.length()
-        if dst > 0:
-            dir /= dst
+#     return property
+
+
+def convertDensityToPressure(density: float) -> float:
+    densityError = density - TARGET_DENSITY
+    pressure = densityError * PRESSURE_MULTIPLIER
+    return pressure
+
+
+def calculateSharedPressure(densityA: float, densityB: float) -> float:
+    pressureA = convertDensityToPressure(densityA)
+    pressureB = convertDensityToPressure(densityB)
+    return (pressureA + pressureB) / 2
+
+
+def calculatePressureForce(waterId: int,
+                           positions: list[vec2],
+                           densities: list[vec2]) -> vec2:
+    pressureForce = vec2(0, 0)
+
+    for otherId in range(len(positions)):
+        if waterId == otherId: continue
+
+        offset = positions[otherId] - positions[waterId]
+        dst = offset.length()
+        if dst != 0:
+            dir = offset / dst
         else:
-            dir = vec2(1, 0)
+            x = random.random()
+            y = random.random()
+            while x == 0 and y == 0:
+                y = random.random()
+            dir = vec2(x, y).normalize()
+        slope = smoothingKernelDerivate(dst)
+        density = densities[otherId]
+        sharedPressure = calculateSharedPressure(density, densities[otherId])
+        pressureForce += -sharedPressure * dir * slope * WATER_MASS / density
 
-        derivation = smoothInfluenceDerivate(dst)
-        if derivation == 0:
-            continue
-        # density = computeDensity(id, waterPositions, nbWater)
-        density = waterDensity[j]
-        if density == 0:
-            continue
-
-        propertyGradient += dir * derivation * WATER_MASS / density
-
-    return propertyGradient
+    return pressureForce

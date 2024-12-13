@@ -7,7 +7,8 @@ from pygame.math import Vector2 as vec2
 
 from define import  WIN_W, WIN_H, GRAVITY, NB_WATER, WATER_RADIUS,\
                     WATER_EFFECT_RADIUS, WATER_EFFECT_RADIUS2,\
-                    WATER_EFFECT_STRENGH, WATER_FRICTION_RATIO
+                    WATER_EFFECT_STRENGH, WATER_FRICTION_RATIO,\
+                    MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE
 from terrain import Terrain
 from water import Water
 
@@ -114,20 +115,38 @@ class Game:
 
         # Add water
         self.waitInput = max(0, self.waitInput - delta)
-        if self.mouseState[0] and self.waitInput == 0:
+        if self.keyboardState[pg.K_UP] and self.waitInput == 0:
             self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
             self.nbWater += 1
             self.waitInput = 0.2
-        elif self.mouseState[1] and self.waitInput == 0:
+        elif self.keyboardState[pg.K_DOWN] and self.waitInput == 0:
             self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
             self.nbWater += 1
-        elif self.mouseState[2] and self.waitInput == 0:
-            self.waters.append(Water(self.mousePos[0], self.mousePos[1]))
-            self.nbWater += 1
-            self.waitInput = 0.05
         elif self.keyboardState[pg.K_SPACE] and self.waitInput == 0:
             self.gravity = not self.gravity
             self.waitInput = 0.2
+
+        # Apply force
+        if self.mouseState[0]: # Attract
+            mpos = vec2(self.mousePos[0], self.mousePos[1])
+            for water in self.waters:
+                dir = mpos - water.pos
+                lenght = dir.length_squared()
+                if lenght > MOUSE_RADIUS2 or lenght == 0:
+                    continue
+                dir /= math.sqrt(lenght)
+                water.applyForce(dir, MOUSE_FORCE)
+        elif self.mouseState[2]: # Repuls
+            mpos = vec2(self.mousePos[0], self.mousePos[1])
+            for water in self.waters:
+                dir = water.pos - mpos
+                lenght = dir.length_squared()
+                if lenght > MOUSE_RADIUS2 or lenght == 0:
+                    continue
+                dir /= math.sqrt(lenght)
+                water.applyForce(dir, MOUSE_FORCE)
+
+
 
         # Generate tiles
         self.waterTiles.clear()
@@ -216,6 +235,12 @@ class Game:
 
         for water in self.waters:
             water.draw(self.win)
+
+        if self.mouseState[0]: # Attract
+            pg.draw.circle(self.win, (0, 255, 0), self.mousePos, MOUSE_RADIUS, 1)
+        elif self.mouseState[2]: # Repuls
+            pg.draw.circle(self.win, (255, 0, 0), self.mousePos, MOUSE_RADIUS, 1)
+
 
         # We update the drawing.
         # Before the function call, any changes will be not visible

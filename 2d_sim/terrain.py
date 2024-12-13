@@ -133,8 +133,8 @@ class Terrain:
     def draw(self, window):
         for line in self.lines:
             pg.draw.line(window, MAP_COLOR, line[0], line[1])
-            mid = (line[0] - line[1]) / 2 + line[1]
-            nmid = mid + line[2] * 10
-            pg.draw.line(window, (255, 0, 0), mid, nmid)
+            # mid = (line[0] - line[1]) / 2 + line[1]
+            # nmid = mid + line[2] * 10
+            # pg.draw.line(window, (255, 0, 0), mid, nmid)
 
 

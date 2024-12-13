@@ -130,7 +130,6 @@ void	Shader::load(std::string vShaderPath, std::string fShaderPath)
 		throw new std::invalid_argument("Shader program linking failed : " + infoString);
 	}
 
-
 	// Give info about how get vertice to draw triange with gpu
 	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
 	// Point position
@@ -172,7 +171,6 @@ void	Shader::allocateMemory(void)
 	glGenBuffers(1, &this->VBO);
 	// Set the new allocated buffer as array one
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-
 
 	// Allocate buffer for indices
 	glGenBuffers(1, &this->EBO);

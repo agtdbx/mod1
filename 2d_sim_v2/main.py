@@ -124,14 +124,24 @@ class Game:
             self.deltas.clear()
             print(f"fps : {1.0 / avg:7.2f} | water {self.nbWater:4}")
 
-        # if self.waitInput > 0:
-        #     self.waitInput = max(0, self.waitInput - delta)
         # else:
         #     if self.mouseState[0]:
         #         density = calculateDensity(vec2(self.mousePos),
         #                                    self.waterPositions)
         #         print(f"density : {density}")
         #         self.waitInput = 0.2
+
+        # Add water
+        if self.waitInput > 0:
+            self.waitInput = max(0, self.waitInput - delta)
+        else:
+            if self.keyboardState[pg.K_UP] or self.keyboardState[pg.K_DOWN]:
+                self.waterPositions.append(vec2(self.mousePos))
+                self.waterVelocities.append(vec2(0, 0))
+                self.waterDensities.append(0)
+                self.nbWater += 1
+                if self.keyboardState[pg.K_UP]:
+                    self.waitInput = 0.2
 
         # =========================================================
         # Simulate and draw water

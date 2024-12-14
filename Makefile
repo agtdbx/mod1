@@ -22,9 +22,9 @@ fclean: clean
 re: fclean all
 
 run: all
-	cd $(MESON_BUILD_DIR) && ./$(EXECUTABLE_NAME) $(DEFAULT_MAP)
+	cd $(MESON_BUILD_DIR) && ./$(EXECUTABLE_NAME) $(DEFAULT_MAP) || echo "Exit at 1"
 
 runval: all
-	cd $(MESON_BUILD_DIR) && valgrind --suppressions=vsupp ./$(EXECUTABLE_NAME) $(DEFAULT_MAP)
+	cd $(MESON_BUILD_DIR) && valgrind --suppressions=vsupp ./$(EXECUTABLE_NAME) $(DEFAULT_MAP) || echo "Exit at 1"
 
 .PHONY: all clean fclean re run runval

@@ -26,6 +26,10 @@ int	main(int argc, char **argv)
 	}
 
 	OpenGLContext	context;
+
+	if (!context.isInitGood())
+		return (1);
+
 	InputManager	inputManager(context.window);
 	Terrain			terrain;
 	Shader			shader;

@@ -14,6 +14,7 @@ public:
 
 	OpenGLContext	&operator=(const OpenGLContext &obj);
 
+	bool	isInitGood(void);
 	void	setDrawMode(bool fillTriangle);
 
 private:

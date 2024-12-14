@@ -50,6 +50,8 @@ OpenGLContext::OpenGLContext(void)
 	glfwSwapInterval(0);
 
 	glEnable(GL_DEPTH_TEST);
+
+	this->initGood = true;
 }
 
 
@@ -72,6 +74,11 @@ OpenGLContext::~OpenGLContext()
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
+
+bool	OpenGLContext::isInitGood(void)
+{
+	return (this->initGood);
+}
 
 //---- Setters -----------------------------------------------------------------
 

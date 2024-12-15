@@ -95,6 +95,8 @@ def calculatePressureForce(waterId: int,
     gx = int(positions[waterId].x // WATER_SMOOTHING_RADIUS)
     gy = int(positions[waterId].y // WATER_SMOOTHING_RADIUS)
 
+    density = densities[waterId]
+
     for otherId in grid[gy][gx]:
         if waterId == otherId: continue
 
@@ -109,7 +111,6 @@ def calculatePressureForce(waterId: int,
                 y = random.random()
             dir = vec2(x, y).normalize()
         slope = smoothingKernelDerivate(dst)
-        density = densities[otherId]
         sharedPressure = calculateSharedPressure(density, densities[otherId])
         pressureForce += -sharedPressure * dir * slope * WATER_MASS / density
 

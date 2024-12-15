@@ -39,9 +39,12 @@ class Game:
         # self.terrain = Terrain()
 
         self.nbWater = NB_WATER
-        self.waterPositions = []
-        self.waterVelocities = []
-        self.waterDensities = []
+        self.waterPositions: list[vec2] = []
+        self.waterVelocities: list[vec2] = []
+        self.waterDensities: list[float] = []
+        self.waterGrid: list[list[list[int]]] = []
+        self.waterGridW = WIN_W // WATER_SMOOTHING_RADIUS + 1
+        self.waterGridH = WIN_H // WATER_SMOOTHING_RADIUS + 1
 
         if NB_WATER > 0:
             # waterPerRow = int(math.sqrt(NB_WATER))
@@ -148,17 +151,44 @@ class Game:
         # =========================================================
         delta *= 10 # To speed up the simulation
 
+        # Compute water grid
+        self.waterGrid.clear()
+        for y in range(self.waterGridH):
+            waterLine = []
+            for x in range(self.waterGridW):
+                waterLine.append([])
+            self.waterGrid.append(waterLine)
+
+        # Put waterid in grid
+        for i in range(self.nbWater):
+            gx = int(self.waterPositions[i].x // WATER_SMOOTHING_RADIUS)
+            gy = int(self.waterPositions[i].y // WATER_SMOOTHING_RADIUS)
+            self.waterGrid[gy][gx].append(i)
+            for uy in [-1, 0, 1]:
+                for ux in [-1, 0, 1]:
+                    if ux == 0 and uy == 0: continue
+                    nx = gx + ux
+                    ny = gy + uy
+
+                    if nx < 0 or nx >= self.waterGridW\
+                        or ny < 0 or ny >= self.waterGridH:
+                        continue
+                    self.waterGrid[ny][nx].append(i)
+
         # Apply gravity and compute densities
         for i in range(self.nbWater):
             pos = self.waterPositions[i]
             # self.waterVelocities[i] += vec2(0, 1) * GRAVITY * delta
-            self.waterDensities[i] = calculateDensity(pos, self.waterPositions)
+            self.waterDensities[i] = calculateDensity(pos,
+                                                      self.waterPositions,
+                                                      self.waterGrid)
 
         # Calculate and apply pressure
         for i in range(self.nbWater):
             pos = self.waterPositions[i]
             pressureForce = calculatePressureForce(i, self.waterPositions,
-                                                   self.waterDensities)
+                                                   self.waterDensities,
+                                                   self.waterGrid)
             pressureAcceleration = pressureForce / self.waterDensities[i]
             self.waterVelocities[i] = pressureAcceleration * delta
 
@@ -170,6 +200,7 @@ class Game:
             pos, velocity = updateWater(pos, velocity, delta)
 
             pg.draw.circle(self.win, WATER_COLOR, pos, WATER_RADIUS)
+
 
         # pg.draw.circle(self.win, (255, 0, 0), self.mousePos,
         #                WATER_SMOOTHING_RADIUS, 1)

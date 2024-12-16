@@ -7,9 +7,12 @@ import sys
 from pygame.math import Vector2 as vec2
 
 from define import  WIN_W, WIN_H, NB_WATER, WATER_BEGIN_SPACE,\
-                    WATER_RADIUS, WATER_COLOR, WATER_SMOOTHING_RADIUS, GRAVITY
+                    WATER_RADIUS, WATER_COLOR, WATER_SMOOTHING_RADIUS,\
+                    WATER_RGB_FAST1, WATER_RGB_FAST2,\
+                    MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE, GRAVITY
 # from terrain import Terrain
-from water import updateWater, calculateDensity, calculatePressureForce
+from water import   updateWater, calculateDensity, calculatePressureForce,\
+                    calculateViscosityForce
 
 class Game:
     def __init__(self):
@@ -38,6 +41,9 @@ class Game:
 
         # self.terrain = Terrain()
 
+        # self.gravity = True
+        self.gravity = False
+
         # self.simulate = True
         self.simulate = False
         self.simulationSpeed = 10
@@ -47,39 +53,65 @@ class Game:
         self.waterPredictionPos: list[vec2] = []
         self.waterVelocities: list[vec2] = []
         self.waterDensities: list[float] = []
-        self.waterGrid: list[list[list[int]]] = []
-        self.waterGridW = WIN_W // WATER_SMOOTHING_RADIUS + 1
-        self.waterGridH = WIN_H // WATER_SMOOTHING_RADIUS + 1
 
         if NB_WATER > 0:
-            # waterPerRow = int(math.sqrt(NB_WATER))
-            # waterPerCol = (NB_WATER // waterPerRow) + 1
-            # width = waterPerRow * WATER_RADIUS * 2 +\
-            #         (waterPerRow - 1) * WATER_BEGIN_SPACE
-            # heigh = waterPerCol * WATER_RADIUS * 2 +\
-            #         (waterPerCol - 1) * WATER_BEGIN_SPACE
-            # startX = WIN_W / 2 - width / 2
-            # # startY = WATER_RADIUS + WATER_BEGIN_SPACE
-            # startY =  WIN_H / 2 - heigh / 2
-            # for i in range(NB_WATER):
-            #     x = startX + (i % waterPerRow) *\
-            #             (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
-            #     y = startY + (i // waterPerRow) *\
-            #             (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
+            waterPerRow = int(math.sqrt(NB_WATER))
+            waterPerCol = (NB_WATER // waterPerRow) + 1
+            width = waterPerRow * WATER_RADIUS * 2 +\
+                    (waterPerRow - 1) * WATER_BEGIN_SPACE
+            heigh = waterPerCol * WATER_RADIUS * 2 +\
+                    (waterPerCol - 1) * WATER_BEGIN_SPACE
+            startX = WIN_W / 2 - width / 2
+            # startY = WATER_RADIUS + WATER_BEGIN_SPACE
+            startY =  WIN_H / 2 - heigh / 2
+            for i in range(NB_WATER):
+                x = startX + (i % waterPerRow) *\
+                        (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
+                y = startY + (i // waterPerRow) *\
+                        (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
+
+                pos = vec2(x, y)
+                vel = vec2(0, 0)
+
+                pos, vel = updateWater(pos, vel, 0.16)
+
+                self.waterPositions.append(pos)
+                self.waterPredictionPos.append(pos)
+                self.waterVelocities.append(vel)
+                self.waterDensities.append(0)
+
+            # for _ in range(NB_WATER):
+            #     x = random.randint(WATER_RADIUS, WIN_W - WATER_RADIUS - 1)
+            #     y = random.randint(WATER_RADIUS, WIN_H - WATER_RADIUS - 1)
 
             #     self.waterPositions.append(vec2(x, y))
             #     self.waterPredictionPos.append(vec2(x, y))
             #     self.waterVelocities.append(vec2(0, 0))
             #     self.waterDensities.append(0)
 
-            for _ in range(NB_WATER):
-                x = random.randint(WATER_RADIUS, WIN_W - WATER_RADIUS - 1)
-                y = random.randint(WATER_RADIUS, WIN_H - WATER_RADIUS - 1)
+        self.waterGrid: list[list[list[int]]] = []
+        self.waterGridW = WIN_W // WATER_SMOOTHING_RADIUS + 1
+        self.waterGridH = WIN_H // WATER_SMOOTHING_RADIUS + 1
+        for y in range(self.waterGridH):
+                waterLine = []
+                for x in range(self.waterGridW):
+                    waterLine.append([])
+                self.waterGrid.append(waterLine)
 
-                self.waterPositions.append(vec2(x, y))
-                self.waterPredictionPos.append(vec2(x, y))
-                self.waterVelocities.append(vec2(0, 0))
-                self.waterDensities.append(0)
+        for i in range(self.nbWater):
+                gx = int(self.waterPositions[i].x // WATER_SMOOTHING_RADIUS)
+                gy = int(self.waterPositions[i].y // WATER_SMOOTHING_RADIUS)
+                self.waterGrid[gy][gx].append(i)
+                for uy in [-1, 0, 1]:
+                    for ux in [-1, 0, 1]:
+                        if ux == 0 and uy == 0: continue
+                        nx = gx + ux
+                        ny = gy + uy
+
+                        if nx < 0 or nx >= self.waterGridW\
+                            or ny < 0 or ny >= self.waterGridH:
+                            continue
+                        self.waterGrid[ny][nx].append(i)
 
 
     def run(self):
@@ -145,6 +177,7 @@ class Game:
         else:
             if self.keyboardState[pg.K_UP] or self.keyboardState[pg.K_DOWN]:
                 self.waterPositions.append(vec2(self.mousePos))
+                self.waterPredictionPos.append(vec2(self.mousePos))
                 self.waterVelocities.append(vec2(0, 0))
                 self.waterDensities.append(0)
                 self.nbWater += 1
@@ -155,6 +188,11 @@ class Game:
                 self.waitInput = 0.2
                 tkt = ["off", "on"]
                 print(f"simulation {tkt[self.simulate]}")
+            if self.keyboardState[pg.K_g]:
+                self.gravity = not self.gravity
+                self.waitInput = 0.2
+                tkt = ["off", "on"]
+                print(f"gravity {tkt[self.gravity]}")
             if self.keyboardState[pg.K_LEFT]:
                 self.simulationSpeed = max(0.5, self.simulationSpeed - 0.5)
                 self.waitInput = 0.2
@@ -164,6 +202,9 @@ class Game:
                 self.waitInput = 0.2
                 print(f"simulation speed : {self.simulationSpeed}")
 
+        if self.keyboardState[pg.K_RSHIFT]:
+            delta *= 2
+
         # =========================================================
         # Simulate and draw water
         # =========================================================
@@ -172,12 +213,9 @@ class Game:
         if self.simulate:
 
             # Compute water grid
-            self.waterGrid.clear()
             for y in range(self.waterGridH):
-                waterLine = []
                 for x in range(self.waterGridW):
-                    waterLine.append([])
-                self.waterGrid.append(waterLine)
+                    self.waterGrid[y][x].clear()
 
             # Put waterid in grid
             for i in range(self.nbWater):
@@ -199,9 +237,26 @@ class Game:
             for i in range(self.nbWater):
                 pos = self.waterPositions[i]
                 velocity = self.waterVelocities[i]
-                # velocity += vec2(0, 1) * GRAVITY * delta
+                if self.gravity:
+                    self.waterVelocities[i] += vec2(0, 1) * GRAVITY * delta
 
-                pos, velocity = updateWater(pos, velocity, delta)
+                if self.mouseState[0] or self.mouseState[2]:
+                    dir = pos - vec2(self.mousePos)
+                    dst = dir.length()
+                    if dst == 0:
+                        dir = vec2(1, 0)
+                    else:
+                        dir /= dst
+
+                    if dst <= MOUSE_RADIUS:
+                        strength = 1 - (dst**2 / MOUSE_RADIUS2)
+
+                        if self.mouseState[0]: # Push water away
+                            self.waterVelocities[i] += dir * strength * MOUSE_FORCE
+                        else: # Pull water to the mouse
+                            self.waterVelocities[i] -= dir * strength * MOUSE_FORCE
+
+                pos, velocity = updateWater(pos.copy(), velocity.copy(), delta)
                 self.waterPredictionPos[i] = pos
 
             # Apply gravity and compute densities
@@ -221,6 +276,11 @@ class Game:
                 pressureAcceleration = pressureForce / self.waterDensities[i]
                 self.waterVelocities[i] += pressureAcceleration * delta
 
+                viscosityForce = calculateViscosityForce(i, self.waterPredictionPos,
+                                                         self.waterVelocities,
+                                                         self.waterGrid)
+                self.waterVelocities[i] += viscosityForce * delta
+
             # Update positions with screen collision
             for i in range(self.nbWater):
                 pos = self.waterPositions[i]
@@ -228,13 +288,56 @@ class Game:
 
                 pos, velocity = updateWater(pos, velocity, delta)
 
-                pg.draw.circle(self.win, WATER_COLOR, pos, WATER_RADIUS)
+                self.waterPositions[i] = pos
+                self.waterVelocities[i] = velocity
+
+                speed = velocity.length()
+
+                if speed <= 10:
+                    speedRatio = min(1, speed / 10)
+                    slowRatio = 1 - speedRatio
+
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * speedRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * speedRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * speedRatio
+
+                else:
+                    speedRatio = min(1, (speed - 10) / 10)
+                    slowRatio = 1 - speedRatio
+
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST2[0] * speedRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST2[1] * speedRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST2[2] * speedRatio
+
+                pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
 
         else:
-             for i in range(self.nbWater):
+            for i in range(self.nbWater):
                 pos = self.waterPositions[i]
+                speed = self.waterVelocities[i].length()
 
-                pg.draw.circle(self.win, WATER_COLOR, pos, WATER_RADIUS)
+                if speed <= 10:
+                    speedRatio = min(1, speed / 10)
+                    slowRatio = 1 - speedRatio
+
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * speedRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * speedRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * speedRatio
+
+                else:
+                    speedRatio = min(1, (speed - 10) / 10)
+                    slowRatio = 1 - speedRatio
+
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST2[0] * speedRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST2[1] * speedRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST2[2] * speedRatio
+
+                pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
+
+        if self.mouseState[0]:
+            pg.draw.circle(self.win, (255, 0, 0), self.mousePos, MOUSE_RADIUS, 1)
+        elif self.mouseState[2]:
+            pg.draw.circle(self.win, (0, 255, 0), self.mousePos, MOUSE_RADIUS, 1)
 
         # We update the drawing.
         # Before the function call, any changes will be not visible

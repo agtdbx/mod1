@@ -7,7 +7,7 @@ from define import  COLLISION_ENERGY_KEEP,\
                     WATER_MIN_X, WATER_MAX_X, WATER_MIN_Y, WATER_MAX_Y,\
                     WATER_SMOOTHING_RADIUS, WATER_SMOOTHING_RADIUS2, WATER_MASS,\
                     WATER_SMOOTHING_VOLUME, TARGET_DENSITY, PRESSURE_MULTIPLIER,\
-                    WATER_SMOOTHING_SCALE
+                    WATER_SMOOTHING_SCALE, VISCOSITY_FORCE
 
 def updateWater(pos: vec2, velocity: vec2, delta: float) -> tuple[vec2, vec2]:
     pos += velocity * delta
@@ -44,6 +44,14 @@ def smoothingKernelDerivate(dst: float) -> float:
     return (dst - WATER_SMOOTHING_RADIUS) * WATER_SMOOTHING_SCALE
 
 
+@njit(fastmath=True)
+def viscositySmoothingKernel(dst: float) -> float:
+    if dst > WATER_SMOOTHING_RADIUS:
+        return 0
+    value = dst**2 / WATER_SMOOTHING_RADIUS2
+    return value**3
+
+
 def calculateDensity(point: vec2,
                      positions: list[vec2],
                      grid: list[list[list[int]]]) -> float:
@@ -58,18 +66,6 @@ def calculateDensity(point: vec2,
         density += WATER_MASS * influence
 
     return density
-
-
-# def calculateProperty(point: vec2, positions: list[vec2]) -> float:
-#     property = 0
-
-#     for i in range(len(positions)):
-#         dst = (positions[i] - point).magnitude()
-#         influence = smoothingKernel(dst)
-#         density = calculateDensity(point, positions)
-#         property += influence * WATER_MASS / density
-
-#     return property
 
 
 @njit(fastmath=True)
@@ -92,15 +88,16 @@ def calculatePressureForce(waterId: int,
                            grid: list[list[list[int]]]) -> vec2:
     pressureForce = vec2(0, 0)
 
-    gx = int(positions[waterId].x // WATER_SMOOTHING_RADIUS)
-    gy = int(positions[waterId].y // WATER_SMOOTHING_RADIUS)
+    pos = positions[waterId]
+    gx = int(pos.x // WATER_SMOOTHING_RADIUS)
+    gy = int(pos.y // WATER_SMOOTHING_RADIUS)
 
     density = densities[waterId]
 
     for otherId in grid[gy][gx]:
         if waterId == otherId: continue
 
-        offset = positions[otherId] - positions[waterId]
+        offset = positions[otherId] - pos
         dst = offset.length()
         if dst != 0:
             dir = offset / dst
@@ -112,6 +109,33 @@ def calculatePressureForce(waterId: int,
             dir = vec2(x, y).normalize()
         slope = smoothingKernelDerivate(dst)
         sharedPressure = calculateSharedPressure(density, densities[otherId])
-        pressureForce += -sharedPressure * dir * slope * WATER_MASS / density
+        pressureForce += sharedPressure * dir * slope * WATER_MASS / density
 
     return pressureForce
+
+
+def calculateViscosityForce(waterId: int,
+                            positions: list[vec2],
+                            velocities: list[vec2],
+                            grid: list[list[list[int]]]) -> vec2:
+    viscosityForce = vec2(0, 0)
+
+    pos = positions[waterId]
+    vel = velocities[waterId]
+    gx = int(pos.x // WATER_SMOOTHING_RADIUS)
+    gy = int(pos.y // WATER_SMOOTHING_RADIUS)
+
+    for otherId in grid[gy][gx]:
+        if waterId == otherId: continue
+
+        velDir = (velocities[otherId] - vel)
+        velLen = velDir.length()
+        if velLen == 0:
+            continue
+        velDir /= velLen
+        dst = (pos - positions[otherId]).length()
+        influence = viscositySmoothingKernel(dst)
+        viscosityForce += velDir * influence
+
+    return viscosityForce * VISCOSITY_FORCE
+

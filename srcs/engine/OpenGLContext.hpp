@@ -16,6 +16,7 @@ public:
 
 	bool	isInitGood(void);
 	void	setDrawMode(bool fillTriangle);
+	void	close(void);
 
 private:
 	bool	initGood;

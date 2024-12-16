@@ -25,10 +25,19 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	if (!glfwInit())
+	{
+		std::cerr << "Error : Opengl init failed" << std::endl;
+		return (1);
+	}
+
 	OpenGLContext	context;
 
 	if (!context.isInitGood())
+	{
+		glfwTerminate();
 		return (1);
+	}
 
 	InputManager	inputManager(context.window);
 	Terrain			terrain;
@@ -49,6 +58,8 @@ int	main(int argc, char **argv)
 	catch (std::exception &e)
 	{
 		std::cerr << "Error : " << e.what() << std::endl;
+		context.close();
+		glfwTerminate();
 		return (1);
 	}
 
@@ -65,6 +76,8 @@ int	main(int argc, char **argv)
 		draw(context.window, &camera, &terrain, &shader, &textureManager);
 	}
 
+	context.close();
+	glfwTerminate();
 	return (0);
 }
 

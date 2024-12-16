@@ -17,13 +17,6 @@ OpenGLContext::OpenGLContext(void)
 	this->winW = WIN_W;
 	this->winH = WIN_H;
 
-	// Init opengl
-	if (!glfwInit())
-	{
-		this->quitWhenError("Failed to initialize GLFW");
-		return ;
-	}
-
 	// Set opengl print error function
 	glfwSetErrorCallback(print_opengl_error);
 
@@ -65,10 +58,7 @@ OpenGLContext::OpenGLContext(const OpenGLContext &obj)
 
 OpenGLContext::~OpenGLContext()
 {
-	if (this->window != NULL)
-		glfwDestroyWindow(this->window);
-
-	glfwTerminate();
+	this->close();
 }
 
 
@@ -107,6 +97,16 @@ void	OpenGLContext::setDrawMode(bool fillTriangle)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+
+
+void	OpenGLContext::close(void)
+{
+	if (this->window != NULL)
+	{
+		glfwDestroyWindow(this->window);
+		this->window = NULL;
+	}
 }
 
 //**** PRIVATE METHODS *********************************************************

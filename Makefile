@@ -27,4 +27,7 @@ run: all
 runval: all
 	cd $(MESON_BUILD_DIR) && valgrind --suppressions=vsupp ./$(EXECUTABLE_NAME) $(DEFAULT_MAP) || echo "Exit at 1"
 
-.PHONY: all clean fclean re run runval
+runvalall: all
+	cd $(MESON_BUILD_DIR) && valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$(EXECUTABLE_NAME) $(DEFAULT_MAP) || echo "Exit at 1"
+
+.PHONY: all clean fclean re run runval runvalall

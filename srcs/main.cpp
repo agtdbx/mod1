@@ -48,12 +48,8 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		// shader.load("data/shaders/perceptive.vs",
-		// 			"data/shaders/colors.fs");
-		// shader.load("data/shaders/perceptive-texture.vs",
-		// 			"data/shaders/perceptive-texture.fs");
-		shader.load("data/shaders/perceptive-light.vs",
-					"data/shaders/colors.fs");
+		shader.load("data/shaders/terrain.vs",
+					"data/shaders/terrain.fs");
 	}
 	catch (std::exception &e)
 	{

@@ -6,20 +6,14 @@
 class Point
 {
 public:
-	Vec3	pos;
-	float	r, g, b, imgx, imgy;
+	Vec3	pos, normal;
+	float	r, g, b;
 
 	Point(void);
-	Point(double x, double y, double z);
-	Point(double x, double y, double z, int r, int g, int b);
-	Point(double x, double y, double z, double r, double g, double b);
-	Point(double x, double y, double z, double imgx, double imgy);
-	Point(double x, double y, double z, double r, double g, double b, double imgx, double imgy);
-	Point(Vec3 &pos);
-	Point(Vec3 &pos, int r, int g, int b);
-	Point(Vec3 &pos, double r, double g, double b);
-	Point(Vec3 &pos, double imgx, double imgy);
-	Point(Vec3 &pos, double r, double g, double b, double imgx, double imgy);
+	Point(Vec3 pos);
+	Point(Vec3 pos, Vec3 normal);
+	Point(Vec3 pos, double r, double g, double b);
+	Point(Vec3 pos, Vec3 normal, double r, double g, double b);
 	Point(const Point &obj);
 	~Point();
 

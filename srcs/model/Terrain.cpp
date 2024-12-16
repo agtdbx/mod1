@@ -131,105 +131,8 @@ void	Terrain::createMesh(void)
 	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
 
-	// for (double y = 0; y < MAP_SIZE; y++)
-	// {
-	// 	for (double x = 0; x < MAP_SIZE; x++)
-	// 	{
-	// 		double red = double(x/ MAP_SIZE);
-	// 		double green = double(y / MAP_SIZE);
-	// 		double blue = 0;
-	// 		// double red = 0.5;
-	// 		// double green = 0.5;
-	// 		// double blue = 0.5;
-	// 		if (int(y) % 2 == 0)
-	// 		{
-	// 			if (int(x) % 2 == 0)
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 1.0));
-	// 			}
-	// 			else
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 1.0));
-	// 			}
-
-	// 		}
-	// 		else
-	// 		{
-	// 			if (int(x) % 2 == 0)
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue,  1.0, 0.0));
-	// 			}
-	// 			else
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 0.0));
-	// 			}
-	// 		}
-	// 		// vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), double(x/ MAP_SIZE), double(y / MAP_SIZE), 0.0, 1.0, 0.0));
-	// 		// std::cout << " New point : " << Vec3((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10)) << std::endl;
-	// 	}
-	// }
-	// for (double y = 0; y < MAP_SIZE; y++)
-	// {
-	// 	for (double x = 0; x < MAP_SIZE; x++)
-	// 	{
-	// 		double red = double(x/ MAP_SIZE);
-	// 		double green = double(y / MAP_SIZE);
-	// 		double blue = 0;
-	// 		// double red = 0.5;
-	// 		// double green = 0.5;
-	// 		// double blue = 0.5;
-	// 		if (int(y) % 2 == 0)
-	// 		{
-	// 			if (int(x) % 2 == 0)
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 0.0));
-	// 			}
-	// 			else
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 0.0));
-	// 			}
-
-	// 		}
-	// 		else
-	// 		{
-	// 			if (int(x) % 2 == 0)
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 1.0, 1.0));
-	// 			}
-	// 			else
-	// 			{
-	// 				vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), red, green, blue, 0.0, 1.0));
-	// 			}
-	// 		}
-	// 		// vertices.push_back(Point((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10), double(x/ MAP_SIZE), double(y / MAP_SIZE), 0.0, 1.0, 0.0));
-	// 		// std::cout << " New point : " << Vec3((x - (MAP_SIZE / 2)) / MAP_SIZE,  (y - (MAP_SIZE / 2)) / MAP_SIZE, (this->heightmap[y][x] - ((MAX_HEIGHT * 10) / 2)) / (MAX_HEIGHT * 10)) << std::endl;
-	// 	}
-	// }
-
-	// for (unsigned y = 0; y < MAP_SIZE - 1; y++)
-	// {
-	// 	for (unsigned x = 0; x < MAP_SIZE - 1; x++)
-	// 	{
-	// 		if (y % 2 == 0)
-	// 		{
-	// 		indices.push_back((t_tri_id){y * MAP_SIZE + x, y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x});
-	// 		indices.push_back((t_tri_id){y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x, (y + 1) * MAP_SIZE + x + 1});
-	// 		}
-	// 		else
-	// 		{
-	// 		indices.push_back((t_tri_id){(MAP_SIZE * MAP_SIZE) + y * MAP_SIZE + x,(MAP_SIZE * MAP_SIZE) + y * MAP_SIZE + x + 1,(MAP_SIZE * MAP_SIZE) + (y + 1) * MAP_SIZE + x});
-	// 		indices.push_back((t_tri_id){(MAP_SIZE * MAP_SIZE) +y * MAP_SIZE + x + 1,(MAP_SIZE * MAP_SIZE) + (y + 1) * MAP_SIZE + x,(MAP_SIZE * MAP_SIZE) + (y + 1) * MAP_SIZE + x + 1});
-	// 		}
-	// 		// indices.push_back((t_tri_id){y * MAP_SIZE + x, y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x});
-	// 		// indices.push_back((t_tri_id){y * MAP_SIZE + x + 1, (y + 1) * MAP_SIZE + x, (y + 1) * MAP_SIZE + x + 1});
-	// 		// std::cout << " create triangle with point " << y * MAP_SIZE + x << ", "  <<  y * MAP_SIZE + x + 1 << ", "  << (y + 1) * MAP_SIZE + x
-	// 		// << " and  " << y * MAP_SIZE + x + 1 << ", "  << (y + 1) * MAP_SIZE + x << ", "  << (y + 1) * MAP_SIZE + x + 1 << std::endl;
-	// 	}
-	// }
-
 	unsigned int	id_tl, id_tr, id_dl, id_dr;
-	// double			r, g, b, height;
-	double			height;
+	double			r, g, b, height;
 	Vec3			p1, p2, p3, A, B, normal;
 
 	for (double y = 0; y < MAP_SIZE; y++)
@@ -239,9 +142,9 @@ void	Terrain::createMesh(void)
 			height = this->heightmap[y][x];
 
 			// Compute basic color
-			// r = x / (double)MAP_SIZE;
-			// g = height / (double)MAX_HEIGHT;
-			// b = y / (double)MAP_SIZE;
+			r = height / (double)MAX_HEIGHT;
+			g = 0.8;
+			b = r;
 
 			// Compute normal
 			if (y == MAP_SIZE -1 || x == MAP_SIZE - 1)
@@ -261,8 +164,7 @@ void	Terrain::createMesh(void)
 				normal.normalize();
 			}
 
-			// vertices.push_back(Point(x, height, y, r, g, b));
-			vertices.push_back(Point(x, height, y, normal.x, normal.y, normal.z));
+			vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
 		}
 	}
 

@@ -41,8 +41,8 @@ class Game:
 
         self.terrain = Terrain()
 
-        # self.gravity = True
-        self.gravity = False
+        self.gravity = True
+        # self.gravity = False
 
         # self.simulate = True
         self.simulate = False
@@ -62,8 +62,8 @@ class Game:
             heigh = waterPerCol * WATER_RADIUS * 2 +\
                     (waterPerCol - 1) * WATER_BEGIN_SPACE
             startX = WIN_W / 2 - width / 2
-            # startY = WATER_RADIUS + WATER_BEGIN_SPACE
-            startY =  WIN_H / 2 - heigh / 2
+            startY = WATER_RADIUS + WATER_BEGIN_SPACE
+            # startY =  WIN_H / 2 - heigh / 2
             for i in range(NB_WATER):
                 x = startX + (i % waterPerRow) *\
                         (WATER_BEGIN_SPACE + WATER_RADIUS * 2)
@@ -319,8 +319,12 @@ class Game:
 
                 pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
 
-                p2 = pos + velocity
-                pg.draw.line(self.win, (0, 255, 0), pos, p2)
+                dirLen = velocity.length()
+                if dirLen != 0:
+                    dir = velocity / dirLen
+                    dirLen += WATER_RADIUS * 2
+                    p2 = pos + dir * dirLen - dir * WATER_RADIUS
+                    pg.draw.line(self.win, (0, 255, 0), pos, p2)
 
         else:
             for i in range(self.nbWater):
@@ -344,6 +348,14 @@ class Game:
                     b = WATER_RGB_FAST1[2] * slowRatio + WATER_RGB_FAST2[2] * fastRatio
 
                 pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
+
+                velocity = self.waterVelocities[i]
+                dirLen = velocity.length()
+                if dirLen != 0:
+                    dir = velocity / dirLen
+                    dirLen += WATER_RADIUS * 2
+                    p2 = pos + dir * dirLen - dir * WATER_RADIUS
+                    pg.draw.line(self.win, (0, 255, 0), pos, p2)
 
         if self.mouseState[0]:
             pg.draw.circle(self.win, (255, 0, 0), self.mousePos, MOUSE_RADIUS, 1)

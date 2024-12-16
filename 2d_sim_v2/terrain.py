@@ -83,7 +83,7 @@ class Terrain:
             p2 = vec2(self.points[i + 1])
             dir = p1 - p2
             n = vec2(-dir.y, dir.x).normalize()
-            line = (p1, p2, n, -dir)
+            line = (p1, p2, n, -dir, max(p1.y, p2.y))
             self.lines.append(line)
 
 
@@ -116,8 +116,8 @@ class Terrain:
         for i in range(self.nb_splited_lines):
             lines = []
             for line in self.lines:
-                if line[0].x >= (i - 2) * MAP_SPLIT_SIZE and\
-                    line[1].x <= (i + 3) * MAP_SPLIT_SIZE:
+                if line[0].x >= (i - 5) * MAP_SPLIT_SIZE and\
+                    line[1].x <= (i + 6) * MAP_SPLIT_SIZE:
                     lines.append(line)
             self.splited_lines.append(lines)
 

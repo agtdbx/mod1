@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/12 18:17:18 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/16 14:17:03 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@
 # define SMOOTHING_RADIUS 1
 # define WATER_DROP_MASS 1
 # define PRINT_FPS_TIME 1.0
+# define WATER_MAX_HEIGHT MAX_HEIGHT + 10
 
 std::vector<Vec3>	parse(char *name);
 

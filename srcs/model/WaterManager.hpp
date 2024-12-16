@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:16 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/16 14:11:10 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/16 16:02:16 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #ifndef WATERMANAGER
 # define WATERMANAGER
 # include <model/Water.hpp>
+# include <engine/maths/Vec3.hpp>
 
 
 class WaterManager 
@@ -22,6 +23,7 @@ private:
 
 	std::vector<Water> waterDrops;
 	std::vector<std::vector<std::vector<bool> > > waterMapPoint;
+	std::vector<Vec3> pointSave;
 
 protected:
 
@@ -43,6 +45,7 @@ public:
 	void updatePosition();
 	void updateDensity();
 	void draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName);
+	void calculWaterInGrid();
  
 };
 #endif

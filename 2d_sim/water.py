@@ -1,129 +1,202 @@
-import pygame as pg
+import random
 import math
 
-from pygame.math import Vector2 as vec2
 from numba import njit
-from define import  WATER_RADIUS, WATER_RADIUS2, WATER_COLOR,\
-                    WIN_W, WIN_H, AIR_FRICTION_RATIO, LINE_FRICTION_RATIO
+from pygame.math import Vector2 as vec2
+from define import  COLLISION_ENERGY_KEEP, WATER_RADIUS, WATER_RADIUS2,\
+                    WATER_MIN_X, WATER_MAX_X, WATER_MIN_Y, WATER_MAX_Y,\
+                    WATER_SMOOTHING_RADIUS, WATER_SMOOTHING_RADIUS2, WATER_MASS,\
+                    WATER_SMOOTHING_VOLUME, TARGET_DENSITY, PRESSURE_MULTIPLIER,\
+                    WATER_SMOOTHING_SCALE, VISCOSITY_FORCE, WATER_MAX_SPEED
 
-class Water:
-    def __init__(self, x: int, y: int):
-        self.pos = vec2(x, y)
-        self.dir = vec2(0, 0)
-        self.speed = 0
+def updateWater(pos: vec2,
+                velocity: vec2,
+                lines: list[vec2, vec2, vec2],
+                delta: float) -> tuple[vec2, vec2]:
+    lastPos = pos.copy()
+    pos += velocity * delta
 
-
-    def applyForce(self, dir: vec2, strengh: float):
-        self.dir = self.dir * self.speed + dir * strengh
-        self.speed = self.dir.length()
-        if self.speed != 0:
-            self.dir /= self.speed
-
-
-    def tick(self, delta:float, lines: list):
-        if self.speed == 0:
-            return
-
-        current_speed = self.speed * delta
-
-        newpos = self.pos + self.dir * current_speed
-
-        closest = None
-
+    # Collison with the terrain
+    if velocity.x != 0 or velocity.y != 0:
+        velLen = velocity.length()
+        dir = velocity / velLen
+        dirLen = velLen + WATER_RADIUS * 2
+        if velLen > WATER_MAX_SPEED:
+            velocity = dir * WATER_MAX_SPEED
+        endWaterLine = lastPos + dir * dirLen - dir * WATER_RADIUS
+        waterDir = endWaterLine - lastPos
+        testY = pos.y - WATER_RADIUS
         for line in lines:
             p1: vec2 = line[0]
             p2: vec2 = line[1]
             n: vec2 = line[2]
+            v: vec2 = line[3]
+            maxi: float = line[4]
 
-            collid, dist = line_circle_collision(p1.x, p1.y, p2.x, p2.y,
-                                                 self.pos.x, self.pos.y,
-                                                 WATER_RADIUS, WATER_RADIUS2)
-            if not collid:
+            if testY >= maxi:
+                velocity = n * velLen * COLLISION_ENERGY_KEEP
+                pos = lastPos + velocity * delta
+                break
+
+            if not direction_line_collision(lastPos, waterDir, p1, v):
                 continue
 
-            if closest == None or closest[0] > dist:
-                closest = (dist, n)
-
-        if closest != None:
-            dist, n = closest
-
             # Reflection
-            if n.dot(self.dir) >= 0:
-                n = n.copy() * -1
+            if n.dot(dir) > 0:
+                continue
 
-            divider = self.dir.dot(self.dir)
-            if divider == 0:
-                newpos = self.pos
-                self.dir = vec2(0, 0)
-                self.speed = 0
+            divider = dir.dot(dir)
+            projDir = n * (n.dot(dir) / divider) * 2
+            dir = (dir - projDir).normalize()
+            pos = lastPos
+            velocity = dir * velLen * COLLISION_ENERGY_KEEP
+            break
 
-            else:
-                projDir = n * (n.dot(self.dir) / divider) * 2
-                self.dir = (self.dir - projDir).normalize()
-                newpos = self.pos + self.dir * current_speed
-                self.speed *= LINE_FRICTION_RATIO
+    # Collision with the screen
+    if pos.x < WATER_MIN_X:
+        pos.x = WATER_MIN_X
+        velocity.x *= -1 * COLLISION_ENERGY_KEEP
+    if pos.x > WATER_MAX_X:
+        pos.x = WATER_MAX_X
+        velocity.x *= -1 * COLLISION_ENERGY_KEEP
+    if pos.y < WATER_MIN_Y:
+        pos.y = WATER_MIN_Y
+        velocity.y *= -1 * COLLISION_ENERGY_KEEP
+    if pos.y > WATER_MAX_Y:
+        pos.y = WATER_MAX_Y
+        velocity.y *= -1 * COLLISION_ENERGY_KEEP
 
-        # Collision with window
-        newpos.x = max(WATER_RADIUS, min(WIN_W - WATER_RADIUS, newpos.x))
-        newpos.y = max(WATER_RADIUS, min(WIN_H - WATER_RADIUS, newpos.y))
-
-        self.pos = newpos
-        self.speed *= AIR_FRICTION_RATIO
-        if self.speed < 1:
-            self.speed = 0
-            self.dir = vec2(0, 0)
+    return (pos, velocity)
 
 
-    def draw(self, win: pg.Surface):
-        pg.draw.circle(win, WATER_COLOR, self.pos, WATER_RADIUS)
+def direction_line_collision(p0: vec2,
+                             p10: vec2,
+                             p2: vec2,
+                             p32: vec2) -> bool:
+    p02 = p0 - p2
+
+    divide = (-p32.x * p10.y + p10.x * p32.y)
+    if divide == 0:
+        return False
+
+    s = (-p10.y * p02.x + p10.x * p02.y) / divide
+    if s < 0 or s > 1:
+        return False
+
+    t = ( p32.x * p02.y - p32.y * p02.x) / divide
+    if t < 0 or t > 1:
+        return False
+
+    return True
 
 
 @njit(fastmath=True)
-def line_circle_collision(x1: float, y1: float,
-                          x2: float, y2: float,
-                          cx: float, cy: float,
-                          r: float, r2: float) -> tuple[bool, float]:
-    OPx = x1 - cx
-    OPy = y1 - cy
-    distOP = OPx**2 + OPy**2
+def smoothingKernel(dst: float) -> float:
+    if dst > WATER_SMOOTHING_RADIUS:
+        return 0
+    return (WATER_SMOOTHING_RADIUS - dst)**2 / WATER_SMOOTHING_VOLUME
 
-    OQx = x2 - cx
-    OQy = y2 - cy
-    distOQ = OQx**2 + OQy**2
 
-    if distOP > distOQ:
-        maxDist = distOP
-        minDist = distOQ
-    else:
-        maxDist = distOQ
-        minDist = distOP
+@njit(fastmath=True)
+def smoothingKernelDerivate(dst: float) -> float:
+    if dst >= WATER_SMOOTHING_RADIUS:
+        return 0
 
-    if maxDist < r2:
-        return False, -1
+    return (dst - WATER_SMOOTHING_RADIUS) * WATER_SMOOTHING_SCALE
 
-    maxDist = math.sqrt(maxDist)
 
-    QPx = x1 - x2
-    QPy = y1 - y2
+@njit(fastmath=True)
+def viscositySmoothingKernel(dst: float) -> float:
+    if dst > WATER_SMOOTHING_RADIUS:
+        return 0
+    value = dst**2 / WATER_SMOOTHING_RADIUS2
+    return value**3
 
-    OPdotQP = OPx * QPx + OPy * QPy
 
-    needSqrt = True
-    if OPdotQP > 0:
-        PQx = x2 - x1
-        PQy = y2 - y1
-        OQdotPQ = OQx * PQx + OQy * PQy
-        if OQdotPQ > 0:
-            tri_area = abs(cx * QPy + x1 * OQy + x2 * (cy - y1))
-            distPQ = math.sqrt(PQx**2 + PQy**2)
-            minDist = tri_area / distPQ
-            needSqrt = False
+def calculateDensity(point: vec2,
+                     positions: list[vec2],
+                     grid: list[list[list[int]]]) -> float:
+    density = 0
 
-    if needSqrt:
-        if minDist > r2:
-            return False, -1
-        return True, math.sqrt(minDist)
+    gx = int(point.x // WATER_SMOOTHING_RADIUS)
+    gy = int(point.y // WATER_SMOOTHING_RADIUS)
 
-    if minDist <= r:
-        return True, minDist
-    return False, -1
+    for i in grid[gy][gx]:
+        dst = (positions[i] - point).magnitude()
+        influence = smoothingKernel(dst)
+        density += WATER_MASS * influence
+
+    return density
+
+
+@njit(fastmath=True)
+def convertDensityToPressure(density: float) -> float:
+    densityError = density - TARGET_DENSITY
+    pressure = densityError * PRESSURE_MULTIPLIER
+    return pressure
+
+
+@njit(fastmath=True)
+def calculateSharedPressure(densityA: float, densityB: float) -> float:
+    pressureA = convertDensityToPressure(densityA)
+    pressureB = convertDensityToPressure(densityB)
+    return (pressureA + pressureB) / 2
+
+
+def calculatePressureForce(waterId: int,
+                           positions: list[vec2],
+                           densities: list[vec2],
+                           grid: list[list[list[int]]]) -> vec2:
+    pressureForce = vec2(0, 0)
+
+    pos = positions[waterId]
+    gx = int(pos.x // WATER_SMOOTHING_RADIUS)
+    gy = int(pos.y // WATER_SMOOTHING_RADIUS)
+
+    density = densities[waterId]
+
+    for otherId in grid[gy][gx]:
+        if waterId == otherId: continue
+
+        offset = positions[otherId] - pos
+        dst = offset.length()
+        if dst != 0:
+            dir = offset / dst
+        else:
+            x = random.random()
+            y = random.random()
+            while x == 0 and y == 0:
+                y = random.random()
+            dir = vec2(x, y).normalize()
+        slope = smoothingKernelDerivate(dst)
+        sharedPressure = calculateSharedPressure(density, densities[otherId])
+        pressureForce += sharedPressure * dir * slope * WATER_MASS / density
+
+    return pressureForce
+
+
+def calculateViscosityForce(waterId: int,
+                            positions: list[vec2],
+                            velocities: list[vec2],
+                            grid: list[list[list[int]]]) -> vec2:
+    viscosityForce = vec2(0, 0)
+
+    pos = positions[waterId]
+    vel = velocities[waterId]
+    gx = int(pos.x // WATER_SMOOTHING_RADIUS)
+    gy = int(pos.y // WATER_SMOOTHING_RADIUS)
+
+    for otherId in grid[gy][gx]:
+        if waterId == otherId: continue
+
+        velDir = (velocities[otherId] - vel)
+        velLen = velDir.length()
+        if velLen == 0:
+            continue
+        velDir /= velLen
+        dst = (pos - positions[otherId]).length()
+        influence = viscositySmoothingKernel(dst)
+        viscosityForce += velDir * influence
+
+    return viscosityForce * VISCOSITY_FORCE
+

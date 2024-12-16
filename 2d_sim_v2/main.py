@@ -10,7 +10,7 @@ from define import  WIN_W, WIN_H, NB_WATER, WATER_BEGIN_SPACE,\
                     WATER_RADIUS, WATER_COLOR, WATER_SMOOTHING_RADIUS,\
                     WATER_RGB_FAST1, WATER_RGB_FAST2,\
                     MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE, GRAVITY
-# from terrain import Terrain
+from terrain import Terrain
 from water import   updateWater, calculateDensity, calculatePressureForce,\
                     calculateViscosityForce
 
@@ -39,7 +39,7 @@ class Game:
 
         self.runMainLoop = True
 
-        # self.terrain = Terrain()
+        self.terrain = Terrain()
 
         # self.gravity = True
         self.gravity = False
@@ -73,7 +73,8 @@ class Game:
                 pos = vec2(x, y)
                 vel = vec2(0, 0)
 
-                pos, vel = updateWater(pos, vel, 0.16)
+                pos, vel = updateWater(pos, vel,
+                                       self.terrain.get_split_lines(pos.x), 0.16)
 
                 self.waterPositions.append(pos)
                 self.waterPredictionPos.append(pos)
@@ -156,6 +157,8 @@ class Game:
     def update(self):
         # We clean our screen with one color
         self.win.fill((0, 0, 0))
+
+        self.terrain.draw(self.win)
 
         tmp = time.time()
         delta = tmp - self.last
@@ -256,7 +259,10 @@ class Game:
                         else: # Pull water to the mouse
                             self.waterVelocities[i] -= dir * strength * MOUSE_FORCE
 
-                pos, velocity = updateWater(pos.copy(), velocity.copy(), delta)
+                pos, velocity = updateWater(pos.copy(),
+                                            velocity.copy(),
+                                            self.terrain.get_split_lines(pos.x),
+                                            delta)
                 self.waterPredictionPos[i] = pos
 
             # Apply gravity and compute densities
@@ -286,7 +292,9 @@ class Game:
                 pos = self.waterPositions[i]
                 velocity = self.waterVelocities[i]
 
-                pos, velocity = updateWater(pos, velocity, delta)
+                pos, velocity = updateWater(pos, velocity,
+                                            self.terrain.get_split_lines(pos.x),
+                                            delta)
 
                 self.waterPositions[i] = pos
                 self.waterVelocities[i] = velocity
@@ -294,22 +302,25 @@ class Game:
                 speed = velocity.length()
 
                 if speed <= 10:
-                    speedRatio = min(1, speed / 10)
-                    slowRatio = 1 - speedRatio
+                    fastRatio = min(1, speed / 10)
+                    slowRatio = 1 - fastRatio
 
-                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * speedRatio
-                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * speedRatio
-                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * speedRatio
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * fastRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * fastRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * fastRatio
 
                 else:
-                    speedRatio = min(1, (speed - 10) / 10)
-                    slowRatio = 1 - speedRatio
+                    fastRatio = min(1, (speed - 10) / 10)
+                    slowRatio = 1 - fastRatio
 
-                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST2[0] * speedRatio
-                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST2[1] * speedRatio
-                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST2[2] * speedRatio
+                    r = WATER_RGB_FAST1[0] * slowRatio + WATER_RGB_FAST2[0] * fastRatio
+                    g = WATER_RGB_FAST1[1] * slowRatio + WATER_RGB_FAST2[1] * fastRatio
+                    b = WATER_RGB_FAST1[2] * slowRatio + WATER_RGB_FAST2[2] * fastRatio
 
                 pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
+
+                p2 = pos + velocity
+                pg.draw.line(self.win, (0, 255, 0), pos, p2)
 
         else:
             for i in range(self.nbWater):
@@ -317,20 +328,20 @@ class Game:
                 speed = self.waterVelocities[i].length()
 
                 if speed <= 10:
-                    speedRatio = min(1, speed / 10)
-                    slowRatio = 1 - speedRatio
+                    fastRatio = min(1, speed / 10)
+                    slowRatio = 1 - fastRatio
 
-                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * speedRatio
-                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * speedRatio
-                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * speedRatio
+                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST1[0] * fastRatio
+                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST1[1] * fastRatio
+                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST1[2] * fastRatio
 
                 else:
-                    speedRatio = min(1, (speed - 10) / 10)
-                    slowRatio = 1 - speedRatio
+                    fastRatio = min(1, (speed - 10) / 10)
+                    slowRatio = 1 - fastRatio
 
-                    r = WATER_COLOR[0] * slowRatio + WATER_RGB_FAST2[0] * speedRatio
-                    g = WATER_COLOR[1] * slowRatio + WATER_RGB_FAST2[1] * speedRatio
-                    b = WATER_COLOR[2] * slowRatio + WATER_RGB_FAST2[2] * speedRatio
+                    r = WATER_RGB_FAST1[0] * slowRatio + WATER_RGB_FAST2[0] * fastRatio
+                    g = WATER_RGB_FAST1[1] * slowRatio + WATER_RGB_FAST2[1] * fastRatio
+                    b = WATER_RGB_FAST1[2] * slowRatio + WATER_RGB_FAST2[2] * fastRatio
 
                 pg.draw.circle(self.win, (r, g, b), pos, WATER_RADIUS)
 

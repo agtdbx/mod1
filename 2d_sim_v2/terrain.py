@@ -81,9 +81,9 @@ class Terrain:
         for i in range(0, len(self.points) - 1):
             p1 = vec2(self.points[i])
             p2 = vec2(self.points[i + 1])
-            tmp = p1 - p2
-            n = vec2(-tmp.y, tmp.x).normalize()
-            line = (p1, p2, n)
+            dir = p1 - p2
+            n = vec2(-dir.y, dir.x).normalize()
+            line = (p1, p2, n, -dir)
             self.lines.append(line)
 
 

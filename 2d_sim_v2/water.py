@@ -3,14 +3,46 @@ import math
 
 from numba import njit
 from pygame.math import Vector2 as vec2
-from define import  COLLISION_ENERGY_KEEP,\
+from define import  COLLISION_ENERGY_KEEP, WATER_RADIUS, WATER_RADIUS2,\
                     WATER_MIN_X, WATER_MAX_X, WATER_MIN_Y, WATER_MAX_Y,\
                     WATER_SMOOTHING_RADIUS, WATER_SMOOTHING_RADIUS2, WATER_MASS,\
                     WATER_SMOOTHING_VOLUME, TARGET_DENSITY, PRESSURE_MULTIPLIER,\
                     WATER_SMOOTHING_SCALE, VISCOSITY_FORCE
 
-def updateWater(pos: vec2, velocity: vec2, delta: float) -> tuple[vec2, vec2]:
+def updateWater(pos: vec2,
+                velocity: vec2,
+                lines: list[vec2, vec2, vec2],
+                delta: float) -> tuple[vec2, vec2]:
+    lastPos = pos.copy()
     pos += velocity * delta
+
+    # Collison with the terrain
+    if velocity.x != 0 or velocity.y != 0:
+        dirLen = velocity.length()
+        dir = velocity / dirLen
+        for line in lines:
+            p1: vec2 = line[0]
+            p2: vec2 = line[1]
+            n: vec2 = line[2]
+            v: vec2 = line[3]
+
+            if not line_circle_collision(p1.x, p1.y, p2.x, p2.y, pos.x, pos.y,
+                                            WATER_RADIUS, WATER_RADIUS2):
+                continue
+            # if not direction_line_collision(lastPos, dir, dirLen,
+            #                                 n, v, p1):
+            #     continue
+
+            # Reflection
+            if n.dot(dir) >= 0:
+                n = n.copy() * -1
+
+            divider = dir.dot(dir)
+            projDir = n * (n.dot(dir) / divider) * 2
+            dir = (dir - projDir).normalize()
+            pos = lastPos
+            velocity = dir * dirLen * COLLISION_ENERGY_KEEP
+            break
 
     # Collision with the screen
     if pos.x < WATER_MIN_X:
@@ -27,6 +59,85 @@ def updateWater(pos: vec2, velocity: vec2, delta: float) -> tuple[vec2, vec2]:
         velocity.y *= -1 * COLLISION_ENERGY_KEEP
 
     return (pos, velocity)
+
+
+def direction_line_collision(waterPos: vec2,
+                             waterDir: vec2,
+                             waterDirLen: float,
+                             segNormal: vec2,
+                             segDir: vec2,
+                             segP1: vec2) -> bool:
+    if 0 <= waterDir.dot(segNormal):
+        return False
+
+    v1 = waterPos - segP1
+    v2 = segDir
+    v3 = vec2(-waterDir.y, waterDir.x)
+
+    subpart = v2.dot(v2)
+    if subpart == 0:
+        return False
+
+    t1 = v2.cross(v1) / subpart
+    if (t1 < 0):
+        return False
+
+    t2 = v1.dot(v3) / subpart
+    if (t2 < 0 or 1 < t2):
+        return False
+
+    return t1 <= waterDirLen
+
+
+@njit(fastmath=True)
+def line_circle_collision(x1: float, y1: float,
+                          x2: float, y2: float,
+                          cx: float, cy: float,
+                          r: float, r2: float) -> bool:
+    OPx = x1 - cx
+    OPy = y1 - cy
+    distOP = OPx**2 + OPy**2
+
+    OQx = x2 - cx
+    OQy = y2 - cy
+    distOQ = OQx**2 + OQy**2
+
+    if distOP > distOQ:
+        maxDist = distOP
+        minDist = distOQ
+    else:
+        maxDist = distOQ
+        minDist = distOP
+
+    if maxDist < r2:
+        return False
+
+    maxDist = math.sqrt(maxDist)
+
+    QPx = x1 - x2
+    QPy = y1 - y2
+
+    OPdotQP = OPx * QPx + OPy * QPy
+
+    needSqrt = True
+    if OPdotQP > 0:
+        PQx = x2 - x1
+        PQy = y2 - y1
+        OQdotPQ = OQx * PQx + OQy * PQy
+        if OQdotPQ > 0:
+            tri_area = abs(cx * QPy + x1 * OQy + x2 * (cy - y1))
+            distPQ = math.sqrt(PQx**2 + PQy**2)
+            minDist = tri_area / distPQ
+            needSqrt = False
+
+    if needSqrt:
+        if minDist > r2:
+            return False
+        return True
+
+    if minDist <= r:
+        return True
+    return False
 
 
 @njit(fastmath=True)

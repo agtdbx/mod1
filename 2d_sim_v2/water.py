@@ -20,18 +20,19 @@ def updateWater(pos: vec2,
     if velocity.x != 0 or velocity.y != 0:
         dirLen = velocity.length()
         dir = velocity / dirLen
+        dirLen += WATER_RADIUS * 2
+        endWaterLine = lastPos + dir * dirLen - dir * WATER_RADIUS
         for line in lines:
             p1: vec2 = line[0]
             p2: vec2 = line[1]
             n: vec2 = line[2]
             v: vec2 = line[3]
 
-            if not line_circle_collision(p1.x, p1.y, p2.x, p2.y, pos.x, pos.y,
-                                            WATER_RADIUS, WATER_RADIUS2):
-                continue
-            # if not direction_line_collision(lastPos, dir, dirLen,
-            #                                 n, v, p1):
+            # if not line_circle_collision(p1.x, p1.y, p2.x, p2.y, pos.x, pos.y,
+            #                                 WATER_RADIUS, WATER_RADIUS2):
             #     continue
+            if not direction_line_collision(lastPos, endWaterLine, p1, p2,):
+                continue
 
             # Reflection
             if n.dot(dir) >= 0:
@@ -61,32 +62,47 @@ def updateWater(pos: vec2,
     return (pos, velocity)
 
 
-def direction_line_collision(waterPos: vec2,
-                             waterDir: vec2,
-                             waterDirLen: float,
-                             segNormal: vec2,
-                             segDir: vec2,
-                             segP1: vec2) -> bool:
-    if 0 <= waterDir.dot(segNormal):
-        return False
+def direction_line_collision(p0: vec2,
+                             p1: vec2,
+                             p2: vec2,
+                             p3: vec2) -> bool:
+    s1 = p1 - p0
+    s2 = p3 - p2
 
-    v1 = waterPos - segP1
-    v2 = segDir
-    v3 = vec2(-waterDir.y, waterDir.x)
+    s = (-s1.y * (p0.x - p2.x) + s1.x * (p0.y - p2.y)) / (-s2.x * s1.y + s1.x * s2.y)
+    t = ( s2.x * (p0.y - p2.y) - s2.y * (p0.x - p2.x)) / (-s2.x * s1.y + s1.x * s2.y)
 
-    subpart = v2.dot(v2)
-    if subpart == 0:
-        return False
+    if s >= 0 and s <= 1 and t >= 0 and t <= 1:
+        return True
+    return False
 
-    t1 = v2.cross(v1) / subpart
-    if (t1 < 0):
-        return False
 
-    t2 = v1.dot(v3) / subpart
-    if (t2 < 0 or 1 < t2):
-        return False
+# def direction_line_collision(waterPos: vec2,
+#                              waterDir: vec2,
+#                              waterDirLen: float,
+#                              segNormal: vec2,
+#                              segDir: vec2,
+#                              segP1: vec2) -> bool:
+#     if 0 <= waterDir.dot(segNormal):
+#         return False
 
-    return t1 <= waterDirLen
+#     v1 = waterPos - segP1
+#     v2 = segDir
+#     v3 = vec2(-waterDir.y, waterDir.x)
+
+#     subpart = v2.dot(v2)
+#     if subpart == 0:
+#         return False
+
+#     t1 = v2.cross(v1) / subpart
+#     if (t1 < 0):
+#         return False
+
+#     t2 = v1.dot(v3) / subpart
+#     if (t2 < 0 or 1 < t2):
+#         return False
+
+#     return t1 <= waterDirLen
 
 
 @njit(fastmath=True)

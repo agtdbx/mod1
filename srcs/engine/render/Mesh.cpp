@@ -122,24 +122,31 @@ Mesh::~Mesh()
 
 void Mesh::setVertices(std::vector<Point> & vertices)
 {
-	this->nbVertices = vertices.size() * 8;
+	if (this->vertices)
+	{
+		delete [] this->vertices;
+		this->vertices = NULL;
+	}
+
+	this->nbVertices = vertices.size() * 9;
 	this->vertices = new float[this->nbVertices];
 
 	if (this->vertices == NULL)
 		throw new std::invalid_argument("Mesh vertrices alloc failed");
 
 	int	id;
-	for (int i = 0; i < this->nbVertices; i += 8)
+	for (int i = 0; i < this->nbVertices; i += 9)
 	{
-		id = i / 8;
-		this->vertices[i] = vertices[id].pos.x;
+		id = i / 9;
+		this->vertices[i    ] = vertices[id].pos.x;
 		this->vertices[i + 1] = vertices[id].pos.y;
 		this->vertices[i + 2] = vertices[id].pos.z;
-		this->vertices[i + 3] = vertices[id].r;
-		this->vertices[i + 4] = vertices[id].g;
-		this->vertices[i + 5] = vertices[id].b;
-		this->vertices[i + 6] = vertices[id].imgx;
-		this->vertices[i + 7] = vertices[id].imgy;
+		this->vertices[i + 3] = vertices[id].normal.x;
+		this->vertices[i + 4] = vertices[id].normal.y;
+		this->vertices[i + 5] = vertices[id].normal.z;
+		this->vertices[i + 6] = vertices[id].r;
+		this->vertices[i + 7] = vertices[id].g;
+		this->vertices[i + 8] = vertices[id].b;
 	}
 }
 //---- Operators ---------------------------------------------------------------

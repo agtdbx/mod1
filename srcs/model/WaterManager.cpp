@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:10 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/16 18:03:00 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/16 18:25:48 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void WaterManager::updatePosition()
 	for(Water & water : this->waterDrops)
 	{
 		water.update();
-		water.actualiseMeshPosition();
+		// water.actualiseMeshPosition();
 	}
 }
 
@@ -96,7 +96,6 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
 
-	return (*this);
 
 	for (size_t x = 0; x < MAP_SIZE - 1; x++)
 	{
@@ -108,39 +107,39 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 
 				if (this->waterMapPoint[x + 1][y + 1][z + 1])	//	7
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x][y + 1][z + 1])	//	6
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x + 1][y][z + 1])	//	5
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x][y][z + 1])	//	4
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x + 1][y + 1][z])	//	3
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x][y + 1][z])	//	2
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x + 1][y][z])	//	1
 					choice++;
-				choice << 1;
+				choice <<= 1;
 				if (this->waterMapPoint[x][y][z])	//	0
 					choice++;
 			}
 		}
 	}
-	mesh = Mesh(vertices, indices);
+	Mesh mesh = Mesh(vertices, indices);
 	mesh.draw(camera, shader, textureManager, textureName);
 }
 
 void WaterManager::calculWaterInGrid()
 {
 	int ind = 0;
-	int pointSaveSize = this->pointSave.size()
-	while (!(this->pointSave[ind].x == 0 && this->pointSave[ind].x == y this->pointSave[ind].z == 0))
+	// int pointSaveSize = this->pointSave.size();
+	while (!(this->pointSave[ind].x == 0 && this->pointSave[ind].x == 0 && this->pointSave[ind].z == 0))
 	{
 		this->waterMapPoint[this->pointSave[ind].x][this->pointSave[ind].y][this->pointSave[ind].z] = 0;
 		this->pointSave[ind].x = 0;

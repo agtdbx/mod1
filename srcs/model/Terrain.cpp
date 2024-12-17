@@ -52,9 +52,9 @@ void	Terrain::loadFromFile(char *filePath)
 }
 
 
-void	Terrain::renderMesh(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName)
+void	Terrain::renderMesh(Camera *camera, ShaderManager *shaderManager)
 {
-	this->mesh.draw(camera, shader, textureManager, textureName);
+	this->mesh.draw(camera, shaderManager->getTerrainShader(), shaderManager->getVAOId());
 }
 
 //**** PRIVATE METHODS *********************************************************

@@ -36,7 +36,7 @@ public:
 	void	rotate(glm::vec3 rotation, float degrees);
 	void	scale(float scale);
 
-	void	draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName);
+	void	draw(Camera *camera, Shader *shader, unsigned int VAOid);
 	void	print(void);
 
 private:

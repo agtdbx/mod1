@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WaterManager.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:10 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/17 11:50:50 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/17 12:38:06 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ WaterManager::WaterManager(/* args */)
 	// 	{
 	// 		this->waterMapPoint[x].push_back(std::vector<bool>(MAP_SIZE, 0));
 	// 	}
-		
+
 	// }
-	
+
 }
 
 WaterManager::~WaterManager()
@@ -81,7 +81,7 @@ void WaterManager::updateDensity()
 }
 
 
-void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName)
+void WaterManager::draw(Camera *camera, ShaderManager *shaderManager)
 {
 	// for(Water & water : this->waterDrops)
 	// {
@@ -100,15 +100,15 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 	int indicesIterator = 0;
 
 	this->calculWaterInGrid();
-	
-	// TODO multi thread this : 
+
+	// TODO multi thread this :
 	for (size_t x = 0; x < MAP_SIZE - 1; x++)
 	{
 		for (size_t y = 0; y < WATER_MAX_HEIGHT - 1; y++)
 		{
 			for (size_t z = 0; z < MAP_SIZE - 1; z++)
 			{
-				
+
 				choice = 0;
 
 				if (this->waterMapPoint[x][y + 1][z + 1])	//	6
@@ -173,7 +173,7 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 		}
 	}
 	Mesh mesh = Mesh(vertices, indices);
-	mesh.draw(camera, shader, textureManager, textureName);
+	mesh.draw(camera, shaderManager->getWaterShader(), shaderManager->getVAOId());
 }
 
 void WaterManager::calculWaterInGrid()
@@ -193,7 +193,7 @@ void WaterManager::calculWaterInGrid()
 	for (Water & water : this->waterDrops)
 	{
 		Vec3 waterPos = Vec3(int(water.getPosition().x), int(water.getPosition().y), int(water.getPosition().z));
-		
+
 		this->waterMapPoint[waterPos.x][waterPos.y][waterPos.z] = 1;
 		this->pointSave[ind].x = waterPos.x;
 		this->pointSave[ind].y = waterPos.y;

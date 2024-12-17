@@ -14,9 +14,6 @@ public:
 	~Shader();
 
 	unsigned int	getShaderId(void);
-	unsigned int	getVAOId(void);
-	unsigned int	getVBOId(void);
-	unsigned int	getEBOId(void);
 
 	Shader	&operator=(const Shader &obj);
 
@@ -24,9 +21,8 @@ public:
 	void	use(void);
 
 private:
-	unsigned int	id, VAO, VBO, EBO;
+	unsigned int	id;
 
-	void			allocateMemory(void);
 	unsigned int	getVertexShader(std::string shaderPath);
 	unsigned int	getFragmentShader(std::string shaderPath);
 };

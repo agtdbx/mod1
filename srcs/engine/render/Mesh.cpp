@@ -220,21 +220,11 @@ void	Mesh::scale(float scale)
 }
 
 
-void	Mesh::draw(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName)
+void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 {
-	unsigned int	texture;
-
 	if (this->vertices == NULL || this ->indices == NULL)
 		return ;
 
-	try
-	{
-		texture = textureManager->getTexture(textureName);
-	}
-	catch (std::exception &e)
-	{
-		return ;
-	}
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
 
@@ -249,8 +239,8 @@ void	Mesh::draw(Camera *camera, Shader *shader, TextureManager *textureManager, 
 	int cameraPosLoc = glGetUniformLocation(shader->getShaderId(), "cameraPos");
 	glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera->getPosition()));
 
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBindVertexArray(shader->getVAOId());
+	glBindVertexArray(VAOid);
+
 	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
 }
 

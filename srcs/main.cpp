@@ -3,7 +3,7 @@
 
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
-#include <engine/render/Shader.hpp>
+#include <engine/render/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/Camera.hpp>
@@ -14,8 +14,8 @@
 void	events(GLFWwindow* window, InputManager *inputManager);
 void	computation(InputManager *inputManager, Camera *camera);
 void	draw(GLFWwindow* window, Camera *camera,
-				Terrain *terrain, Shader *shader,
-				TextureManager *textureManager, WaterManager *waterManager );
+			Terrain *terrain, ShaderManager *shaderManager,
+			WaterManager *waterManager);
 
 int	main(int argc, char **argv)
 {
@@ -41,7 +41,7 @@ int	main(int argc, char **argv)
 
 	InputManager	inputManager(context.window);
 	Terrain			terrain;
-	Shader			shader;
+	ShaderManager	shaderManager;
 	TextureManager	textureManager;
 	WaterManager	waterManager;
 	Camera			camera;
@@ -49,8 +49,7 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shader.load("data/shaders/terrain.vs",
-					"data/shaders/terrain.fs");
+		shaderManager.loadShaderFiles();
 	}
 	catch (std::exception &e)
 	{
@@ -93,7 +92,8 @@ int	main(int argc, char **argv)
 		// waterManager.updatePosition();
 
 		//drawing map
-		draw(context.window, &camera, &terrain, &shader, &textureManager, &waterManager);
+		draw(context.window, &camera, &terrain,
+			&shaderManager, &waterManager);
 
 	}
 
@@ -175,16 +175,16 @@ void	computation(InputManager *inputManager, Camera *camera)
 
 
 void	draw(GLFWwindow* window, Camera *camera,
-			Terrain *terrain, Shader *shader,
-			TextureManager *textureManager, WaterManager *waterManager )
+			Terrain *terrain, ShaderManager *shaderManager,
+			WaterManager *waterManager)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Draw mesh
-	terrain->renderMesh(camera, shader, textureManager, "dirt");
-	waterManager->draw(camera, shader, textureManager, "dirt");
+	terrain->renderMesh(camera, shaderManager);
+	waterManager->draw(camera, shaderManager);
 
 	// Display the new image
 	glfwSwapBuffers(window);

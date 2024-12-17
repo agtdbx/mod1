@@ -10,18 +10,12 @@
 Shader::Shader(void)
 {
 	this->id = -1;
-	this->VAO = -1;
-	this->VBO = -1;
-	this->EBO = -1;
 }
 
 
 Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 {
 	this->id = -1;
-	this->VAO = -1;
-	this->VBO = -1;
-	this->EBO = -1;
 
 	this->load(vShaderPath, fShaderPath);
 }
@@ -30,21 +24,12 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 Shader::Shader(const Shader &obj)
 {
 	this->id = obj.id;
-	this->VAO = obj.VAO;
-	this->VBO = obj.VBO;
-	this->EBO = obj.EBO;
 }
 
 //---- Destructor --------------------------------------------------------------
 
 Shader::~Shader()
 {
-	if (this->VAO >= 0)
-		glDeleteVertexArrays(1, &this->VAO);
-	if (this->VBO >= 0)
-		glDeleteBuffers(1, &this->VBO);
-	if (this->EBO >= 0)
-		glDeleteBuffers(1, &this->EBO);
 }
 
 
@@ -54,24 +39,6 @@ Shader::~Shader()
 unsigned int	Shader::getShaderId(void)
 {
 	return (this->id);
-}
-
-
-unsigned int	Shader::getVAOId(void)
-{
-	return (this->VAO);
-}
-
-
-unsigned int	Shader::getVBOId(void)
-{
-	return (this->VBO);
-}
-
-
-unsigned int	Shader::getEBOId(void)
-{
-	return (this->EBO);
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -84,9 +51,6 @@ Shader	&Shader::operator=(const Shader &obj)
 		return (*this);
 
 	this->id = obj.id;
-	this->VAO = obj.VAO;
-	this->VBO = obj.VBO;
-	this->EBO = obj.EBO;
 
 	return (*this);
 }
@@ -95,18 +59,6 @@ Shader	&Shader::operator=(const Shader &obj)
 
 void	Shader::load(std::string vShaderPath, std::string fShaderPath)
 {
-	if (this->VAO >= 0)
-		glDeleteVertexArrays(1, &this->VAO);
-	this->VAO = -1;
-	if (this->VBO >= 0)
-		glDeleteBuffers(1, &this->VBO);
-	this->VBO = -1;
-	if (this->EBO >= 0)
-		glDeleteBuffers(1, &this->EBO);
-	this->EBO = -1;
-
-	this->allocateMemory();
-
 	unsigned int vertexShader = this->getVertexShader(vShaderPath);
 	unsigned int fragmentShader = this->getFragmentShader(fShaderPath);
 
@@ -160,23 +112,6 @@ void	Shader::use(void)
 }
 
 //**** PRIVATE METHODS *********************************************************
-
-void	Shader::allocateMemory(void)
-{
-	// Allocate memory for vertice array into gpu
-	glGenVertexArrays(1, &this->VAO);
-	glBindVertexArray(this->VAO);
-
-	// Allocate memory into gpu
-	glGenBuffers(1, &this->VBO);
-	// Set the new allocated buffer as array one
-	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-
-	// Allocate buffer for indices
-	glGenBuffers(1, &this->EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-}
-
 
 unsigned int	Shader::getVertexShader(std::string shaderPath)
 {

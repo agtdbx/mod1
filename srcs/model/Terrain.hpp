@@ -4,7 +4,7 @@
 # include <define.hpp>
 # include <engine/render/Mesh.hpp>
 # include <engine/render/Camera.hpp>
-# include <engine/render/Shader.hpp>
+# include <engine/render/ShaderManager.hpp>
 # include <engine/render/TextureManager.hpp>
 
 class Terrain
@@ -17,7 +17,7 @@ public:
 	Terrain	&operator=(const Terrain &obj);
 
 	void	loadFromFile(char *filePath);
-	void	renderMesh(Camera *camera, Shader *shader, TextureManager *textureManager, std::string textureName);
+	void	renderMesh(Camera *camera, ShaderManager *shaderManager);
 
 private:
 	std::vector<Vec3>					parameterPoints;

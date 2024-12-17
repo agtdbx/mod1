@@ -14,5 +14,7 @@ void main()
 {
 	// note that we read the multiplication from right to left
 	gl_Position = proj * view * model * vec4(point, 1.0);
-	pointColor = color;
+	vec3 cameraDir = normalize(point - cameraPos);
+	float nb = max(0, dot(cameraDir, normal));
+	pointColor = color * nb;
 }

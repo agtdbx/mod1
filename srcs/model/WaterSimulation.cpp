@@ -142,9 +142,12 @@ static bool	isPoint(
 void	WaterSimulation::createMesh(void)
 {
 	std::unordered_map<int, t_water_grid_pos>	waterInfluenceMap;
-	int	wx, wy, wz, nbPoints, id;
+	std::unordered_map<int, t_water_grid_pos>	pointAlreadyCreate;
+	int						wx, wy, wz, nbPoints, id, posId;
+	unsigned int			p1, p2, p3;
 	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
+	Vec3					normal, A, B;
 
 
 	// Update water influence by water pos
@@ -189,6 +192,12 @@ void	WaterSimulation::createMesh(void)
 			z = wz + lookAround[j][2];
 			id = 0;
 
+			// TODO: CHECK IF IT NOT COST TOO MUCH PERF
+			posId = getHashId(x, y, z);
+			if (isPoint(pointAlreadyCreate, posId))
+				continue;
+			pointAlreadyCreate[posId] = (t_water_grid_pos){x, y, z};
+
 			if (isPoint(waterInfluenceMap, x, y + 1, z + 1))
 				id++; // 6
 			id <<= 1;
@@ -231,9 +240,20 @@ void	WaterSimulation::createMesh(void)
 
 			for (int i = 0; i < 16 && this->triangleListPoint[id][i] != -1; i += 3)
 			{
-				indices.push_back((t_tri_id){(unsigned int) nbPoints + this->triangleListPoint[id][i],
-												(unsigned int) nbPoints + this->triangleListPoint[id][i + 1],
-												(unsigned int) nbPoints + this->triangleListPoint[id][i + 2]});
+				p1 = nbPoints + this->triangleListPoint[id][i];
+				p2 = nbPoints + this->triangleListPoint[id][i + 1];
+				p3 = nbPoints + this->triangleListPoint[id][i + 2];
+
+				A = vertices[p2].pos - vertices[p1].pos;
+				B = vertices[p3].pos - vertices[p1].pos;
+				normal = A.cross(B);
+				normal.normalize();
+
+				vertices[p1].normal = normal;
+				vertices[p2].normal = normal;
+				vertices[p3].normal = normal;
+
+				indices.push_back((t_tri_id){p1, p2, p3});
 			}
 			nbPoints += 12;
 		}

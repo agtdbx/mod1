@@ -71,10 +71,10 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	simulation.addWater(Vec3(5, 5, 5));
-	simulation.addWater(Vec3(4, 5, 5));
-	simulation.addWater(Vec3(4, 4, 5));
-	simulation.addWater(Vec3(5, 4, 5));
+	for (int i = 0; i < MAP_SIZE; i++)
+	{
+		simulation.addWater(Vec3(i, 5, 5));
+	}
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop
@@ -85,12 +85,12 @@ int	main(int argc, char **argv)
 		if (inputManager.escape.isPressed())
 			break;
 
+		// Compute part
 		computation(&inputManager, &camera, &simulation);
 
-		//drawing map
+		// Drawing part
 		draw(context.window, &camera, &terrain,
 			&shaderManager, &waterManager, &simulation);
-
 	}
 
 	context.close();
@@ -135,7 +135,8 @@ static void	computation(
 			avg += dtime;
 		}
 		avg /= deltas.size();
-		std::cout << "fps : " << 1.0 / avg << std::endl;
+		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
+				simulation->getNbParticules());
 		deltas.clear();
 	}
 

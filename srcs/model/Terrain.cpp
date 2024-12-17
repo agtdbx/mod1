@@ -149,7 +149,7 @@ void	Terrain::createMesh(void)
 			// Compute normal
 			if (y == MAP_SIZE -1 || x == MAP_SIZE - 1)
 			{
-				normal = Vec3(0, 1, 0);
+				normal = Vec3(0, -1, 0);
 			}
 			else
 			{

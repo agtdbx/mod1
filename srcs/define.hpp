@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/17 16:59:18 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/17 18:03:07 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # define WIN_TITLE "mod1"
 # define MAX_XY 100
 # define MAX_HEIGHT 50
-# define MAP_SIZE 11
+# define MAP_SIZE 200
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
 # define CAMERA_MAX_VIEW_DIST 10000.0f

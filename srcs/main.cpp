@@ -63,7 +63,7 @@ int	main(int argc, char **argv)
 	{
 		for (double j = 30; j < 40; j += 0.5)
 		{
-			waterManager.addWaterDrop(Water(Vec3(10, j, i), Vec3(0, 0, 0), WATER_GRAVITY));
+			waterManager.addWaterDrop(Water(Vec3(j, 40, i), Vec3(0, 0, 0), WATER_GRAVITY));
 		}
 	}
 	// for (double i = 0; i < 100; i += 0.5)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WaterManager.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:16 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/16 16:02:16 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/17 07:05:39 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ protected:
 	/* data */
 
 public:
+
+	static const int triangleListPoint[256][16];
 
 	WaterManager(void);					//constructor
 	~WaterManager();							//destructor

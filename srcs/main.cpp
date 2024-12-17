@@ -10,12 +10,22 @@
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
 #include <model/WaterManager.hpp>
+#include <model/WaterSimulation.hpp>
 
-void	events(GLFWwindow* window, InputManager *inputManager);
-void	computation(InputManager *inputManager, Camera *camera);
-void	draw(GLFWwindow* window, Camera *camera,
-			Terrain *terrain, ShaderManager *shaderManager,
-			WaterManager *waterManager);
+static void	events(
+				GLFWwindow* window,
+				InputManager *inputManager);
+static void	computation(
+				InputManager *inputManager,
+				Camera *camera,
+				WaterSimulation	*simulation);
+static void	draw(
+				GLFWwindow* window,
+				Camera *camera,
+				Terrain *terrain,
+				ShaderManager *shaderManager,
+				WaterManager *waterManager,
+				WaterSimulation	*simulation);
 
 int	main(int argc, char **argv)
 {
@@ -44,7 +54,9 @@ int	main(int argc, char **argv)
 	ShaderManager	shaderManager;
 	TextureManager	textureManager;
 	WaterManager	waterManager;
+	WaterSimulation	simulation;
 	Camera			camera;
+
 	try
 	{
 		terrain.loadFromFile(argv[1]);
@@ -59,25 +71,8 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
-	// for (double i = 1; i < 10; i += 1)
-	// {
-	// 	for (double j = 1; j < 10; j += 1)
-	// 	{
-	// 		waterManager.addWaterDrop(Water(Vec3(j, j + 35, i), Vec3(0, 0, 0), WATER_GRAVITY));
-	// 	}
-	// }
-	// for (double i = 0; i < 100; i += 0.5)
-	// {
-	// 	for (double j = 30; j < 40; j += 0.5)
-	// 	{
-	// 		for (double k = 0; k < 100; k += 0.5)
-	// 		{
-	// 			waterManager.addWaterDrop(Water(Vec3(k, j, i), Vec3(0, 0, 0), WATER_GRAVITY));
-	// 		}
-	// 	}
-	// }
-	// Water water = Water(Vec3(20, 30, 30), Vec3(0, 0, 0), WATER_GRAVITY);
+	simulation.addWater(Vec3(5, 5, 5));
+	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window)) {
@@ -87,14 +82,11 @@ int	main(int argc, char **argv)
 		if (inputManager.escape.isPressed())
 			break;
 
-		computation(&inputManager, &camera);
-
-		//fluid calculation
-		// waterManager.updatePosition();
+		computation(&inputManager, &camera, &simulation);
 
 		//drawing map
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &waterManager);
+			&shaderManager, &waterManager, &simulation);
 
 	}
 
@@ -104,7 +96,9 @@ int	main(int argc, char **argv)
 }
 
 
-void	events(GLFWwindow* window, InputManager *inputManager)
+static void	events(
+				GLFWwindow* window,
+				InputManager *inputManager)
 {
 	// Update events
 	glfwPollEvents();
@@ -113,7 +107,10 @@ void	events(GLFWwindow* window, InputManager *inputManager)
 }
 
 
-void	computation(InputManager *inputManager, Camera *camera)
+static void	computation(
+				InputManager *inputManager,
+				Camera *camera,
+				WaterSimulation	*simulation)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
@@ -136,6 +133,7 @@ void	computation(InputManager *inputManager, Camera *camera)
 		}
 		avg /= deltas.size();
 		std::cout << "fps : " << 1.0 / avg << std::endl;
+		deltas.clear();
 	}
 
 	cameraSpeed = CAMERA_SPEED * delta;
@@ -172,12 +170,18 @@ void	computation(InputManager *inputManager, Camera *camera)
 		camera->rotateY(-CAMERA_ROTATION_SPEED * delta);
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
+
+	simulation->tick(delta);
 }
 
 
-void	draw(GLFWwindow* window, Camera *camera,
-			Terrain *terrain, ShaderManager *shaderManager,
-			WaterManager *waterManager)
+static void	draw(
+				GLFWwindow* window,
+				Camera *camera,
+				Terrain *terrain,
+				ShaderManager *shaderManager,
+				WaterManager *waterManager,
+				WaterSimulation	*simulation)
 {
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
@@ -185,7 +189,8 @@ void	draw(GLFWwindow* window, Camera *camera,
 
 	// Draw mesh
 	terrain->renderMesh(camera, shaderManager);
-	waterManager->draw(camera, shaderManager);
+	// waterManager->draw(camera, shaderManager);
+	simulation->draw(camera, shaderManager);
 
 	// Display the new image
 	glfwSwapBuffers(window);

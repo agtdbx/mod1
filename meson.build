@@ -23,6 +23,7 @@ executable('mod1',
           'srcs/model/Terrain.cpp',
           'srcs/model/Water.cpp',
           'srcs/model/WaterManager.cpp',
+          'srcs/model/WaterSimulation.cpp',
           'srcs/parsing.cpp',
           build_rpath: '.',
           dependencies : [

@@ -149,6 +149,62 @@ void Mesh::setVertices(std::vector<Point> & vertices)
 		this->vertices[i + 8] = vertices[id].b;
 	}
 }
+
+void	Mesh::setMesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
+{
+	if (this->vertices)
+	{
+		delete [] this->vertices;
+		this->vertices = NULL;
+	}
+
+	this->nbVertices = vertices.size() * 9;
+	this->vertices = new float[this->nbVertices];
+
+	if (this->vertices == NULL)
+		throw new std::invalid_argument("Mesh vertrices alloc failed");
+
+	int	id;
+	for (int i = 0; i < this->nbVertices; i += 9)
+	{
+		id = i / 9;
+		this->vertices[i    ] = vertices[id].pos.x;
+		this->vertices[i + 1] = vertices[id].pos.y;
+		this->vertices[i + 2] = vertices[id].pos.z;
+		this->vertices[i + 3] = vertices[id].normal.x;
+		this->vertices[i + 4] = vertices[id].normal.y;
+		this->vertices[i + 5] = vertices[id].normal.z;
+		this->vertices[i + 6] = vertices[id].r;
+		this->vertices[i + 7] = vertices[id].g;
+		this->vertices[i + 8] = vertices[id].b;
+	}
+
+	if (this->indices)
+	{
+		delete [] this->indices;
+		this->indices = NULL;
+	}
+
+	this->nbIndices = indices.size() * 3;
+	this->indices = new unsigned int[this->nbIndices];
+
+	if (this->indices == NULL)
+	{
+		delete [] this->vertices;
+		this->vertices = NULL;
+		throw new std::invalid_argument("Mesh indices alloc failed");
+	}
+
+	for (int i = 0; i < this->nbIndices; i += 3)
+	{
+		id = i / 3;
+		this->indices[i    ] = indices[id].p1;
+		this->indices[i + 1] = indices[id].p2;
+		this->indices[i + 2] = indices[id].p3;
+	}
+}
+
+
 //---- Operators ---------------------------------------------------------------
 
 Mesh	&Mesh::operator=(const Mesh &obj)

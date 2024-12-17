@@ -29,8 +29,8 @@ public:
 
 	Mesh	&operator=(const Mesh &obj);
 
-	void setVertices(std::vector<Point> & vertices);
-
+	void	setVertices(std::vector<Point> &vertices);
+	void	setMesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices);
 
 	void	translate(glm::vec3 translation);
 	void	rotate(glm::vec3 rotation, float degrees);

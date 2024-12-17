@@ -59,13 +59,14 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	for (double i = 0; i < 100; i += 0.5)
-	{
-		for (double j = 30; j < 40; j += 0.5)
-		{
-			waterManager.addWaterDrop(Water(Vec3(j, 40, i), Vec3(0, 0, 0), WATER_GRAVITY));
-		}
-	}
+	waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
+	// for (double i = 1; i < 10; i += 1)
+	// {
+	// 	for (double j = 1; j < 10; j += 1)
+	// 	{
+	// 		waterManager.addWaterDrop(Water(Vec3(j, j + 35, i), Vec3(0, 0, 0), WATER_GRAVITY));
+	// 	}
+	// }
 	// for (double i = 0; i < 100; i += 0.5)
 	// {
 	// 	for (double j = 30; j < 40; j += 0.5)
@@ -89,7 +90,7 @@ int	main(int argc, char **argv)
 		computation(&inputManager, &camera);
 
 		//fluid calculation
-		waterManager.updatePosition();
+		// waterManager.updatePosition();
 
 		//drawing map
 		draw(context.window, &camera, &terrain, &shader, &textureManager, &waterManager);

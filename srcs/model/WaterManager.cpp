@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:10 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/17 11:08:27 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/17 11:50:50 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 	//                3    2                         7    6
 	//
 	//                0    1                         4    5
-	std::vector<Point>		vertices = std::vector<Point>(MAP_SIZE * MAP_SIZE * WATER_MAX_HEIGHT * 12, Point(Vec3(0, 0, 0), 0.0, 0.0, 0.8));
+	std::vector<Point>		vertices = std::vector<Point>(MAP_SIZE * MAP_SIZE * WATER_MAX_HEIGHT* 12, Point(Vec3(0, 0, 0), 0.0, 0.0, 0.8));
 
 	std::vector<t_tri_id>	indices;
 	int choice = 0;

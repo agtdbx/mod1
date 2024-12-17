@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/17 11:42:06 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/17 16:59:18 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,12 @@
 # define TERRAIN_PRECISION 0.01
 # define WATER_GRAVITY 0.01
 # define COLLISION_DAMPLING 0.7
+# define COLLISION_ENERGY_KEEP 0.7
 # define WATER_DROP_SIZE 0.1
 # define SMOOTHING_RADIUS 1
 # define WATER_DROP_MASS 1
 # define PRINT_FPS_TIME 1.0
-# define WATER_MAX_HEIGHT MAX_HEIGHT + 10
+# define WATER_MAX_HEIGHT (MAX_HEIGHT + 10)
 
 std::vector<Vec3>	parse(char *name);
 

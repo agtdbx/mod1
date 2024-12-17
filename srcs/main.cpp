@@ -72,6 +72,9 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	simulation.addWater(Vec3(5, 5, 5));
+	simulation.addWater(Vec3(4, 5, 5));
+	simulation.addWater(Vec3(4, 4, 5));
+	simulation.addWater(Vec3(5, 4, 5));
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop

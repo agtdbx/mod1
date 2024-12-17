@@ -59,7 +59,45 @@ void	WaterSimulation::tick(double delta)
 {
 	for (int i = 0; i < this->nbParticules; i++)
 	{
+		// Apply gravity
+		this->velocities[i] += Vec3(0, -0.1, 0) * delta;
+
+		// Update particule position
 		this->positions[i] += this->velocities[i] * delta;
+
+		// Check if particule is out of the map on x axis
+		if (this->positions[i].x < 0.0)
+		{
+			this->positions[i].x = 0.0;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
+		else if (this->positions[i].x >= MAP_SIZE)
+		{
+			this->positions[i].x = MAP_SIZE;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
+		// Check if particule is out of the map on y axis
+		if (this->positions[i].y < 0.0)
+		{
+			this->positions[i].y = 0.0;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
+		else if (this->positions[i].y >= WATER_MAX_HEIGHT)
+		{
+			this->positions[i].y = MAP_SIZE;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
+		// Check if particule is out of the map on z axis
+		if (this->positions[i].z < 0.0)
+		{
+			this->positions[i].z = 0.0;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
+		else if (this->positions[i].z >= MAP_SIZE)
+		{
+			this->positions[i].z = MAP_SIZE;
+			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+		}
 	}
 
 	this->createMesh();
@@ -74,21 +112,40 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 //**** PRIVATE METHODS *********************************************************
 
-#define TEST_SIZE 200
-#define TEST_HEIGHT 60
+typedef struct s_water_grid_pos
+{
+	int	x;
+	int	y;
+	int	z;
+}	t_water_grid_pos;
+
+static int	getHashId(int x, int y, int z)
+{
+	return (x + y * MAP_SIZE + (z * WATER_MAX_HEIGHT));
+}
+
+static bool	isPoint(
+				std::unordered_map<int, t_water_grid_pos> &waterInfluenceMap,
+				int posId)
+{
+	return (waterInfluenceMap.find(posId) != waterInfluenceMap.end());
+}
+
+static bool	isPoint(
+				std::unordered_map<int, t_water_grid_pos> &waterInfluenceMap,
+				int x, int y, int z)
+{
+	return (waterInfluenceMap.find(getHashId(x, y, z)) != waterInfluenceMap.end());
+}
+
 
 void	WaterSimulation::createMesh(void)
 {
-	bool	waterInfluenceMap[TEST_SIZE][TEST_HEIGHT][TEST_SIZE];
+	std::unordered_map<int, t_water_grid_pos>	waterInfluenceMap;
 	int	wx, wy, wz, nbPoints, id;
 	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
 
-	// Init water influence map
-	for (int x = 0; x < TEST_SIZE; x++)
-		for (int y = 0; y < TEST_HEIGHT; y++)
-			for (int z = 0; z < TEST_SIZE; z++)
-				waterInfluenceMap[x][y][z] = 0.0;
 
 	// Update water influence by water pos
 	for (int i = 0; i < this->nbParticules; i++)
@@ -97,69 +154,92 @@ void	WaterSimulation::createMesh(void)
 		wy = this->positions[i].y + 0.5;
 		wz = this->positions[i].z + 0.5;
 
-		waterInfluenceMap[wx][wy][wz] = true;
+		waterInfluenceMap[getHashId(wx, wy, wz)] = (t_water_grid_pos){wx, wy, wz};
 	}
 
 	// Create points and triangles
 	nbPoints = 0;
-	for (int x = 0; x < TEST_SIZE - 1; x++)
+
+	std::unordered_map<int, t_water_grid_pos>::const_iterator it;
+
+	it = waterInfluenceMap.begin();
+
+	const int	lookAround[8][3] = {
+		{ 0,  0,  0},
+		{ 0,  0, -1},
+		{ 0, -1,  0},
+		{ 0, -1, -1},
+		{-1,  0,  0},
+		{-1,  0, -1},
+		{-1, -1,  0},
+		{-1, -1, -1}
+	};
+
+	int x, y, z;
+	while (it != waterInfluenceMap.end())
 	{
-		for (int y = 0; y < TEST_HEIGHT - 1; y++)
+		wx = it->second.x;
+		wy = it->second.y;
+		wz = it->second.z;
+
+		for (int j = 0; j < 8; j++)
 		{
-			for (int z = 0; z < TEST_SIZE - 1; z++)
+			x = wx + lookAround[j][0];
+			y = wy + lookAround[j][1];
+			z = wz + lookAround[j][2];
+			id = 0;
+
+			if (isPoint(waterInfluenceMap, x, y + 1, z + 1))
+				id++; // 6
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x + 1, y + 1, z + 1))
+				id++; // 7
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x + 1, y, z + 1))
+				id++; // 5
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x, y, z + 1))
+				id++; // 4
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x, y + 1, z))
+				id++; // 2
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x + 1, y + 1, z))
+				id++; // 3
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x + 1, y, z))
+				id++; // 1
+			id <<= 1;
+			if (isPoint(waterInfluenceMap, x, y, z))
+				id++; // 0
+
+			if (id == 0 || id == 0b11111111)
+				continue;
+
+			vertices.push_back(Point(Vec3(x + 0.5, y, z), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 1, y + 0.5, z), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 0.5, y + 1, z), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x, y + 0.5, z), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 0.5, y, z + 1), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 1, y + 0.5, z + 1), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 0.5, y + 1, z + 1), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x, y + 0.5, z + 1), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x, y, z + 0.5), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 1, y, z + 0.5), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x + 1, y + 1, z + 0.5), 0, 0, 0.8));
+			vertices.push_back(Point(Vec3(x, y + 1, z + 0.5), 0, 0, 0.8));
+
+			for (int i = 0; i < 16 && this->triangleListPoint[id][i] != -1; i += 3)
 			{
-				id = 0;
-
-				if (waterInfluenceMap[x][y + 1][z + 1])
-					id++; // 6
-				id <<= 1;
-				if (waterInfluenceMap[x + 1][y + 1][z + 1])
-					id++; // 7
-				id <<= 1;
-				if (waterInfluenceMap[x + 1][y][z + 1])
-					id++; // 5
-				id <<= 1;
-				if (waterInfluenceMap[x][y][z + 1])
-					id++; // 4
-				id <<= 1;
-				if (waterInfluenceMap[x][y + 1][z])
-					id++; // 2
-				id <<= 1;
-				if (waterInfluenceMap[x + 1][y + 1][z])
-					id++; // 3
-				id <<= 1;
-				if (waterInfluenceMap[x + 1][y][z])
-					id++; // 1
-				id <<= 1;
-				if (waterInfluenceMap[x][y][z])
-					id++; // 0
-
-				if (id == 0 || id == 0b11111111)
-					continue;
-
-				vertices.push_back(Point(Vec3(x + 0.5, y, z), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 1, y + 0.5, z), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 0.5, y + 1, z), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x, y + 0.5, z), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 0.5, y, z + 1), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 1, y + 0.5, z + 1), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 0.5, y + 1, z + 1), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x, y + 0.5, z + 1), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x, y, z + 0.5), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 1, y, z + 0.5), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x + 1, y + 1, z + 0.5), 0, 0, 0.8));
-				vertices.push_back(Point(Vec3(x, y + 1, z + 0.5), 0, 0, 0.8));
-
-				for (int i = 0; i < 16 && this->triangleListPoint[id][i] != -1; i += 3)
-				{
-					indices.push_back((t_tri_id){(unsigned int) nbPoints + this->triangleListPoint[id][i],
-													(unsigned int) nbPoints + this->triangleListPoint[id][i + 1],
-													(unsigned int) nbPoints + this->triangleListPoint[id][i + 2]});
-				}
-
-				nbPoints += 12;
+				indices.push_back((t_tri_id){(unsigned int) nbPoints + this->triangleListPoint[id][i],
+												(unsigned int) nbPoints + this->triangleListPoint[id][i + 1],
+												(unsigned int) nbPoints + this->triangleListPoint[id][i + 2]});
 			}
+			nbPoints += 12;
 		}
+
+
+		it++;
 	}
 
 	this->mesh.setMesh(vertices, indices);

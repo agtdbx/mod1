@@ -54,7 +54,7 @@ void	Terrain::loadFromFile(char *filePath)
 
 void	Terrain::renderMesh(Camera *camera, ShaderManager *shaderManager)
 {
-	this->mesh.draw(camera, shaderManager->getTerrainShader(), shaderManager->getVAOId());
+	this->mesh.draw(camera, shaderManager->getShader("terrain"), shaderManager->getVAOId());
 }
 
 //**** PRIVATE METHODS *********************************************************

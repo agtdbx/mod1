@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:10 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/17 12:38:06 by aderouba         ###   ########.fr       */
+/*   Updated: 2024/12/17 13:48:41 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ void WaterManager::draw(Camera *camera, ShaderManager *shaderManager)
 		}
 	}
 	Mesh mesh = Mesh(vertices, indices);
-	mesh.draw(camera, shaderManager->getWaterShader(), shaderManager->getVAOId());
+	mesh.draw(camera, shaderManager->getShader("water"), shaderManager->getVAOId());
 }
 
 void WaterManager::calculWaterInGrid()

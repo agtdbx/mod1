@@ -222,7 +222,7 @@ void	Mesh::scale(float scale)
 
 void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 {
-	if (this->vertices == NULL || this ->indices == NULL)
+	if (this->vertices == NULL || this ->indices == NULL || shader == NULL)
 		return ;
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);

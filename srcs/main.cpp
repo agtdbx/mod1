@@ -49,7 +49,8 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shaderManager.loadShaderFiles();
+		shaderManager.addShader("terrain", "data/shaders/terrain.vs", "data/shaders/terrain.fs");
+		shaderManager.addShader("water", "data/shaders/water.vs", "data/shaders/water.fs");
 	}
 	catch (std::exception &e)
 	{

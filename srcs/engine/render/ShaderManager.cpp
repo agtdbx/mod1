@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <stdexcept>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -40,15 +41,16 @@ ShaderManager::~ShaderManager()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
-Shader	*ShaderManager::getTerrainShader(void)
+Shader	*ShaderManager::getShader(std::string shaderName)
 {
-	return (&this->terrainShader);
-}
+	std::unordered_map<std::string, Shader>::iterator	checkShader;
 
+	checkShader = this->shaders.find(shaderName);
 
-Shader	*ShaderManager::getWaterShader(void)
-{
-	return (&this->waterShader);
+	if (checkShader == this->shaders.end())
+		return (NULL);
+
+	return (&checkShader->second);
 }
 
 
@@ -75,10 +77,23 @@ ShaderManager	&ShaderManager::operator=(const ShaderManager &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-void	ShaderManager::loadShaderFiles(void)
+void	ShaderManager::addShader(
+						std::string shaderName,
+						std::string vShaderFile,
+						std::string fShaderFile)
 {
-	this->terrainShader.load("data/shaders/terrain.vs", "data/shaders/terrain.fs");
-	this->waterShader.load("data/shaders/water.vs", "data/shaders/water.fs");
+	std::unordered_map<std::string, Shader>::const_iterator	checkShader;
+
+	checkShader = this->shaders.find(shaderName);
+
+	// If shader exist, error
+	if (checkShader != this->shaders.end())
+		throw std::invalid_argument("Shader name '" + shaderName
+										+ "' is already took");
+
+	Shader	shader(vShaderFile, fShaderFile);
+
+	this->shaders.insert(std::pair<std::string, Shader>(shaderName, shader));
 }
 
 //**** PRIVATE METHODS *********************************************************

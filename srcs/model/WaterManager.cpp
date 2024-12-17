@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WaterManager.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 15:25:10 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/17 08:15:28 by lflandri         ###   ########.fr       */
+/*   Updated: 2024/12/17 11:08:27 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ void WaterManager::draw(Camera *camera, Shader *shader, TextureManager *textureM
 					{
 						if (WaterManager::triangleListPoint[choice][i] == -1)
 							break;
-						indices.push_back((t_tri_id){indicesIterator + WaterManager::triangleListPoint[choice][i], indicesIterator + WaterManager::triangleListPoint[choice][i + 1], indicesIterator + WaterManager::triangleListPoint[choice][i + 2]});
+						indices.push_back((t_tri_id){(unsigned int) indicesIterator + WaterManager::triangleListPoint[choice][i],(unsigned int) indicesIterator + WaterManager::triangleListPoint[choice][i + 1],(unsigned int) indicesIterator + WaterManager::triangleListPoint[choice][i + 2]});
 					}
 					indicesIterator += 12;
 				}

@@ -65,7 +65,7 @@ void	WaterSimulation::tick(double delta)
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		// Apply gravity
-		this->velocities[i] += Vec3(0, -0.1, 0) * delta;
+		// this->velocities[i] += Vec3(0, -0.1, 0) * delta;
 
 		// Update particule position
 		this->positions[i] += this->velocities[i] * delta;
@@ -117,7 +117,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 //**** PRIVATE METHODS *********************************************************
 
-static int	getHashId(int x, int y, int z)
+static inline int	getHashId(int x, int y, int z)
 {
 	return (x | (y << 8) | (z << 16));
 }

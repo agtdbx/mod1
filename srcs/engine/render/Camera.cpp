@@ -11,10 +11,17 @@ Camera::Camera(void)
 										(float)WIN_W/(float)WIN_H,
 										CAMERA_MIN_VIEW_DIST, CAMERA_MAX_VIEW_DIST);
 
+	this->lightPosition = glm::vec3(100.0f, 200.0f, 100.0f);
+
 	this->position = glm::vec3(-127.0f, 75.0f, 103.0f);
 	this->pitch = -15.463547f;
 	this->yaw = -0.144872f;
 	this->roll = 0.0f;
+
+	// this->position = glm::vec3(-6.0f, 7.5f, 3.0f);
+	// this->pitch = -15.463547f;
+	// this->yaw = -0.144872f;
+	// this->roll = 0.0f;
 
 	this->front = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
 	this->right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->front));
@@ -36,6 +43,7 @@ Camera::Camera(const Camera &obj)
 	this->front = obj.front;
 	this->up = obj.up;
 	this->right = obj.right;
+	this->lightPosition = obj.lightPosition;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -72,6 +80,12 @@ glm::mat4	Camera::getProjection(void)
 	return (this->projection);
 }
 
+
+glm::vec3	Camera::getLightPosition(void)
+{
+	return (this->lightPosition);
+}
+
 //---- Setters -----------------------------------------------------------------
 
 //---- Operators ---------------------------------------------------------------
@@ -90,6 +104,7 @@ Camera	&Camera::operator=(const Camera &obj)
 	this->front = obj.front;
 	this->up = obj.up;
 	this->right = obj.right;
+	this->lightPosition = obj.lightPosition;
 
 	return (*this);
 }

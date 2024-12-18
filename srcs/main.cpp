@@ -71,14 +71,18 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
+	// simulation.addWater(Vec3(5, 5, 5));
+	// simulation.addWater(Vec3(5, 5, 6));
 	for (int i = 0; i < MAP_SIZE; i++)
 	{
-		simulation.addWater(Vec3(i, 5, 5));
+		for (int j = 0; j < MAP_SIZE; j++)
+			simulation.addWater(Vec3(i, 5, j));
 	}
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop
-	while (!glfwWindowShouldClose(context.window)) {
+	while (!glfwWindowShouldClose(context.window))
+	{
 		events(context.window, &inputManager);
 
 		// Close window on escape

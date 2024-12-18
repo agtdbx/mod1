@@ -292,8 +292,8 @@ void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->getView()));
 	int projLoc = glGetUniformLocation(shader->getShaderId(), "proj");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->getProjection()));
-	int cameraPosLoc = glGetUniformLocation(shader->getShaderId(), "cameraPos");
-	glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera->getPosition()));
+	int lightPosLoc = glGetUniformLocation(shader->getShaderId(), "lightPos");
+	glUniform3fv(lightPosLoc, 1, glm::value_ptr(camera->getLightPosition()));
 
 	glBindVertexArray(VAOid);
 

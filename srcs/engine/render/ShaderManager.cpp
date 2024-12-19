@@ -54,6 +54,12 @@ Shader	*ShaderManager::getShader(std::string shaderName)
 }
 
 
+WaterShader	*ShaderManager::getWaterShader(void)
+{
+	return (&this->waterShader);
+}
+
+
 unsigned int	ShaderManager::getVAOId(void)
 {
 	return (this->VAO);
@@ -94,6 +100,14 @@ void	ShaderManager::addShader(
 	Shader	shader(vShaderFile, fShaderFile);
 
 	this->shaders.insert(std::pair<std::string, Shader>(shaderName, shader));
+}
+
+
+void	ShaderManager::loadWaterShaderFiles(
+						std::string vShaderFile,
+						std::string fShaderFile)
+{
+	this->waterShader.load(vShaderFile, fShaderFile);
 }
 
 //**** PRIVATE METHODS *********************************************************

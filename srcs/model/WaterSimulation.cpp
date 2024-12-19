@@ -1,27 +1,39 @@
 #include <model/WaterSimulation.hpp>
 
+#include <engine/render/WaterShader.hpp>
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
 WaterSimulation::WaterSimulation(void)
 {
 	this->nbParticules = 0;
+	this->waterPositions = NULL;
+	this->needCreateWaterPositions = true;
+	this->model = glm::mat4(1.0f);
 }
 
 
 WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 {
-	this->mesh = obj.mesh;
+	// this->mesh = obj.mesh;
 	this->nbParticules = obj.nbParticules;
 	this->positions = obj.positions;
 	this->velocities = obj.velocities;
+	this->waterPositions = NULL;
+	this->needCreateWaterPositions = true;
+	this->model = obj.model;
 }
 
 //---- Destructor --------------------------------------------------------------
 
 WaterSimulation::~WaterSimulation()
 {
-
+	if (this->waterPositions)
+	{
+		delete [] this->waterPositions;
+		this->waterPositions = NULL;
+	}
 }
 
 
@@ -42,10 +54,12 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	if (this == &obj)
 		return (*this);
 
-	this->mesh = obj.mesh;
+	// this->mesh = obj.mesh;
 	this->nbParticules = obj.nbParticules;
 	this->positions = obj.positions;
 	this->velocities = obj.velocities;
+	this->needCreateWaterPositions = true;
+	this->model = obj.model;
 
 	return (*this);
 }
@@ -57,11 +71,18 @@ void	WaterSimulation::addWater(Vec3 position)
 	this->positions.push_back(position);
 	this->velocities.push_back(Vec3(0, 0, 0));
 	this->nbParticules++;
+	this->needCreateWaterPositions = true;
 }
 
 
 void	WaterSimulation::tick(double delta)
 {
+	if (this->needCreateWaterPositions)
+	{
+		this->needCreateWaterPositions = false;
+		this->createWaterPositions();
+	}
+
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		// Apply gravity
@@ -103,221 +124,89 @@ void	WaterSimulation::tick(double delta)
 			this->positions[i].z = MAP_SIZE;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
-	}
 
-	this->createMesh();
+		// Update water position list
+		this->waterPositions[i].x = this->positions[i].x;
+		this->waterPositions[i].y = this->positions[i].y;
+		this->waterPositions[i].z = this->positions[i].z;
+	}
 }
 
 
 void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 {
-	this->mesh.draw(camera, shaderManager->getShader("water"),
-					shaderManager->getVAOId());
+	WaterShader *shader;
+
+	if (this->waterPositions == NULL)
+		return ;
+
+	float	triangleOverScreen[12] = {
+		// Triangle 1
+		-1.0f, -1.0f,
+		-1.0f,  1.0f,
+		 1.0f,  1.0f,
+
+		// Triangle 2
+		-1.0f, -1.0f,
+		 1.0f,  1.0f,
+		 1.0f, -1.0f,
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, triangleOverScreen, GL_STATIC_DRAW);
+
+	shader = shaderManager->getWaterShader();
+	shader->use();
+
+	int lightPosLoc = glGetUniformLocation(shader->getShaderId(), "lightPos");
+	glUniform3fv(lightPosLoc, 1, glm::value_ptr(camera->getLightPosition()));
+
+	int cameraPosLoc = glGetUniformLocation(shader->getShaderId(), "cameraPos");
+	glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera->getPosition()));
+
+	int cameraFrontLoc = glGetUniformLocation(shader->getShaderId(), "cameraFront");
+	glUniform3fv(cameraFrontLoc, 1, glm::value_ptr(camera->getFront()));
+
+	int cameraRightLoc = glGetUniformLocation(shader->getShaderId(), "cameraRight");
+	glUniform3fv(cameraRightLoc, 1, glm::value_ptr(camera->getRight()));
+
+	int cameraUpLoc = glGetUniformLocation(shader->getShaderId(), "cameraUp");
+	glUniform3fv(cameraUpLoc, 1, glm::value_ptr(camera->getUp()));
+
+	int nbPositionsLoc = glGetUniformLocation(shader->getShaderId(), "nbPositions");
+	glUniform1i(nbPositionsLoc, this->nbParticules);
+
+	int			positionsLoc;
+	std::string	id;
+	for (int i = 0; i < this->nbParticules; i++)
+	{
+		id = "positions[" + std::to_string(i) + "]";
+		positionsLoc = glGetUniformLocation(shader->getShaderId(), id.c_str());
+		glUniform3fv(positionsLoc, 1, glm::value_ptr(this->waterPositions[i]));
+	}
+
+	glBindVertexArray(shaderManager->getVAOId());
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 //**** PRIVATE METHODS *********************************************************
 
-static inline int	getHashId(int x, int y, int z)
+void	WaterSimulation::createWaterPositions(void)
 {
-	return (x | (y << 8) | (z << 16));
-}
+	if (this->waterPositions)
+	{
+		delete [] this->waterPositions;
+		this->waterPositions = NULL;
+	}
 
-static bool	isPoint(
-				std::unordered_map<int, bool> &waterInfluenceMap,
-				int posId)
-{
-	return (waterInfluenceMap.find(posId) != waterInfluenceMap.end());
-}
+	this->waterPositions = new glm::vec3[this->nbParticules];
 
-static bool	isPoint(
-				std::unordered_map<int, t_water_grid_pos> &waterInfluenceMap,
-				int x, int y, int z)
-{
-	return (waterInfluenceMap.find(getHashId(x, y, z)) != waterInfluenceMap.end());
-}
+	if (this->waterPositions == NULL)
+		return ;
 
-#include <ctime> // TODO: REMOVE
-typedef struct s_timetest
-{
-	int				nbCall;
-	int				totalTime;
-	std::clock_t	start;
-}	t_timetest;
-
-void	printTimeTest(const char *str, t_timetest &timetest)
-{
-	float	timePerCall = 0.0f;
-
-	if (timetest.totalTime > 0)
-		timePerCall = (float)timetest.totalTime / (float)timetest.nbCall;
-
-	printf("%s :\n", str);
-	printf(" - nb call : %i ms\n", timetest.nbCall);
-	printf(" - total time : %i ms\n", timetest.totalTime);
-	printf(" - time per call : %.3f ms\n", timePerCall);
-	printf("\n");
-}
-
-void	computeTimeTook(t_timetest &timetest)
-{
-	timetest.totalTime += ((double)(std::clock() - timetest.start) / CLOCKS_PER_SEC) * 1000000;
-	timetest.nbCall++;
-}
-
-void	WaterSimulation::createMesh(void)
-{
-	std::unordered_map<int, t_water_grid_pos>	waterInfluenceMap;
-	std::unordered_map<int, bool>	pointAlreadyCreate;
-	int						wx, wy, wz, nbPoints, id, posId;
-	unsigned int			p1, p2, p3;
-	std::vector<Point>		vertices;
-	std::vector<t_tri_id>	indices;
-	Vec3					normal, A, B;
-	// TODO: REMOVE
-	// t_timetest	tCreateWmap, tCreateTriangles, tCreateMesh,
-	// 			tCheckDuplicatePoint, tCheckCubeCorner,
-	// 			tAddVertices, tAddIndices;
-
-	// tCreateWmap.nbCall = 0; tCreateWmap.totalTime = 0;
-	// tCreateTriangles.nbCall = 0; tCreateTriangles.totalTime = 0;
-	// tCreateMesh.nbCall = 0; tCreateMesh.totalTime = 0;
-	// tCheckDuplicatePoint.nbCall = 0; tCheckDuplicatePoint.totalTime = 0;
-	// tCheckCubeCorner.nbCall = 0; tCheckCubeCorner.totalTime = 0;
-	// tAddVertices.nbCall = 0; tAddVertices.totalTime = 0;
-	// tAddIndices.nbCall = 0; tAddIndices.totalTime = 0;
-
-	// printf("\n\n%i water particles\n\n", this->nbParticules);
-
-	// Update water influence by water pos
 	for (int i = 0; i < this->nbParticules; i++)
 	{
-		// tCreateWmap.start = std::clock();
-		wx = this->positions[i].x + 0.5;
-		wy = this->positions[i].y + 0.5;
-		wz = this->positions[i].z + 0.5;
-
-		waterInfluenceMap[getHashId(wx, wy, wz)] = (t_water_grid_pos){wx, wy, wz};
-		// computeTimeTook(tCreateWmap);
+		this->waterPositions[i].x = 0.0f;
+		this->waterPositions[i].y = 0.0f;
+		this->waterPositions[i].z = 0.0f;
 	}
-	// printTimeTest("Create water influence map", tCreateWmap);
-
-	// Create points and triangles
-	nbPoints = 0;
-
-	std::unordered_map<int, t_water_grid_pos>::const_iterator it;
-
-	it = waterInfluenceMap.begin();
-
-	const int	lookAround[8][3] = {
-		{ 0,  0,  0},
-		{ 0,  0, -1},
-		{ 0, -1,  0},
-		{ 0, -1, -1},
-		{-1,  0,  0},
-		{-1,  0, -1},
-		{-1, -1,  0},
-		{-1, -1, -1}
-	};
-
-	int x, y, z;
-	while (it != waterInfluenceMap.end())
-	{
-		// tCreateTriangles.start = std::clock();
-		wx = it->second.x;
-		wy = it->second.y;
-		wz = it->second.z;
-
-		for (int j = 0; j < 8; j++)
-		{
-			x = wx + lookAround[j][0];
-			y = wy + lookAround[j][1];
-			z = wz + lookAround[j][2];
-			id = 0;
-
-			// tCheckDuplicatePoint.start = std::clock();
-			posId = getHashId(x, y, z);
-			bool test = isPoint(pointAlreadyCreate, posId);
-			// computeTimeTook(tCheckDuplicatePoint);
-			if (test)
-				continue;
-			pointAlreadyCreate[posId] = true;
-
-			// tCheckCubeCorner.start = std::clock();
-			if (isPoint(waterInfluenceMap, x, y + 1, z + 1))
-				id++; // 6
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x + 1, y + 1, z + 1))
-				id++; // 7
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x + 1, y, z + 1))
-				id++; // 5
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x, y, z + 1))
-				id++; // 4
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x, y + 1, z))
-				id++; // 2
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x + 1, y + 1, z))
-				id++; // 3
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x + 1, y, z))
-				id++; // 1
-			id <<= 1;
-			if (isPoint(waterInfluenceMap, x, y, z))
-				id++; // 0
-			// computeTimeTook(tCheckCubeCorner);
-
-			if (id == 0 || id == 0b11111111)
-				continue;
-
-			// tAddVertices.start = std::clock();
-			vertices.push_back(Point(Vec3(x + 0.5, y, z), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 1, y + 0.5, z), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 0.5, y + 1, z), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x, y + 0.5, z), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 0.5, y, z + 1), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 1, y + 0.5, z + 1), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 0.5, y + 1, z + 1), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x, y + 0.5, z + 1), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x, y, z + 0.5), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 1, y, z + 0.5), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x + 1, y + 1, z + 0.5), 0, 0, 0.8));
-			vertices.push_back(Point(Vec3(x, y + 1, z + 0.5), 0, 0, 0.8));
-			// computeTimeTook(tAddVertices);
-
-			// tAddIndices.start = std::clock();
-			for (int i = 0; i < 16 && this->trianglePoints[id][i] != -1; i += 3)
-			{
-				p1 = nbPoints + this->trianglePoints[id][i];
-				p2 = nbPoints + this->trianglePoints[id][i + 1];
-				p3 = nbPoints + this->trianglePoints[id][i + 2];
-
-				A = vertices[p2].pos - vertices[p1].pos;
-				B = vertices[p3].pos - vertices[p1].pos;
-				normal = A.cross(B);
-				normal.normalize();
-
-				vertices[p1].normal = normal;
-				vertices[p2].normal = normal;
-				vertices[p3].normal = normal;
-
-				indices.push_back((t_tri_id){p1, p2, p3});
-			}
-			// computeTimeTook(tAddIndices);
-			nbPoints += 12;
-		}
-		it++;
-		// computeTimeTook(tCreateTriangles);
-	}
-	// printTimeTest("Check point in map for marching cube", tCreateTriangles);
-	// printTimeTest("Check duplicate point", tCheckDuplicatePoint);
-	// printTimeTest("Check cube corner", tCheckCubeCorner);
-	// printTimeTest("Add vertices", tAddVertices);
-	// printTimeTest("Add indices", tAddIndices);
-
-	// tCreateMesh.start = std::clock();
-	this->mesh.setMesh(vertices, indices);
-	// computeTimeTook(tCreateMesh);
-	// printTimeTest("Create mesh", tCreateMesh);
 }

@@ -62,7 +62,7 @@ int	main(int argc, char **argv)
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		shaderManager.addShader("terrain", "data/shaders/terrain.vs", "data/shaders/terrain.fs");
-		shaderManager.addShader("water", "data/shaders/water.vs", "data/shaders/water.fs");
+		shaderManager.loadWaterShaderFiles("data/shaders/water.vs", "data/shaders/water.fs");
 	}
 	catch (std::exception &e)
 	{
@@ -71,13 +71,13 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	// simulation.addWater(Vec3(5, 5, 5));
+	simulation.addWater(Vec3(5, 5, 5));
 	// simulation.addWater(Vec3(5, 5, 6));
-	for (int i = 0; i < MAP_SIZE / 4; i++)
-	{
-		for (int j = 0; j < MAP_SIZE / 4; j++)
-			simulation.addWater(Vec3(i, 5, j));
-	}
+	// for (int i = 0; i < MAP_SIZE / 4; i++)
+	// {
+	// 	for (int j = 0; j < MAP_SIZE / 4; j++)
+	// 		simulation.addWater(Vec3(i, 5, j));
+	// }
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop

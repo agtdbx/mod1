@@ -15,7 +15,9 @@ public:
 	~Camera();
 
 	glm::vec3	getPosition(void);
-	glm::vec3	getDirection(void);
+	glm::vec3	getFront(void);
+	glm::vec3	getRight(void);
+	glm::vec3	getUp(void);
 	glm::mat4	getView(void);
 	glm::mat4	getProjection(void);
 	glm::vec3	getLightPosition(void);

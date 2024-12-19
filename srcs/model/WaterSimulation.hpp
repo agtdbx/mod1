@@ -32,14 +32,19 @@ public:
 	void	draw(Camera *camera, ShaderManager *shaderManager);
 
 private:
-	Mesh				mesh;
+	// Mesh				mesh;
 	std::vector<Vec3>	positions;
 	std::vector<Vec3>	velocities;
 	std::vector<double>	densities;
 	int					nbParticules;
 	static const char	trianglePoints[256][16];
+	bool				needCreateWaterPositions;
+	glm::vec3			*waterPositions;
+	glm::mat4			model;
 
-	void	createMesh(void);
+	void	createWaterPositions(void);
+
+	// void	createMesh(void);
 };
 
 #endif

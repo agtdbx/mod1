@@ -63,9 +63,21 @@ glm::vec3	Camera::getPosition(void)
 }
 
 
-glm::vec3	Camera::getDirection(void)
+glm::vec3	Camera::getFront(void)
 {
 	return (this->front);
+}
+
+
+glm::vec3	Camera::getRight(void)
+{
+	return (this->right);
+}
+
+
+glm::vec3	Camera::getUp(void)
+{
+	return (this->up);
 }
 
 

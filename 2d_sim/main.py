@@ -220,23 +220,7 @@ class Game:
                 for x in range(self.waterGridW):
                     self.waterGrid[y][x].clear()
 
-            # Put waterid in grid
-            for i in range(self.nbWater):
-                gx = int(self.waterPositions[i].x // WATER_SMOOTHING_RADIUS)
-                gy = int(self.waterPositions[i].y // WATER_SMOOTHING_RADIUS)
-                self.waterGrid[gy][gx].append(i)
-                for uy in [-1, 0, 1]:
-                    for ux in [-1, 0, 1]:
-                        if ux == 0 and uy == 0: continue
-                        nx = gx + ux
-                        ny = gy + uy
-
-                        if nx < 0 or nx >= self.waterGridW\
-                            or ny < 0 or ny >= self.waterGridH:
-                            continue
-                        self.waterGrid[ny][nx].append(i)
-
-            # Compute predicted pos
+            # Compute predicted pos and put waterid in grid
             for i in range(self.nbWater):
                 pos = self.waterPositions[i]
                 velocity = self.waterVelocities[i]
@@ -265,7 +249,21 @@ class Game:
                                             delta)
                 self.waterPredictionPos[i] = pos
 
-            # Apply gravity and compute densities
+                gx = int(pos.x // WATER_SMOOTHING_RADIUS)
+                gy = int(pos.y // WATER_SMOOTHING_RADIUS)
+                self.waterGrid[gy][gx].append(i)
+                for uy in [-1, 0, 1]:
+                    for ux in [-1, 0, 1]:
+                        if ux == 0 and uy == 0: continue
+                        nx = gx + ux
+                        ny = gy + uy
+
+                        if nx < 0 or nx >= self.waterGridW\
+                            or ny < 0 or ny >= self.waterGridH:
+                            continue
+                        self.waterGrid[ny][nx].append(i)
+
+            # Compute densities
             for i in range(self.nbWater):
                 self.waterDensities[i] = calculateDensity(self.waterPredictionPos[i],
                                                         self.waterPredictionPos,

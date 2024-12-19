@@ -136,6 +136,33 @@ static bool	isPoint(
 	return (waterInfluenceMap.find(getHashId(x, y, z)) != waterInfluenceMap.end());
 }
 
+#include <ctime> // TODO: REMOVE
+typedef struct s_timetest
+{
+	int				nbCall;
+	int				totalTime;
+	std::clock_t	start;
+}	t_timetest;
+
+void	printTimeTest(const char *str, t_timetest &timetest)
+{
+	float	timePerCall = 0.0f;
+
+	if (timetest.totalTime > 0)
+		timePerCall = (float)timetest.totalTime / (float)timetest.nbCall;
+
+	printf("%s :\n", str);
+	printf(" - nb call : %i ms\n", timetest.nbCall);
+	printf(" - total time : %i ms\n", timetest.totalTime);
+	printf(" - time per call : %.3f ms\n", timePerCall);
+	printf("\n");
+}
+
+void	computeTimeTook(t_timetest &timetest)
+{
+	timetest.totalTime += ((double)(std::clock() - timetest.start) / CLOCKS_PER_SEC) * 1000000;
+	timetest.nbCall++;
+}
 
 void	WaterSimulation::createMesh(void)
 {
@@ -146,16 +173,33 @@ void	WaterSimulation::createMesh(void)
 	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
 	Vec3					normal, A, B;
+	// TODO: REMOVE
+	// t_timetest	tCreateWmap, tCreateTriangles, tCreateMesh,
+	// 			tCheckDuplicatePoint, tCheckCubeCorner,
+	// 			tAddVertices, tAddIndices;
+
+	// tCreateWmap.nbCall = 0; tCreateWmap.totalTime = 0;
+	// tCreateTriangles.nbCall = 0; tCreateTriangles.totalTime = 0;
+	// tCreateMesh.nbCall = 0; tCreateMesh.totalTime = 0;
+	// tCheckDuplicatePoint.nbCall = 0; tCheckDuplicatePoint.totalTime = 0;
+	// tCheckCubeCorner.nbCall = 0; tCheckCubeCorner.totalTime = 0;
+	// tAddVertices.nbCall = 0; tAddVertices.totalTime = 0;
+	// tAddIndices.nbCall = 0; tAddIndices.totalTime = 0;
+
+	// printf("\n\n%i water particles\n\n", this->nbParticules);
 
 	// Update water influence by water pos
 	for (int i = 0; i < this->nbParticules; i++)
 	{
+		// tCreateWmap.start = std::clock();
 		wx = this->positions[i].x + 0.5;
 		wy = this->positions[i].y + 0.5;
 		wz = this->positions[i].z + 0.5;
 
 		waterInfluenceMap[getHashId(wx, wy, wz)] = (t_water_grid_pos){wx, wy, wz};
+		// computeTimeTook(tCreateWmap);
 	}
+	// printTimeTest("Create water influence map", tCreateWmap);
 
 	// Create points and triangles
 	nbPoints = 0;
@@ -178,6 +222,7 @@ void	WaterSimulation::createMesh(void)
 	int x, y, z;
 	while (it != waterInfluenceMap.end())
 	{
+		// tCreateTriangles.start = std::clock();
 		wx = it->second.x;
 		wy = it->second.y;
 		wz = it->second.z;
@@ -189,11 +234,15 @@ void	WaterSimulation::createMesh(void)
 			z = wz + lookAround[j][2];
 			id = 0;
 
+			// tCheckDuplicatePoint.start = std::clock();
 			posId = getHashId(x, y, z);
-			if (isPoint(pointAlreadyCreate, posId))
+			bool test = isPoint(pointAlreadyCreate, posId);
+			// computeTimeTook(tCheckDuplicatePoint);
+			if (test)
 				continue;
 			pointAlreadyCreate[posId] = true;
 
+			// tCheckCubeCorner.start = std::clock();
 			if (isPoint(waterInfluenceMap, x, y + 1, z + 1))
 				id++; // 6
 			id <<= 1;
@@ -217,10 +266,12 @@ void	WaterSimulation::createMesh(void)
 			id <<= 1;
 			if (isPoint(waterInfluenceMap, x, y, z))
 				id++; // 0
+			// computeTimeTook(tCheckCubeCorner);
 
 			if (id == 0 || id == 0b11111111)
 				continue;
 
+			// tAddVertices.start = std::clock();
 			vertices.push_back(Point(Vec3(x + 0.5, y, z), 0, 0, 0.8));
 			vertices.push_back(Point(Vec3(x + 1, y + 0.5, z), 0, 0, 0.8));
 			vertices.push_back(Point(Vec3(x + 0.5, y + 1, z), 0, 0, 0.8));
@@ -233,7 +284,9 @@ void	WaterSimulation::createMesh(void)
 			vertices.push_back(Point(Vec3(x + 1, y, z + 0.5), 0, 0, 0.8));
 			vertices.push_back(Point(Vec3(x + 1, y + 1, z + 0.5), 0, 0, 0.8));
 			vertices.push_back(Point(Vec3(x, y + 1, z + 0.5), 0, 0, 0.8));
+			// computeTimeTook(tAddVertices);
 
+			// tAddIndices.start = std::clock();
 			for (int i = 0; i < 16 && this->trianglePoints[id][i] != -1; i += 3)
 			{
 				p1 = nbPoints + this->trianglePoints[id][i];
@@ -251,12 +304,20 @@ void	WaterSimulation::createMesh(void)
 
 				indices.push_back((t_tri_id){p1, p2, p3});
 			}
+			// computeTimeTook(tAddIndices);
 			nbPoints += 12;
 		}
-
-
 		it++;
+		// computeTimeTook(tCreateTriangles);
 	}
+	// printTimeTest("Check point in map for marching cube", tCreateTriangles);
+	// printTimeTest("Check duplicate point", tCheckDuplicatePoint);
+	// printTimeTest("Check cube corner", tCheckCubeCorner);
+	// printTimeTest("Add vertices", tAddVertices);
+	// printTimeTest("Add indices", tAddIndices);
 
+	// tCreateMesh.start = std::clock();
 	this->mesh.setMesh(vertices, indices);
+	// computeTimeTook(tCreateMesh);
+	// printTimeTest("Create mesh", tCreateMesh);
 }

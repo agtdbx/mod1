@@ -73,9 +73,9 @@ int	main(int argc, char **argv)
 	}
 	// simulation.addWater(Vec3(5, 5, 5));
 	// simulation.addWater(Vec3(5, 5, 6));
-	for (int i = 0; i < MAP_SIZE; i++)
+	for (int i = 0; i < MAP_SIZE / 4; i++)
 	{
-		for (int j = 0; j < MAP_SIZE; j++)
+		for (int j = 0; j < MAP_SIZE / 4; j++)
 			simulation.addWater(Vec3(i, 5, j));
 	}
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));

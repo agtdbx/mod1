@@ -54,7 +54,6 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	if (this == &obj)
 		return (*this);
 
-	// this->mesh = obj.mesh;
 	this->nbParticules = obj.nbParticules;
 	this->positions = obj.positions;
 	this->velocities = obj.velocities;
@@ -86,15 +85,15 @@ void	WaterSimulation::tick(double delta)
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		// Apply gravity
-		// this->velocities[i] += Vec3(0, -0.1, 0) * delta;
+		this->velocities[i] += Vec3(0, -0.1, 0) * delta;
 
 		// Update particule position
 		this->positions[i] += this->velocities[i] * delta;
 
 		// Check if particule is out of the map on x axis
-		if (this->positions[i].x < 0.0)
+		if (this->positions[i].x < WATER_RADIUS)
 		{
-			this->positions[i].x = 0.0;
+			this->positions[i].x = WATER_RADIUS;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].x >= MAP_SIZE)
@@ -103,9 +102,9 @@ void	WaterSimulation::tick(double delta)
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on y axis
-		if (this->positions[i].y < 0.0)
+		if (this->positions[i].y < WATER_RADIUS)
 		{
-			this->positions[i].y = 0.0;
+			this->positions[i].y = WATER_RADIUS;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].y >= WATER_MAX_HEIGHT)
@@ -114,9 +113,9 @@ void	WaterSimulation::tick(double delta)
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on z axis
-		if (this->positions[i].z < 0.0)
+		if (this->positions[i].z < WATER_RADIUS)
 		{
-			this->positions[i].z = 0.0;
+			this->positions[i].z = WATER_RADIUS;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].z >= MAP_SIZE)
@@ -149,10 +148,10 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 		// Triangle 2
 		-1.0f, -1.0f,
 		 1.0f,  1.0f,
-		 1.0f, -1.0f,
+		 1.0f, -1.0f
 	};
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, triangleOverScreen, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 13, triangleOverScreen, GL_STATIC_DRAW);
 
 	shader = shaderManager->getWaterShader();
 	shader->use();
@@ -172,10 +171,28 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	int cameraUpLoc = glGetUniformLocation(shader->getShaderId(), "cameraUp");
 	glUniform3fv(cameraUpLoc, 1, glm::value_ptr(camera->getUp()));
 
+	int cameraFOVLoc = glGetUniformLocation(shader->getShaderId(), "cameraFOV");
+	glUniform1f(cameraFOVLoc, CAMERA_FOV);
+
+	int cameraFarLoc = glGetUniformLocation(shader->getShaderId(), "cameraFar");
+	glUniform1f(cameraFarLoc, CAMERA_MAX_VIEW_DIST);
+
+	int planeWidthLoc = glGetUniformLocation(shader->getShaderId(), "planeWidth");
+	glUniform1f(planeWidthLoc, camera->getPlaneWidth());
+
+	int planeHeightLoc = glGetUniformLocation(shader->getShaderId(), "planeHeight");
+	glUniform1f(planeHeightLoc, camera->getPlaneHeight());
+
+	int waterRadius2Loc = glGetUniformLocation(shader->getShaderId(), "waterRadius2");
+	glUniform1f(waterRadius2Loc, WATER_RADIUS2);
+
+	int waterColorLoc = glGetUniformLocation(shader->getShaderId(), "waterColor");
+	glUniform3fv(waterColorLoc, 1, glm::value_ptr(WATER_COLOR));
+
 	int nbPositionsLoc = glGetUniformLocation(shader->getShaderId(), "nbPositions");
 	glUniform1i(nbPositionsLoc, this->nbParticules);
 
-	int			positionsLoc;
+	int	positionsLoc;
 	std::string	id;
 	for (int i = 0; i < this->nbParticules; i++)
 	{
@@ -185,7 +202,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	}
 
 	glBindVertexArray(shaderManager->getVAOId());
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 12);
 }
 
 //**** PRIVATE METHODS *********************************************************

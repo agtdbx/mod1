@@ -21,6 +21,8 @@ public:
 	glm::mat4	getView(void);
 	glm::mat4	getProjection(void);
 	glm::vec3	getLightPosition(void);
+	float		getPlaneWidth(void);
+	float		getPlaneHeight(void);
 
 	Camera	&operator=(const Camera &obj);
 
@@ -36,7 +38,7 @@ public:
 private:
 	glm::mat4	view, projection;
 	glm::vec3	position, front, up, right,  lightPosition;
-	float		pitch, yaw, roll;
+	float		pitch, yaw, roll, planeWidth, planeHeight;
 
 	void		computeRotation(void);
 	void		computeView(void);

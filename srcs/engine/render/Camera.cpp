@@ -8,8 +8,11 @@
 Camera::Camera(void)
 {
 	this->projection = glm::perspective(glm::radians(CAMERA_FOV),
-										(float)WIN_W/(float)WIN_H,
+										WIN_RATIO,
 										CAMERA_MIN_VIEW_DIST, CAMERA_MAX_VIEW_DIST);
+
+	this->planeHeight = tan(CAMERA_FOV * 0.5f * (3.141592 / 180)) * 2;
+	this->planeWidth = planeHeight * WIN_RATIO;
 
 	this->lightPosition = glm::vec3(100.0f, 200.0f, 100.0f);
 
@@ -44,6 +47,8 @@ Camera::Camera(const Camera &obj)
 	this->up = obj.up;
 	this->right = obj.right;
 	this->lightPosition = obj.lightPosition;
+	this->planeWidth = obj.planeWidth;
+	this->planeHeight = obj.planeHeight;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -98,6 +103,18 @@ glm::vec3	Camera::getLightPosition(void)
 	return (this->lightPosition);
 }
 
+
+float	Camera::getPlaneWidth(void)
+{
+	return (this->planeWidth);
+}
+
+
+float	Camera::getPlaneHeight(void)
+{
+	return (this->planeHeight);
+}
+
 //---- Setters -----------------------------------------------------------------
 
 //---- Operators ---------------------------------------------------------------
@@ -117,6 +134,8 @@ Camera	&Camera::operator=(const Camera &obj)
 	this->up = obj.up;
 	this->right = obj.right;
 	this->lightPosition = obj.lightPosition;
+	this->planeWidth = obj.planeWidth;
+	this->planeHeight = obj.planeHeight;
 
 	return (*this);
 }

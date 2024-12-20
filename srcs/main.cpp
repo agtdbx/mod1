@@ -71,13 +71,12 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	simulation.addWater(Vec3(5, 5, 5));
-	// simulation.addWater(Vec3(5, 5, 6));
-	// for (int i = 0; i < MAP_SIZE / 4; i++)
-	// {
-	// 	for (int j = 0; j < MAP_SIZE / 4; j++)
-	// 		simulation.addWater(Vec3(i, 5, j));
-	// }
+	// simulation.addWater(Vec3(5, 5, 5));
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 10; j++)
+			simulation.addWater(Vec3(i, 5, j));
+	}
 	// waterManager.addWaterDrop(Water(Vec3(5, 5, 5), Vec3(0, 0, 0), WATER_GRAVITY));
 
 	// Main loop
@@ -196,8 +195,8 @@ static void	draw(
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Draw mesh
-	terrain->renderMesh(camera, shaderManager);
 	// waterManager->draw(camera, shaderManager);
+	terrain->renderMesh(camera, shaderManager);
 	simulation->draw(camera, shaderManager);
 
 	// Display the new image

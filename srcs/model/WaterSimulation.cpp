@@ -11,6 +11,8 @@ WaterSimulation::WaterSimulation(void)
 	this->positions = NULL;
 	this->velocities = NULL;
 	this->densities = NULL;
+
+	this->generateTextureBuffer();
 }
 
 
@@ -40,6 +42,7 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 		this->nbParticules = 0;
 	}
 
+	this->generateTextureBuffer();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -47,6 +50,8 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 WaterSimulation::~WaterSimulation()
 {
 	this->freeArrays();
+	glDeleteBuffers(1, &this->textureBuffer);
+	glDeleteTextures(1, &this->texture);
 }
 
 
@@ -319,14 +324,12 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	int nbPositionsLoc = glGetUniformLocation(shader->getShaderId(), "nbPositions");
 	glUniform1i(nbPositionsLoc, this->nbParticules);
 
-	int	positionsLoc;
-	std::string	id;
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		id = "positions[" + std::to_string(i) + "]";
-		positionsLoc = glGetUniformLocation(shader->getShaderId(), id.c_str());
-		glUniform3fv(positionsLoc, 1, glm::value_ptr(this->positions[i]));
-	}
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules, this->positions, GL_STATIC_DRAW);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBuffer);
+
+	glUniform1i(glGetUniformLocation(shader->getShaderId(), "positionsBuffer"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texture);
 
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);
@@ -351,4 +354,15 @@ void	WaterSimulation::freeArrays(void)
 		delete [] this->densities;
 		this->densities = NULL;
 	}
+}
+
+
+void	WaterSimulation::generateTextureBuffer(void)
+{
+	this->textureBuffer = 0;
+	glGenBuffers(1, &this->textureBuffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBuffer);
+
+	this->texture = 0;
+	glGenTextures(1, &texture);
 }

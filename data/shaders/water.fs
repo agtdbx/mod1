@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 out vec4		FragColor;
 in vec2			pointPos;
@@ -14,7 +14,7 @@ uniform float	planeHeight;
 uniform float	waterRadius2;
 uniform vec3	waterColor;
 uniform int		nbPositions;
-uniform vec3	positions[1000];
+uniform samplerBuffer positionsBuffer;
 
 
 struct s_intersection_info
@@ -27,7 +27,7 @@ struct s_intersection_info
 s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 {
 	s_intersection_info	intersectionInfo;
-	vec3	vec ;
+	vec3	vec, pos;
 	float	dotRes;
 	float	nabla;
 	float	dst;
@@ -37,7 +37,8 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 
 	for (int i = 0; i < nbPositions; i++)
 	{
-		vec = rayPos - positions[i];
+		pos = texelFetch(positionsBuffer, i).rgb;
+		vec = rayPos - pos;
 		dotRes = dot(rayDir, vec);
 		nabla = (dotRes * dotRes) - dot(vec, vec) + waterRadius2;
 
@@ -82,8 +83,9 @@ void main()
 	else
 	{
 		vec3 hitPoint = rayPos + rayDir * intersectionInfo.dst;
-		vec3 normal = normalize(hitPoint - positions[intersectionInfo.id]);
-		vec3 lightDir = normalize(lightPos - positions[intersectionInfo.id]);
+		vec3 pos = texelFetch(positionsBuffer, intersectionInfo.id).rgb;
+		vec3 normal = normalize(hitPoint - pos);
+		vec3 lightDir = normalize(lightPos - pos);
 		float colorRatio = dot(normal, lightDir);
 
 		FragColor = vec4(waterColor * colorRatio, 1.0);

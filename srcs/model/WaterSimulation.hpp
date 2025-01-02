@@ -37,8 +37,10 @@ private:
 	glm::vec3	*velocities;
 	double		*densities;
 	int			nbParticules;
+	GLuint		textureBuffer, texture;
 
 	void		freeArrays(void);
+	void		generateTextureBuffer(void);
 };
 
 #endif

@@ -71,14 +71,12 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	std::vector<glm::vec3>	waters;
-	// waters.push_back(glm::vec3(5, 5, 5));
+	// simulation.addWater(glm::vec3(5, 5, 5));
 	for (int i = 0; i < 50; i++)
 	{
 		for (int j = 0; j < 50; j++)
-			waters.push_back(glm::vec3(i + 0.5, 5, j + 0.5));
+			simulation.addWater(glm::vec3(i + 0.5, 5, j + 0.5));
 	}
-	simulation.addWaters(waters);
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))

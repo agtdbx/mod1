@@ -9,13 +9,6 @@
 # include <engine/render/ShaderManager.hpp>
 # include <engine/maths/Vec3.hpp>
 
-typedef struct s_water_grid_pos
-{
-	int	x;
-	int	y;
-	int	z;
-}	t_water_grid_pos;
-
 class WaterSimulation
 {
 public:
@@ -28,19 +21,19 @@ public:
 	WaterSimulation	&operator=(const WaterSimulation &obj);
 
 	void	addWater(glm::vec3 position);
-	void	addWaters(std::vector<glm::vec3> positions);
 	void	tick(float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager);
 
 private:
-	glm::vec3	*positions;
-	glm::vec3	*velocities;
-	double		*densities;
-	int			nbParticules;
-	GLuint		textureBuffer, texture;
+	std::vector<glm::vec3>	positions;
+	std::vector<glm::vec3>	velocities;
+	std::vector<double>		densities;
+	float					triangleOverScreen[12];
+	int						nbParticules;
+	GLuint					textureBuffer, texture;
 
-	void		freeArrays(void);
 	void		generateTextureBuffer(void);
+	void		generateTriangleOverScreen(void);
 };
 
 #endif

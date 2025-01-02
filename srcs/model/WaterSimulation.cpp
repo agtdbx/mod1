@@ -8,48 +8,28 @@
 WaterSimulation::WaterSimulation(void)
 {
 	this->nbParticules = 0;
-	this->positions = NULL;
-	this->velocities = NULL;
-	this->densities = NULL;
 
 	this->generateTextureBuffer();
+	this->generateTriangleOverScreen();
 }
 
 
 WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 {
 	this->nbParticules = obj.nbParticules;
-	this->positions = NULL;
-	this->velocities = NULL;
-	this->densities = NULL;
 
-	this->positions = new glm::vec3[this->nbParticules + 1];
-	this->velocities = new glm::vec3[this->nbParticules + 1];
-	this->densities = new double[this->nbParticules + 1];
-
-	if (this->positions && this->velocities && this->densities)
-	{
-		for (int i = 0; i < this->nbParticules; i++)
-		{
-			this->positions[i] = obj.positions[i];
-			this->velocities[i] = obj.velocities[i];
-			this->densities[i] = obj.densities[i];
-		}
-	}
-	else
-	{
-		this->freeArrays();
-		this->nbParticules = 0;
-	}
+	this->positions = obj.positions;
+	this->velocities = obj.velocities;
+	this->densities = obj.densities;
 
 	this->generateTextureBuffer();
+	this->generateTriangleOverScreen();
 }
 
 //---- Destructor --------------------------------------------------------------
 
 WaterSimulation::~WaterSimulation()
 {
-	this->freeArrays();
 	glDeleteBuffers(1, &this->textureBuffer);
 	glDeleteTextures(1, &this->texture);
 }
@@ -72,42 +52,9 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	if (this == &obj)
 		return (*this);
 
-	glm::vec3	*newPositions = NULL;
-	glm::vec3	*newVelocities = NULL;
-	double		*newDensities = NULL;
-	int			newNbParticles = obj.nbParticules;
-
-	newPositions = new glm::vec3[this->nbParticules + 1];
-	if (newPositions == NULL)
-		return (*this);
-
-	newVelocities = new glm::vec3[this->nbParticules + 1];
-	if (newPositions == NULL)
-	{
-		delete [] newPositions;
-		return (*this);
-	}
-
-	newDensities = new double[this->nbParticules + 1];
-	if (newPositions == NULL)
-	{
-		delete [] newPositions;
-		delete [] newVelocities;
-		return (*this);
-	}
-
-	this->freeArrays();
-
-	for (int i = 0; i < newNbParticles; i++)
-	{
-		newPositions[i] = obj.positions[i];
-		newVelocities[i] = obj.velocities[i];
-		newDensities[i] = obj.densities[i];
-	}
-
-	this->positions = newPositions;
-	this->velocities = newVelocities;
-	this->densities = newDensities;
+	this->positions = obj.positions;
+	this->velocities = obj.velocities;
+	this->densities = obj.densities;
 	this->nbParticules = obj.nbParticules;
 
 	return (*this);
@@ -117,103 +64,10 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 
 void	WaterSimulation::addWater(glm::vec3 position)
 {
-	glm::vec3	*newPositions = NULL;
-	glm::vec3	*newVelocities = NULL;
-	double		*newDensities = NULL;
-
-	// Allocate new data arrays
-	newPositions = new glm::vec3[this->nbParticules + 1];
-	if (newPositions == NULL)
-		return ;
-
-	newVelocities = new glm::vec3[this->nbParticules + 1];
-	if (newVelocities == NULL)
-	{
-		delete [] newPositions;
-		return ;
-	}
-
-	newDensities = new double[this->nbParticules + 1];
-	if (newDensities == NULL)
-	{
-		delete [] newPositions;
-		delete [] newVelocities;
-		return ;
-	}
-
-	// Copy old data
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		newPositions[i] = this->positions[i];
-		newVelocities[i] = this->velocities[i];
-		newDensities[i] = this->densities[i];
-	}
-
-	// Add new data
-	newPositions[this->nbParticules] = position;
-	newVelocities[this->nbParticules] = glm::vec3(0.0f, 0.0f, 0.0f);
-	newDensities[this->nbParticules] = 0.0;
-
-	// Replace old data arrays by new ones
-	this->freeArrays();
-	this->positions = newPositions;
-	this->velocities = newVelocities;
-	this->densities = newDensities;
-
+	this->positions.push_back(position);
+	this->velocities.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	this->densities.push_back(0.0);
 	this->nbParticules++;
-}
-
-
-void	WaterSimulation::addWaters(std::vector<glm::vec3> positions)
-{
-	glm::vec3	*newPositions = NULL;
-	glm::vec3	*newVelocities = NULL;
-	double		*newDensities = NULL;
-	int			nbNewParticles = positions.size();
-
-	// Allocate new data arrays
-	newPositions = new glm::vec3[this->nbParticules + nbNewParticles];
-	if (newPositions == NULL)
-		return ;
-
-	newVelocities = new glm::vec3[this->nbParticules + nbNewParticles];
-	if (newVelocities == NULL)
-	{
-		delete [] newPositions;
-		return ;
-	}
-
-	newDensities = new double[this->nbParticules + nbNewParticles];
-	if (newDensities == NULL)
-	{
-		delete [] newPositions;
-		delete [] newVelocities;
-		return ;
-	}
-
-	// Copy old data
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		newPositions[i] = this->positions[i];
-		newVelocities[i] = this->velocities[i];
-		newDensities[i] = this->densities[i];
-	}
-
-	// Add new data
-	for (int i = 0; i < nbNewParticles; i++)
-	{
-		newPositions[this->nbParticules + i] = positions[i];
-		newVelocities[this->nbParticules + i] = glm::vec3(0.0f, 0.0f, 0.0f);
-		newDensities[this->nbParticules + i] = 0.0;
-	}
-
-	// Replace old data arrays by new ones
-	this->freeArrays();
-	this->positions = newPositions;
-	this->velocities = newVelocities;
-	this->densities = newDensities;
-
-	this->nbParticules += nbNewParticles;
 }
 
 
@@ -271,19 +125,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	if (this->nbParticules == 0)
 		return ;
 
-	float	triangleOverScreen[12] = {
-		// Triangle 1
-		-1.0f, -1.0f,
-		-1.0f,  1.0f,
-		 1.0f,  1.0f,
-
-		// Triangle 2
-		-1.0f, -1.0f,
-		 1.0f,  1.0f,
-		 1.0f, -1.0f
-	};
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 13, triangleOverScreen, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 13, this->triangleOverScreen, GL_STATIC_DRAW);
 
 	shader = shaderManager->getWaterShader();
 	shader->use();
@@ -324,7 +166,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	int nbPositionsLoc = glGetUniformLocation(shader->getShaderId(), "nbPositions");
 	glUniform1i(nbPositionsLoc, this->nbParticules);
 
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules, this->positions, GL_STATIC_DRAW);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules, this->positions.data(), GL_STATIC_DRAW);
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBuffer);
 
 	glUniform1i(glGetUniformLocation(shader->getShaderId(), "positionsBuffer"), 0);
@@ -337,26 +179,6 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 //**** PRIVATE METHODS *********************************************************
 
-void	WaterSimulation::freeArrays(void)
-{
-	if (this->positions)
-	{
-		delete [] this->positions;
-		this->positions = NULL;
-	}
-	if (this->velocities)
-	{
-		delete [] this->velocities;
-		this->velocities = NULL;
-	}
-	if (this->densities)
-	{
-		delete [] this->densities;
-		this->densities = NULL;
-	}
-}
-
-
 void	WaterSimulation::generateTextureBuffer(void)
 {
 	this->textureBuffer = 0;
@@ -365,4 +187,30 @@ void	WaterSimulation::generateTextureBuffer(void)
 
 	this->texture = 0;
 	glGenTextures(1, &texture);
+}
+
+
+void	WaterSimulation::generateTriangleOverScreen(void)
+{
+	// triangle 1 : p1 p2 p3
+	// triangle 2 : p4 p5 p6
+
+	// p1
+	this->triangleOverScreen[0] = -1.0f;
+	this->triangleOverScreen[1] = -1.0f;
+	// p2
+	this->triangleOverScreen[2] = -1.0f;
+	this->triangleOverScreen[3] = 1.0f;
+	// p3
+	this->triangleOverScreen[4] = 1.0f;
+	this->triangleOverScreen[5] = 1.0f;
+	// p4
+	this->triangleOverScreen[6] = -1.0f;
+	this->triangleOverScreen[7] = -1.0f;
+	// p5
+	this->triangleOverScreen[8] = 1.0f;
+	this->triangleOverScreen[9] = 1.0f;
+	// p6
+	this->triangleOverScreen[10] = 1.0f;
+	this->triangleOverScreen[11] = -1.0f;
 }

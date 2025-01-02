@@ -25,7 +25,6 @@ executable('mod1',
           'srcs/model/Water.cpp',
           'srcs/model/WaterManager.cpp',
           'srcs/model/WaterSimulation.cpp',
-          'srcs/model/WaterSimulation_trianglePoints.cpp',
           'srcs/parsing.cpp',
           build_rpath: '.',
           dependencies : [

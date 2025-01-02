@@ -27,24 +27,18 @@ public:
 
 	WaterSimulation	&operator=(const WaterSimulation &obj);
 
-	void	addWater(Vec3 position);
-	void	tick(double delta);
+	void	addWater(glm::vec3 position);
+	void	addWaters(std::vector<glm::vec3> positions);
+	void	tick(float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager);
 
 private:
-	// Mesh				mesh;
-	std::vector<Vec3>	positions;
-	std::vector<Vec3>	velocities;
-	std::vector<double>	densities;
-	int					nbParticules;
-	static const char	trianglePoints[256][16];
-	bool				needCreateWaterPositions;
-	glm::vec3			*waterPositions;
-	glm::mat4			model;
+	glm::vec3	*positions;
+	glm::vec3	*velocities;
+	double		*densities;
+	int			nbParticules;
 
-	void	createWaterPositions(void);
-
-	// void	createMesh(void);
+	void		freeArrays(void);
 };
 
 #endif

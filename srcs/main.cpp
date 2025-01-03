@@ -9,7 +9,6 @@
 #include <engine/render/Camera.hpp>
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
-#include <model/WaterManager.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -24,7 +23,6 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
-				WaterManager *waterManager,
 				WaterSimulation	*simulation);
 
 int	main(int argc, char **argv)
@@ -53,7 +51,6 @@ int	main(int argc, char **argv)
 	Terrain			terrain;
 	ShaderManager	shaderManager;
 	TextureManager	textureManager;
-	WaterManager	waterManager;
 	WaterSimulation	simulation;
 	Camera			camera;
 
@@ -72,9 +69,9 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 50; j++)
+		for (int j = 0; j < 10; j++)
 			simulation.addWater(glm::vec3(i + 0.5, 5, j + 0.5));
 	}
 
@@ -92,7 +89,7 @@ int	main(int argc, char **argv)
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &waterManager, &simulation);
+			&shaderManager, &simulation);
 	}
 
 	context.close();
@@ -186,7 +183,6 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
-				WaterManager *waterManager,
 				WaterSimulation	*simulation)
 {
 	// Clear window

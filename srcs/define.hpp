@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/20 01:16:09 by gugus            ###   ########.fr       */
+/*   Updated: 2025/01/03 13:25:53 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,22 +27,23 @@
 // # define WIN_W 1920
 // # define WIN_H 1080
 # define WIN_TITLE "mod1"
+
 # define MAX_XY 100
 # define MAX_HEIGHT 50
 # define MAP_SIZE 200
+# define TERRAIN_PRECISION 0.01
+
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
 # define CAMERA_MAX_VIEW_DIST 1000.0f
 # define CAMERA_SPEED 20.0
 # define CAMERA_SPRINT_FACTOR 4.2
 # define CAMERA_ROTATION_SPEED 42.0
-# define TERRAIN_PRECISION 0.01
+
 # define WATER_GRAVITY 0.01
-# define COLLISION_DAMPLING 0.7
 # define COLLISION_ENERGY_KEEP 0.7
-# define WATER_DROP_SIZE 0.1
-# define SMOOTHING_RADIUS 1
-# define WATER_DROP_MASS 1
+# define SMOOTHING_RADIUS 42
+
 # define PRINT_FPS_TIME 1.0
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;

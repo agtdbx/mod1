@@ -15,6 +15,8 @@ uniform float	waterRadius2;
 uniform vec3	waterColor;
 uniform int		nbPositions;
 uniform samplerBuffer positionsBuffer;
+// uniform samplerBuffer gridBuffer;
+// uniform samplerBuffer offsetsBuffer;
 
 
 struct s_intersection_info

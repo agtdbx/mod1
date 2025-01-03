@@ -28,12 +28,18 @@ private:
 	std::vector<glm::vec3>	positions;
 	std::vector<glm::vec3>	velocities;
 	std::vector<double>		densities;
+	std::vector<std::vector<int>> grid;
+	std::vector<int>		gridFlat, gridOffsets;
 	float					triangleOverScreen[12];
-	int						nbParticules;
-	GLuint					textureBuffer, texture;
+	int						nbParticules, gridSize, gridW, gridH, gridD,
+							gridFlatSize, gridOffsetsSize;
+	GLuint					textureBufferPositions, texturePositions,
+							textureBufferGridFlat, textureGridFlat,
+							textureBufferGridOffsets, textureGridOffsets;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
+	void		generateFlatGrid(void);
 };
 
 #endif

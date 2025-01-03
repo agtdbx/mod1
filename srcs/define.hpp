@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/03 16:27:04 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/03 21:04:17 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@
 
 # define WATER_GRAVITY 0.01
 # define COLLISION_ENERGY_KEEP 0.7
-# define SMOOTHING_RADIUS 25
+# define SMOOTHING_RADIUS 100
+// # define SMOOTHING_RADIUS 25
 
 # define PRINT_FPS_TIME 1.0
 

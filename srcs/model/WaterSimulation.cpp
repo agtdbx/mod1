@@ -60,11 +60,11 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferPositions);
 	glDeleteTextures(1, &this->texturePositions);
 
-	// glDeleteBuffers(1, &this->textureBufferGridFlat);
-	// glDeleteTextures(1, &this->textureGridFlat);
+	glDeleteBuffers(1, &this->textureBufferGridFlat);
+	glDeleteTextures(1, &this->textureGridFlat);
 
-	// glDeleteBuffers(1, &this->textureBufferGridOffsets);
-	// glDeleteTextures(1, &this->textureGridOffsets);
+	glDeleteBuffers(1, &this->textureBufferGridOffsets);
+	glDeleteTextures(1, &this->textureGridOffsets);
 }
 
 
@@ -252,26 +252,50 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	int nbPositionsLoc = glGetUniformLocation(shaderId, "nbPositions");
 	glUniform1i(nbPositionsLoc, this->nbParticules);
 
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules,
 					this->positions.data(), GL_STATIC_DRAW);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBufferPositions);
-	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBufferPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 0);
 
-	// glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridFlatSize,
-	// 				this->gridFlat.data(), GL_STATIC_DRAW);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridFlat);
-	// glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
-	// glActiveTexture(GL_TEXTURE1);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
+	int mapSizeLoc = glGetUniformLocation(shaderId, "mapSize");
+	glUniform1i(mapSizeLoc, MAP_SIZE);
 
-	// glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridOffsetsSize,
-	// 				this->gridOffsets.data(), GL_STATIC_DRAW);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridOffsets);
-	// glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
-	// glActiveTexture(GL_TEXTURE2);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
+	int mapHeightLoc = glGetUniformLocation(shaderId, "mapHeight");
+	glUniform1i(mapHeightLoc, WATER_MAX_HEIGHT);
+
+	int gridWLoc = glGetUniformLocation(shaderId, "gridW");
+	glUniform1i(gridWLoc, this->gridW);
+
+	int gridHLoc = glGetUniformLocation(shaderId, "gridH");
+	glUniform1i(gridHLoc, this->gridH);
+
+	int gridDLoc = glGetUniformLocation(shaderId, "gridD");
+	glUniform1i(gridDLoc, this->gridD);
+
+	int gridSizeLoc = glGetUniformLocation(shaderId, "gridSize");
+	glUniform1i(gridSizeLoc, this->gridSize);
+
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridFlatSize,
+					this->gridFlat.data(), GL_STATIC_DRAW);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridFlat);
+	glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
+
+	int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
+	glUniform1i(offsetsSizeLoc, this->gridOffsetsSize);
+
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridOffsetsSize,
+					this->gridOffsets.data(), GL_STATIC_DRAW);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridOffsets);
+	glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
 
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);
@@ -282,16 +306,13 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 void	WaterSimulation::generateTextureBuffer(void)
 {
 	glGenBuffers(1, &this->textureBufferPositions);
-	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
 	glGenTextures(1, &texturePositions);
 
-	// glGenBuffers(1, &this->textureBufferGridFlat);
-	// glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
-	// glGenTextures(1, &textureGridFlat);
+	glGenBuffers(1, &this->textureBufferGridFlat);
+	glGenTextures(1, &textureGridFlat);
 
-	// glGenBuffers(1, &this->textureBufferGridOffsets);
-	// glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
-	// glGenTextures(1, &textureGridOffsets);
+	glGenBuffers(1, &this->textureBufferGridOffsets);
+	glGenTextures(1, &textureGridOffsets);
 }
 
 

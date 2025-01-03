@@ -15,8 +15,22 @@ uniform float	waterRadius2;
 uniform vec3	waterColor;
 uniform int		nbPositions;
 uniform samplerBuffer positionsBuffer;
-// uniform samplerBuffer gridBuffer;
-// uniform samplerBuffer offsetsBuffer;
+uniform int		mapSize;
+uniform int		mapHeight;
+uniform int		gridW;
+uniform int		gridH;
+uniform int		gridD;
+uniform int		gridSize;
+uniform samplerBuffer gridBuffer;
+uniform int		offsetsSize;
+uniform samplerBuffer offsetsBuffer;
+
+vec3	normalRight =	vec3( 1.0,  0.0,  0.0);
+vec3	normalLeft =	vec3(-1.0,  0.0,  0.0);
+vec3	normalUp =		vec3( 0.0,  1.0,  0.0);
+vec3	normalDown =	vec3( 0.0, -1.0,  0.0);
+vec3	normalFront =	vec3( 0.0,  0.0, -1.0);
+vec3	normalBack =	vec3( 0.0,  0.0,  1.0);
 
 
 struct s_intersection_info
@@ -26,16 +40,116 @@ struct s_intersection_info
 };
 
 
+bool	isSameSign(float a, float b)
+{
+	return ((a >= 0.0 && b >= 0.0) || (a < 0.0 && b < 0.0));
+}
+
+
+bool	intersectWithCubeFace(vec3 rayPos, vec3 rayDir, vec3 faceNormal,
+								vec3 facePoint_lu, vec3 facePoint_ru,
+								vec3 facePoint_ld, vec3 facePoint_rd)
+{
+	float	denom, dist, o1, o2, o3, o4;
+	vec3	q, p1_q, p2_q, p3_q, p4_q;
+
+	denom = dot(rayDir, faceNormal);
+	if (denom >= 0.000001)
+		return (false);
+
+	dist = dot(facePoint_lu - rayPos, faceNormal) / denom;
+	if (dist < 0.0)
+		return (false);
+
+	q = rayPos + rayDir * dist;
+
+	p1_q = facePoint_lu - q;
+	p2_q = facePoint_ld - q;
+
+	o1 = dot(cross(p1_q, p2_q), faceNormal);
+	if (o1 == 0.0)
+		return (false);
+
+	p3_q = facePoint_rd - q;
+	o2 = dot(cross(p2_q, p3_q), faceNormal);
+	if (o2 == 0.0 || !isSameSign(o1, o2))
+		return (false);
+
+	p4_q = facePoint_ru - q;
+	o3 = dot(cross(p3_q, p4_q), faceNormal);
+	if (o3 == 0.0 || !isSameSign(o2, o3))
+		return (false);
+
+	o4 = dot(cross(p4_q, p1_q), faceNormal);
+	if (o4 == 0.0 || !isSameSign(o3, o4))
+		return (false);
+
+	return (true);
+}
+
+
+bool	intersectWithCube(vec3 rayPos, vec3 rayDir,
+							vec3 facePoint_luf, vec3 facePoint_ruf,
+							vec3 facePoint_ldf, vec3 facePoint_rdf,
+							vec3 facePoint_lub, vec3 facePoint_rub,
+							vec3 facePoint_ldb, vec3 facePoint_rdb)
+{
+	if (intersectWithCubeFace(rayPos, rayDir, normalRight,
+								facePoint_ruf, facePoint_rub,
+								facePoint_rdf, facePoint_rdb))
+		return (true);
+
+	if (intersectWithCubeFace(rayPos, rayDir, normalLeft,
+								facePoint_lub, facePoint_luf,
+								facePoint_ldb, facePoint_ldf))
+		return (true);
+
+	if (intersectWithCubeFace(rayPos, rayDir, normalUp,
+								facePoint_lub, facePoint_rub,
+								facePoint_luf, facePoint_ruf))
+		return (true);
+
+	if (intersectWithCubeFace(rayPos, rayDir, normalDown,
+								facePoint_ldf, facePoint_rdf,
+								facePoint_ldb, facePoint_rdb))
+		return (true);
+
+	if (intersectWithCubeFace(rayPos, rayDir, normalFront,
+								facePoint_luf, facePoint_ruf,
+								facePoint_ldf, facePoint_rdf))
+		return (true);
+
+	if (intersectWithCubeFace(rayPos, rayDir, normalBack,
+								facePoint_rub, facePoint_lub,
+								facePoint_rdb, facePoint_ldb))
+		return (true);
+
+	return (false);
+}
+
+
 s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 {
 	s_intersection_info	intersectionInfo;
 	vec3	vec, pos;
-	float	dotRes;
-	float	nabla;
-	float	dst;
+	vec3	p_luf, p_ruf, p_ldf, p_rdf, p_lub, p_rub, p_ldb, p_rdb;
+	float	dotRes, nabla, dst;
 
 	intersectionInfo.dst = cameraFar;
 	intersectionInfo.id = -1;
+
+	p_luf = vec3(0.0, mapHeight, 0.0);
+	p_ruf = vec3(mapSize, mapHeight, 0.0);
+	p_ldf = vec3(0.0, 0.0, 0.0);
+	p_rdf = vec3(mapSize, 0.0, 0.0);
+	p_lub = vec3(0.0, mapHeight, mapSize);
+	p_rub = vec3(mapSize, mapHeight, mapSize);
+	p_ldb = vec3(0.0, 0.0, mapSize);
+	p_rdb = vec3(mapSize, 0.0, mapSize);
+	if (!intersectWithCube(rayPos, rayDir,
+							p_luf, p_ruf, p_ldf, p_rdf,
+							p_lub, p_rub, p_ldb, p_rdb))
+		return (intersectionInfo);
 
 	for (int i = 0; i < nbPositions; i++)
 	{

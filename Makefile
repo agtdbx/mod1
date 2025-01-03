@@ -1,8 +1,8 @@
 MESON_CONFIG_DIR	:= build
 MESON_BUILD_DIR		:= release
 EXECUTABLE_NAME		:= mod1
-DEFAULT_MAP			:= map/flat.mod1
-# DEFAULT_MAP			:= map/test.mod1
+# DEFAULT_MAP			:= map/flat.mod1
+DEFAULT_MAP			:= map/test2.mod1
 
 
 all: $(EXECUTABLE_NAME)

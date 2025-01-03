@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2024/12/20 01:16:09 by gugus            ###   ########.fr       */
+/*   Updated: 2025/01/03 16:16:52 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <GLFW/glfw3.h>
 # include <glm/glm.hpp>
 # include <vector>
+# include <deque>
 
 # include <engine/maths/Vec3.hpp>
 # include <engine/maths/Vec2.hpp>

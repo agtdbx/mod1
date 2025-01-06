@@ -29,7 +29,7 @@ private:
 	std::vector<glm::vec3>	velocities;
 	std::vector<double>		densities;
 	std::vector<std::vector<int>> grid;
-	std::vector<int>		gridFlat, gridOffsets;
+	std::vector<float>		gridFlat, gridOffsets;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize;

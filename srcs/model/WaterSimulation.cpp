@@ -23,21 +23,11 @@ WaterSimulation::WaterSimulation(void)
 	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
 
-	// TODO: REMOVE
-	printf("SIZE W %i\n", this->gridW);
-	printf("SIZE H %i\n", this->gridH);
-	printf("SIZE D %i\n", this->gridD);
-	printf("SIZE T %i\n", this->gridSize);
-
 	for (int i = 0; i < this->gridSize; i++)
 	{
 		std::vector<int>	gridContent;
 		this->grid.push_back(gridContent);
 	}
-
-	int total_units;
-	glGetIntegerv(GL_MAX_IMAGE_UNITS, &total_units);
-	printf("max nb img %i\n", total_units);
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
@@ -128,7 +118,7 @@ void	WaterSimulation::tick(float delta)
 {
 	static int	Hsize = this->gridW * this->gridH;
 
-	int	px, py, pz, gx, gy, gz, gid;
+	int	gx, gy, gz, gid;
 	// Clear grid
 	for (int i = 0; i < this->gridSize; i++)
 		this->grid[i].clear();
@@ -136,36 +126,12 @@ void	WaterSimulation::tick(float delta)
 	// Put particles into grid
 	for (int i = 0; i < this->nbParticules; i++)
 	{
-		px = this->positions[i].x / SMOOTHING_RADIUS;
-		py = this->positions[i].y / SMOOTHING_RADIUS;
-		pz = this->positions[i].z / SMOOTHING_RADIUS;
+		gx = this->positions[i].x / SMOOTHING_RADIUS;
+		gy = this->positions[i].y / SMOOTHING_RADIUS;
+		gz = this->positions[i].z / SMOOTHING_RADIUS;
 
-		gid = px + pz * this->gridW + py * Hsize;
+		gid = gx + gz * this->gridW + gy * Hsize;
 		this->grid[gid].push_back(i);
-
-		// for (int cx = -1; cx < 2; cx++)
-		// {
-		// 	gx = px + cx;
-		// 	if (gx < 0 || gx >= this->gridW)
-		// 		continue;
-
-		// 	for (int cy = -1; cy < 2; cy++)
-		// 	{
-		// 		gy = py + cy;
-		// 		if (gy < 0 || gy >= this->gridH)
-		// 			continue;
-
-		// 		for (int cz = -1; cz < 2; cz++)
-		// 		{
-		// 			gz = pz + cz;
-		// 			if (gz < 0 || gz >= this->gridD)
-		// 				continue;
-
-		// 			gid = gx + gz * this->gridW + gy * Hsize;
-		// 			this->grid[gid].push_back(i);
-		// 		}
-		// 	}
-		// }
 	}
 
 	for (int i = 0; i < this->nbParticules; i++)
@@ -271,10 +237,10 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules,
-					this->positions.data(), GL_STATIC_DRAW);
+					this->positions.data(), GL_DYNAMIC_DRAW);
 	glActiveTexture(GL_TEXTURE0);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBufferPositions);
 	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBufferPositions);
 	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 0);
 
 	int mapSizeLoc = glGetUniformLocation(shaderId, "mapSize");
@@ -297,10 +263,10 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridFlatSize,
-					this->gridFlat.data(), GL_STATIC_DRAW);
+					this->gridFlat.data(), GL_DYNAMIC_DRAW);
 	glActiveTexture(GL_TEXTURE1);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridFlat);
 	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridFlat);
 	glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
 
 	int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
@@ -308,10 +274,10 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(int) * this->gridOffsetsSize,
-					this->gridOffsets.data(), GL_STATIC_DRAW);
+					this->gridOffsets.data(), GL_DYNAMIC_DRAW);
 	glActiveTexture(GL_TEXTURE2);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridOffsets);
 	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, this->textureBufferGridOffsets);
 	glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
 
 	glBindVertexArray(shaderManager->getVAOId());
@@ -380,14 +346,4 @@ void	WaterSimulation::generateFlatGrid(void)
 		this->gridFlatSize += cellSize;
 		this->gridOffsetsSize++;
 	}
-
-	this->gridFlat[0] = 10000;
-
-	// for (int i = 0; i < this->gridOffsetsSize; i++)
-	// 	printf("%i ", gridOffsets[i]);
-	// printf("\nflat size %i\n\n", this->gridFlatSize);
-	/*
-0 2500 2500 2500 2500 2500 2500 2500 2500
-flat size 2500
-	*/
 }

@@ -69,11 +69,13 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	// simulation.addWater(glm::vec3(5, 5, 5));
-	for (int i = 0; i < 50; i++)
+	int	nbWater = 10;
+	glm::vec3	offset(MAP_SIZE / 2 - nbWater / 2, 0.5, MAP_SIZE / 2 - nbWater / 2);
+	for (int i = 0; i < nbWater; i++)
 	{
-		for (int j = 0; j < 50; j++)
-			simulation.addWater(glm::vec3(i + 0.5, 5, j + 0.5));
+		for (int j = 0; j < nbWater; j++)
+			for (int k = 0; k < nbWater; k++)
+				simulation.addWater(glm::vec3(i, k, j) + offset);
 	}
 
 	// Main loop

@@ -147,19 +147,18 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 	intersectionInfo.dst = cameraFar;
 	intersectionInfo.id = -1;
 
-	// TODO: uncomment
-	// p_luf = vec3(0.0, mapHeight, 0.0);
-	// p_ruf = vec3(mapSize, mapHeight, 0.0);
-	// p_ldf = vec3(0.0, 0.0, 0.0);
-	// p_rdf = vec3(mapSize, 0.0, 0.0);
-	// p_lub = vec3(0.0, mapHeight, mapSize);
-	// p_rub = vec3(mapSize, mapHeight, mapSize);
-	// p_ldb = vec3(0.0, 0.0, mapSize);
-	// p_rdb = vec3(mapSize, 0.0, mapSize);
-	// if (!intersectWithCube(rayPos, rayDir,
-	// 						p_luf, p_ruf, p_ldf, p_rdf,
-	// 						p_lub, p_rub, p_ldb, p_rdb))
-	// 	return (intersectionInfo);
+	p_luf = vec3(0.0, mapHeight, 0.0);
+	p_ruf = vec3(mapSize, mapHeight, 0.0);
+	p_ldf = vec3(0.0, 0.0, 0.0);
+	p_rdf = vec3(mapSize, 0.0, 0.0);
+	p_lub = vec3(0.0, mapHeight, mapSize);
+	p_rub = vec3(mapSize, mapHeight, mapSize);
+	p_ldb = vec3(0.0, 0.0, mapSize);
+	p_rdb = vec3(mapSize, 0.0, mapSize);
+	if (!intersectWithCube(rayPos, rayDir,
+							p_luf, p_ruf, p_ldf, p_rdf,
+							p_lub, p_rub, p_ldb, p_rdb))
+		return (intersectionInfo);
 
 	for (int cx = 0; cx < gridW; cx++)
 	{
@@ -188,14 +187,6 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 					endId = int(texelFetch(offsetsBuffer, offsetId + 1).r);
 				else
 					endId = gridSize;
-
-				if (int(texelFetch(offsetsBuffer, offsetId).r) == 0)
-				// if (startId < endId)
-				// if (offsetId == 0)
-				{
-					intersectionInfo.id = 1;
-					return (intersectionInfo);
-				}
 
 				for (int i = startId; i < endId; i++)
 				{
@@ -227,73 +218,35 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 		}
 	}
 
-	// for (int i = 0; i < nbPositions; i++)
-	// {
-	// 	pos = texelFetch(positionsBuffer, i).rgb;
-	// 	vec = rayPos - pos;
-	// 	dotRes = dot(rayDir, vec);
-	// 	nabla = (dotRes * dotRes) - dot(vec, vec) + waterRadius2;
-
-	// 	if (nabla < 0.0)
-	// 		continue;
-
-	// 	nabla = sqrt(nabla);
-	// 	dst = -dotRes - nabla;
-
-	// 	if (dst < 0.0)
-	// 		dst = -dotRes + nabla;
-
-	// 	if (dst < 0.0)
-	// 		continue;
-
-	// 	if (dst < intersectionInfo.dst)
-	// 	{
-	// 		intersectionInfo.dst = dst;
-	// 		intersectionInfo.id = i;
-	// 	}
-	// }
-
 	return (intersectionInfo);
 }
 
+
 void main()
 {
-	// TODO: remove
-	if (int(texelFetch(gridBuffer, 0).r) == 10000)
-		FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-	else
+	vec3	rayPos = cameraPos - (cameraRight * planeWidth * pointPos.x) + (cameraUp * planeHeight * pointPos.y);
+	vec3	fakeCameraPos = cameraPos - cameraFront * 2;
+	vec3	rayDir = normalize(rayPos - fakeCameraPos);
+
+	float totalDist = 0.0;
+	s_intersection_info intersectionInfo;
+	int id = 0;
+
+	intersectionInfo = getIntersectionPointWithWater(rayPos, rayDir);
+
+	if (intersectionInfo.id == -1)
+	{
+		// The default color to transparent
 		FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+	}
+	else
+	{
+		vec3 hitPoint = rayPos + rayDir * intersectionInfo.dst;
+		vec3 pos = texelFetch(positionsBuffer, intersectionInfo.id).rgb;
+		vec3 normal = normalize(hitPoint - pos);
+		vec3 lightDir = normalize(lightPos - pos);
+		float colorRatio = dot(normal, lightDir);
 
-	// vec3	rayPos = cameraPos - (cameraRight * planeWidth * pointPos.x) + (cameraUp * planeHeight * pointPos.y);
-	// vec3	fakeCameraPos = cameraPos - cameraFront * 2;
-	// vec3	rayDir = normalize(rayPos - fakeCameraPos);
-
-	// float totalDist = 0.0;
-	// s_intersection_info intersectionInfo;
-	// int id = 0;
-
-	// intersectionInfo = getIntersectionPointWithWater(rayPos, rayDir);
-
-	// // TODO: remove
-	// if (intersectionInfo.id <= 0)
-	// 	FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-	// else
-	// 	FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-
-	// TODO: uncomment
-	// if (intersectionInfo.id == -1)
-	// {
-	// 	// The default color to transparent
-	// 	FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-	// }
-	// else
-	// {
-	// 	vec3 hitPoint = rayPos + rayDir * intersectionInfo.dst;
-	// 	vec3 pos = texelFetch(positionsBuffer, intersectionInfo.id).rgb;
-	// 	vec3 normal = normalize(hitPoint - pos);
-	// 	vec3 lightDir = normalize(lightPos - pos);
-	// 	float colorRatio = dot(normal, lightDir);
-
-	// 	FragColor = vec4(waterColor * colorRatio, 1.0);
-	// }
+		FragColor = vec4(waterColor * colorRatio, 1.0);
+	}
 }

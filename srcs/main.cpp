@@ -70,7 +70,7 @@ int	main(int argc, char **argv)
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
 	int	nbWater = 10;
-	glm::vec3	offset(MAP_SIZE / 2 - nbWater / 2, 0.5, MAP_SIZE / 2 - nbWater / 2);
+	glm::vec3	offset(MAP_SIZE / 2 - nbWater / 2, 5, MAP_SIZE / 2 - nbWater / 2);
 	for (int i = 0; i < nbWater; i++)
 	{
 		for (int j = 0; j < nbWater; j++)
@@ -141,6 +141,10 @@ static void	computation(
 				simulation->getNbParticules());
 		deltas.clear();
 	}
+
+	// To avoid big simulation step
+	if (delta > MINIMUN_SIMULATION_UPDATE)
+		delta = MINIMUN_SIMULATION_UPDATE;
 
 	cameraSpeed = CAMERA_SPEED * delta;
 	if (inputManager->lcontrol.isDown())

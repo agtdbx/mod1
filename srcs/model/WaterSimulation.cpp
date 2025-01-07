@@ -185,6 +185,7 @@ void	WaterSimulation::tick(float delta)
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		// Apply gravity
+		this->velocities[i] *= ENERGY_LOSE;
 		this->velocities[i] += glm::vec3(0, -GRAVITY_FORCE, 0) * delta;
 		// Compute predicted position
 		this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
@@ -513,7 +514,6 @@ glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
 	py = position.y / SMOOTHING_RADIUS;
 	pz = position.z / SMOOTHING_RADIUS;
 
-
 	for (int cx = -1; cx <= 1; cx++)
 	{
 		gx = px + cx;
@@ -542,7 +542,7 @@ glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
 					dir = this->predictedPositions[i] - position;
 					dst = vec3Length(dir);
 					if (dst == 0.0f)
-						dir = glm::vec3(1.0f, 0.0f, 0.0f);
+						dir = glm::vec3(0.0f, 1.0f, 0.0f);
 					else
 						dir /= dst;
 					slope = smoothingKernelDerivate(dst);

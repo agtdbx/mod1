@@ -26,13 +26,14 @@ public:
 
 private:
 	std::vector<glm::vec3>	positions;
+	std::vector<glm::vec3>	predictedPositions;
 	std::vector<glm::vec3>	velocities;
-	std::vector<double>		densities;
+	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
 	std::vector<float>		gridFlat, gridOffsets;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridFlatSize, gridOffsetsSize;
+							gridFlatSize, gridOffsetsSize, idHsize;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets;
@@ -40,6 +41,10 @@ private:
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
 	void		generateFlatGrid(void);
+
+	float		calculateDensity(glm::vec3 position);
+	glm::vec3	calculatePressureForce(int particuleIndex);
+	glm::vec3	calculateViscosityForce(int particuleIndex);
 };
 
 #endif

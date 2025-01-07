@@ -9,7 +9,8 @@ from pygame.math import Vector2 as vec2
 from define import  WIN_W, WIN_H, NB_WATER, WATER_BEGIN_SPACE,\
                     WATER_RADIUS, WATER_COLOR, WATER_SMOOTHING_RADIUS,\
                     WATER_RGB_FAST1, WATER_RGB_FAST2,\
-                    MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE, GRAVITY
+                    MOUSE_RADIUS, MOUSE_RADIUS2, MOUSE_FORCE, GRAVITY,\
+                    MINIMUM_SIMULATION_STEP
 from terrain import Terrain
 from water import   updateWater, calculateDensity, calculatePressureForce,\
                     calculateViscosityForce
@@ -204,6 +205,8 @@ class Game:
                 self.simulationSpeed = min(20, self.simulationSpeed + 0.5)
                 self.waitInput = 0.2
                 print(f"simulation speed : {self.simulationSpeed}")
+
+        delta = min(delta, MINIMUM_SIMULATION_STEP)
 
         if self.keyboardState[pg.K_RSHIFT]:
             delta *= 2

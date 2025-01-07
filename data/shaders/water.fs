@@ -142,7 +142,7 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 	vec3	p_luf, p_ruf, p_ldf, p_rdf, p_lub, p_rub, p_ldb, p_rdb;
 	float	dotRes, nabla, dst;
 	int		offsetId, startId, endId, waterId;
-	int		Hsize = gridW * gridH;
+	int		Hsize = gridW * gridD;
 
 	intersectionInfo.dst = cameraFar;
 	intersectionInfo.id = -1;

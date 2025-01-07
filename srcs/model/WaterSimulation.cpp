@@ -1,6 +1,6 @@
 #include <model/WaterSimulation.hpp>
 
-#include <engine/render/WaterShader.hpp>
+#include <engine/render/shader/WaterShader.hpp>
 
 //**** STATIC FUNCTIONS ********************************************************
 
@@ -116,6 +116,15 @@ WaterSimulation::~WaterSimulation()
 {
 	glDeleteBuffers(1, &this->textureBufferPositions);
 	glDeleteTextures(1, &this->texturePositions);
+
+	glDeleteBuffers(1, &this->textureBufferPredictedPositions);
+	glDeleteTextures(1, &this->texturePredictedPositions);
+
+	glDeleteBuffers(1, &this->textureBufferVelocities);
+	glDeleteTextures(1, &this->textureVelocities);
+
+	glDeleteBuffers(1, &this->textureBufferDensities);
+	glDeleteTextures(1, &this->textureDensities);
 
 	glDeleteBuffers(1, &this->textureBufferGridFlat);
 	glDeleteTextures(1, &this->textureGridFlat);
@@ -397,6 +406,15 @@ void	WaterSimulation::generateTextureBuffer(void)
 {
 	glGenBuffers(1, &this->textureBufferPositions);
 	glGenTextures(1, &texturePositions);
+
+	glGenBuffers(1, &this->textureBufferPredictedPositions);
+	glGenTextures(1, &texturePredictedPositions);
+
+	glGenBuffers(1, &this->textureBufferVelocities);
+	glGenTextures(1, &textureVelocities);
+
+	glGenBuffers(1, &this->textureBufferDensities);
+	glGenTextures(1, &textureDensities);
 
 	glGenBuffers(1, &this->textureBufferGridFlat);
 	glGenTextures(1, &textureGridFlat);

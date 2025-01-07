@@ -1,4 +1,4 @@
-#include <engine/render/ShaderManager.hpp>
+#include <engine/render/shader/ShaderManager.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

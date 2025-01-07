@@ -3,7 +3,7 @@
 
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
-#include <engine/render/ShaderManager.hpp>
+#include <engine/render/shader/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/Camera.hpp>
@@ -58,8 +58,8 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shaderManager.addShader("terrain", "data/shaders/terrain.vs", "data/shaders/terrain.fs");
-		shaderManager.loadWaterShaderFiles("data/shaders/water.vs", "data/shaders/water.fs");
+		shaderManager.addShader("terrain", "data/shaders/terrain.glslv", "data/shaders/terrain.glslf");
+		shaderManager.loadWaterShaderFiles("data/shaders/water.glslv", "data/shaders/water.glslf");
 	}
 	catch (std::exception &e)
 	{

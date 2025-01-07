@@ -4,8 +4,8 @@
 # include <string>
 # include <unordered_map>
 
-# include <engine/render/Shader.hpp>
-# include <engine/render/WaterShader.hpp>
+# include <engine/render/shader/Shader.hpp>
+# include <engine/render/shader/WaterShader.hpp>
 
 class ShaderManager
 {

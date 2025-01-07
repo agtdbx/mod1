@@ -6,7 +6,7 @@
 
 # include <engine/render/Mesh.hpp>
 # include <engine/render/Camera.hpp>
-# include <engine/render/ShaderManager.hpp>
+# include <engine/render/shader/ShaderManager.hpp>
 # include <engine/maths/Vec3.hpp>
 
 class WaterSimulation
@@ -35,6 +35,9 @@ private:
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize, idHsize;
 	GLuint					textureBufferPositions, texturePositions,
+							textureBufferPredictedPositions, texturePredictedPositions,
+							textureBufferVelocities, textureVelocities,
+							textureBufferDensities, textureDensities,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets;
 

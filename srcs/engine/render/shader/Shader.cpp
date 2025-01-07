@@ -1,4 +1,4 @@
-#include <engine/render/WaterShader.hpp>
+#include <engine/render/shader/Shader.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -7,13 +7,13 @@
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
-WaterShader::WaterShader(void)
+Shader::Shader(void)
 {
 	this->id = -1;
 }
 
 
-WaterShader::WaterShader(std::string vShaderPath, std::string fShaderPath)
+Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 {
 	this->id = -1;
 
@@ -21,14 +21,14 @@ WaterShader::WaterShader(std::string vShaderPath, std::string fShaderPath)
 }
 
 
-WaterShader::WaterShader(const WaterShader &obj)
+Shader::Shader(const Shader &obj)
 {
 	this->id = obj.id;
 }
 
 //---- Destructor --------------------------------------------------------------
 
-WaterShader::~WaterShader()
+Shader::~Shader()
 {
 }
 
@@ -36,7 +36,7 @@ WaterShader::~WaterShader()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
-unsigned int	WaterShader::getShaderId(void)
+unsigned int	Shader::getShaderId(void)
 {
 	return (this->id);
 }
@@ -45,7 +45,7 @@ unsigned int	WaterShader::getShaderId(void)
 
 //---- Operators ---------------------------------------------------------------
 
-WaterShader	&WaterShader::operator=(const WaterShader &obj)
+Shader	&Shader::operator=(const Shader &obj)
 {
 	if (this == &obj)
 		return (*this);
@@ -57,7 +57,7 @@ WaterShader	&WaterShader::operator=(const WaterShader &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-void	WaterShader::load(std::string vShaderPath, std::string fShaderPath)
+void	Shader::load(std::string vShaderPath, std::string fShaderPath)
 {
 	unsigned int vertexShader = this->getVertexShader(vShaderPath);
 	unsigned int fragmentShader = this->getFragmentShader(fShaderPath);
@@ -75,11 +75,12 @@ void	WaterShader::load(std::string vShaderPath, std::string fShaderPath)
 	int success;
 	// Check if link
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
-	if(!success) {
+	if(!success)
+	{
 		char infoLog[512];
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("WaterShader program linking failed : " + infoString);
+		throw new std::invalid_argument("Shader program linking failed : " + infoString);
 	}
 
 	// Delete base shader because there are useless now
@@ -88,16 +89,24 @@ void	WaterShader::load(std::string vShaderPath, std::string fShaderPath)
 }
 
 
-void	WaterShader::use(void)
+void	Shader::use(void)
 {
 	if (this->id < 0)
 		return ;
 
-	// Give info about how get vertice to draw triange with gpu
+	// Give info about how get vertice to draw trianlges with gpu
 	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
 	// Point position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
+
+	// Point normal
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// Point color
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	// Select the program shader as active one
 	glUseProgram(this->id);
@@ -105,7 +114,7 @@ void	WaterShader::use(void)
 
 //**** PRIVATE METHODS *********************************************************
 
-unsigned int	WaterShader::getVertexShader(std::string shaderPath)
+unsigned int	Shader::getVertexShader(std::string shaderPath)
 {
 	std::string			shaderCode;
 	std::ifstream		file;
@@ -144,7 +153,7 @@ unsigned int	WaterShader::getVertexShader(std::string shaderPath)
 }
 
 
-unsigned int	WaterShader::getFragmentShader(std::string shaderPath)
+unsigned int	Shader::getFragmentShader(std::string shaderPath)
 {
 	// Create fragment shader
 	std::string			shaderCode;

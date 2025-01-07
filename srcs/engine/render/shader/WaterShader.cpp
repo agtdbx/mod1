@@ -1,4 +1,4 @@
-#include <engine/render/Shader.hpp>
+#include <engine/render/shader/WaterShader.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -7,13 +7,13 @@
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
-Shader::Shader(void)
+WaterShader::WaterShader(void)
 {
 	this->id = -1;
 }
 
 
-Shader::Shader(std::string vShaderPath, std::string fShaderPath)
+WaterShader::WaterShader(std::string vShaderPath, std::string fShaderPath)
 {
 	this->id = -1;
 
@@ -21,14 +21,14 @@ Shader::Shader(std::string vShaderPath, std::string fShaderPath)
 }
 
 
-Shader::Shader(const Shader &obj)
+WaterShader::WaterShader(const WaterShader &obj)
 {
 	this->id = obj.id;
 }
 
 //---- Destructor --------------------------------------------------------------
 
-Shader::~Shader()
+WaterShader::~WaterShader()
 {
 }
 
@@ -36,7 +36,7 @@ Shader::~Shader()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
-unsigned int	Shader::getShaderId(void)
+unsigned int	WaterShader::getShaderId(void)
 {
 	return (this->id);
 }
@@ -45,7 +45,7 @@ unsigned int	Shader::getShaderId(void)
 
 //---- Operators ---------------------------------------------------------------
 
-Shader	&Shader::operator=(const Shader &obj)
+WaterShader	&WaterShader::operator=(const WaterShader &obj)
 {
 	if (this == &obj)
 		return (*this);
@@ -57,7 +57,7 @@ Shader	&Shader::operator=(const Shader &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-void	Shader::load(std::string vShaderPath, std::string fShaderPath)
+void	WaterShader::load(std::string vShaderPath, std::string fShaderPath)
 {
 	unsigned int vertexShader = this->getVertexShader(vShaderPath);
 	unsigned int fragmentShader = this->getFragmentShader(fShaderPath);
@@ -79,7 +79,7 @@ void	Shader::load(std::string vShaderPath, std::string fShaderPath)
 		char infoLog[512];
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Shader program linking failed : " + infoString);
+		throw new std::invalid_argument("WaterShader program linking failed : " + infoString);
 	}
 
 	// Delete base shader because there are useless now
@@ -88,24 +88,16 @@ void	Shader::load(std::string vShaderPath, std::string fShaderPath)
 }
 
 
-void	Shader::use(void)
+void	WaterShader::use(void)
 {
 	if (this->id < 0)
 		return ;
 
-	// Give info about how get vertice to draw trianlges with gpu
+	// Give info about how get vertice to draw triange with gpu
 	// (vertice offset, nb vertice, need to normalize point, size of array, thing for weird cast)
 	// Point position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
-
-	// Point normal
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	// Point color
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 	// Select the program shader as active one
 	glUseProgram(this->id);
@@ -113,7 +105,7 @@ void	Shader::use(void)
 
 //**** PRIVATE METHODS *********************************************************
 
-unsigned int	Shader::getVertexShader(std::string shaderPath)
+unsigned int	WaterShader::getVertexShader(std::string shaderPath)
 {
 	std::string			shaderCode;
 	std::ifstream		file;
@@ -152,7 +144,7 @@ unsigned int	Shader::getVertexShader(std::string shaderPath)
 }
 
 
-unsigned int	Shader::getFragmentShader(std::string shaderPath)
+unsigned int	WaterShader::getFragmentShader(std::string shaderPath)
 {
 	// Create fragment shader
 	std::string			shaderCode;

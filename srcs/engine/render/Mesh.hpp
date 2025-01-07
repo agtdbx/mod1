@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 # include <model/Point.hpp>
-# include <engine/render/Shader.hpp>
+# include <engine/render/shader/Shader.hpp>
 # include <engine/render/TextureManager.hpp>
 # include <engine/render/Camera.hpp>
 

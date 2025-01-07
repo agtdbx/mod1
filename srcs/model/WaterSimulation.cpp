@@ -4,6 +4,12 @@
 
 //**** STATIC FUNCTIONS ********************************************************
 
+static float	vec3Length(glm::vec3 vec)
+{
+	return (sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+}
+
+
 static float	smoothingKernel(float dst)
 {
 	float	tmp;
@@ -62,20 +68,22 @@ WaterSimulation::WaterSimulation(void)
 {
 	this->nbParticules = 0;
 
-	this->gridW = MAP_SIZE / SMOOTHING_RADIUS;
-	if (MAP_SIZE > SMOOTHING_RADIUS && MAP_SIZE % SMOOTHING_RADIUS != 0)
+	int smoothing_radius = SMOOTHING_RADIUS;
+
+	this->gridW = MAP_SIZE / smoothing_radius;
+	if (MAP_SIZE > smoothing_radius && MAP_SIZE % smoothing_radius != 0)
 		this->gridW++;
-	this->gridH = WATER_MAX_HEIGHT / SMOOTHING_RADIUS + 1;
-	if (WATER_MAX_HEIGHT > SMOOTHING_RADIUS
-		&& (int)WATER_MAX_HEIGHT % SMOOTHING_RADIUS != 0)
+	this->gridH = MAP_MAX_HEIGHT / smoothing_radius;
+	if (MAP_MAX_HEIGHT > smoothing_radius
+		&& (int)MAP_MAX_HEIGHT % smoothing_radius != 0)
 		this->gridH++;
-	this->gridD = MAP_SIZE / SMOOTHING_RADIUS;
-	if (MAP_SIZE > SMOOTHING_RADIUS && MAP_SIZE % SMOOTHING_RADIUS != 0)
-		this->gridD++;
+	this->gridD = this->gridW;
 	this->gridSize = this->gridW * this->gridH * this->gridD;
 	this->idHsize = this->gridW * this->gridH;
 	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
+
+	printf("GRID SIZE %i %i %i (total %i)\n", this->gridW, this->gridH, this->gridD, this->gridSize);
 
 	for (int i = 0; i < this->gridSize; i++)
 	{
@@ -174,7 +182,7 @@ void	WaterSimulation::addWater(glm::vec3 position)
 void	WaterSimulation::tick(float delta)
 {
 	int			gx, gy, gz, gid;
-	glm::vec3	pressureForce, pressureAcceleration, viscosityForce;
+	// glm::vec3	pressureForce, pressureAcceleration, viscosityForce;
 
 	// Clear grid
 	for (int i = 0; i < this->gridSize; i++)
@@ -190,18 +198,18 @@ void	WaterSimulation::tick(float delta)
 		// Check if particule is out of the map on x axis
 		if (this->predictedPositions[i].x < WATER_RADIUS)
 			this->predictedPositions[i].x = WATER_RADIUS;
-		else if (this->predictedPositions[i].x >= MAP_SIZE)
-			this->predictedPositions[i].x = MAP_SIZE;
+		else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
+			this->predictedPositions[i].x = WATER_MAX_XZ;
 		// Check if particule is out of the map on y axis
 		if (this->predictedPositions[i].y < WATER_RADIUS)
 			this->predictedPositions[i].y = WATER_RADIUS;
 		else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
-			this->predictedPositions[i].y = MAP_SIZE;
+			this->predictedPositions[i].y = WATER_MAX_HEIGHT;
 		// Check if particule is out of the map on z axis
 		if (this->predictedPositions[i].z < WATER_RADIUS)
 			this->predictedPositions[i].z = WATER_RADIUS;
-		else if (this->predictedPositions[i].z >= MAP_SIZE)
-			this->predictedPositions[i].z = MAP_SIZE;
+		else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
+			this->predictedPositions[i].z = WATER_MAX_XZ;
 
 		gx = this->predictedPositions[i].x / SMOOTHING_RADIUS;
 		gy = this->predictedPositions[i].y / SMOOTHING_RADIUS;
@@ -212,13 +220,16 @@ void	WaterSimulation::tick(float delta)
 	}
 
 	// Compute densities
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
-	}
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
+	// }
 
-	float	tkt = this->calculateDensity(glm::vec3(25, 12.5, 25));;
-	// printf("tkt : %f\n", tkt);
+	float	density = this->calculateDensity(glm::vec3(25, 12.5, 25));
+	printf("SMOOTHING_RADIUS : %2.1f, density : %.3f\n", SMOOTHING_RADIUS, density);
+	// SMOOTHING_RADIUS : 5.0, density : 0.525
+	// SMOOTHING_RADIUS : 10.0, density : 0.033
+	// SMOOTHING_RADIUS : 20.0, density : 0.002
 
 	// Calculate and apply pressure
 	// for (int i = 0; i < this->nbParticules; i++)
@@ -250,9 +261,9 @@ void	WaterSimulation::tick(float delta)
 			this->positions[i].x = WATER_RADIUS;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
-		else if (this->positions[i].x >= MAP_SIZE)
+		else if (this->positions[i].x >= WATER_MAX_XZ)
 		{
-			this->positions[i].x = MAP_SIZE;
+			this->positions[i].x = WATER_MAX_XZ;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on y axis
@@ -263,7 +274,7 @@ void	WaterSimulation::tick(float delta)
 		}
 		else if (this->positions[i].y >= WATER_MAX_HEIGHT)
 		{
-			this->positions[i].y = MAP_SIZE;
+			this->positions[i].y = WATER_MAX_HEIGHT;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on z axis
@@ -272,9 +283,9 @@ void	WaterSimulation::tick(float delta)
 			this->positions[i].z = WATER_RADIUS;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
-		else if (this->positions[i].z >= MAP_SIZE)
+		else if (this->positions[i].z >= WATER_MAX_XZ)
 		{
-			this->positions[i].z = MAP_SIZE;
+			this->positions[i].z = WATER_MAX_XZ;
 			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
 		}
 	}
@@ -451,58 +462,44 @@ void	WaterSimulation::generateFlatGrid(void)
 }
 
 
-std::vector<int>	WaterSimulation::getParticulesNear(glm::vec3 position)
+float	WaterSimulation::calculateDensity(glm::vec3 position)
 {
-	std::vector<int>	particulesNear;
-	int					px, py, pz, gx, gy, gz, gid;
+	float	density, dst, influence;
+	int		px, py, pz, gx, gy, gz, gid;
 
+	density = 0.0f;
 	px = position.x / SMOOTHING_RADIUS;
 	py = position.y / SMOOTHING_RADIUS;
 	pz = position.z / SMOOTHING_RADIUS;
 
-	for (int cx = -1; cx < 2; cx ++)
+	for (int cx = -1; cx <= 1; cx++)
 	{
 		gx = px + cx;
-		if (cx < 0 || cx >= this->gridW)
+		if (gx < 0 || gx >= this->gridW)
 			continue;
 
-		for (int cy = -1; cy < 2; cy ++)
+		for (int cy = -1; cy <= 1; cy++)
 		{
 			gy = py + cy;
-			if (cy < 0 || cy >= this->gridH)
+			if (gy < 0 || gy >= this->gridH)
 				continue;
 
-			for (int cz = -1; cz < 2; cz ++)
+			for (int cz = -1; cz <= 1; cz++)
 			{
 				gz = pz + cz;
-				if (cz < 0 || cz >= this->gridD)
+				if (gz < 0 || gz >= this->gridD)
 					continue;
 
 				gid = gx + gz * this->gridW + gy * this->idHsize;
-				particulesNear.insert(particulesNear.end(),
-										this->grid[gid].begin(),
-										this->grid[gid].end());
+
+				for (const int &i : this->grid[gid])
+				{
+					dst = vec3Length(this->positions[i] - position);
+					influence = smoothingKernel(dst);
+					density += WATER_MASS * influence;
+				}
 			}
 		}
-	}
-
-	return (particulesNear);
-}
-
-
-float	WaterSimulation::calculateDensity(glm::vec3 position)
-{
-	float				density, dst, influence;
-	std::vector<int>	particulesNear;
-
-	density = 0.0f;
-	particulesNear = this->getParticulesNear(position);
-
-	for (int i : particulesNear)
-	{
-		dst = (this->positions[i] - position).length();
-		influence = smoothingKernel(dst);
-		density += WATER_MASS * influence;
 	}
 
 	return (density);
@@ -511,30 +508,56 @@ float	WaterSimulation::calculateDensity(glm::vec3 position)
 
 glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
 {
-	glm::vec3			pressureForce, position, dir;
-	float				density, dst, slope, sharedPressure;
-	std::vector<int>	particulesNear;
+	glm::vec3	pressureForce, position, dir;
+	float		density, dst, slope, sharedPressure;
+	int			px, py, pz, gx, gy, gz, gid;
 
 	pressureForce = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	position = this->predictedPositions[particuleIndex];
 	density = this->densities[particuleIndex];
-	particulesNear = this->getParticulesNear(position);
+	px = position.x / SMOOTHING_RADIUS;
+	py = position.y / SMOOTHING_RADIUS;
+	pz = position.z / SMOOTHING_RADIUS;
 
-	for (int i : particulesNear)
+
+	for (int cx = -1; cx <= 1; cx++)
 	{
-		if (i == particuleIndex)
+		gx = px + cx;
+		if (gx < 0 || gx >= this->gridW)
 			continue;
 
-		dir = this->predictedPositions[i] - position;
-		dst = dir.length();
-		if (dst == 0.0f)
-			dir = glm::vec3(1.0f, 0.0f, 0.0f);
-		else
-			dir /= dst;
-		slope = smoothingKernelDerivate(dst);
-		sharedPressure = calculateSharedPressure(density, this->densities[i]);
-		pressureForce += sharedPressure * dir * slope * WATER_MASS / density;
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= this->gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= this->gridD)
+					continue;
+
+				gid = gx + gz * this->gridW + gy * this->idHsize;
+
+				for (const int &i : this->grid[gid])
+				{
+					if (i == particuleIndex)
+						continue;
+
+					dir = this->predictedPositions[i] - position;
+					dst = vec3Length(dir);
+					if (dst == 0.0f)
+						dir = glm::vec3(1.0f, 0.0f, 0.0f);
+					else
+						dir /= dst;
+					slope = smoothingKernelDerivate(dst);
+					sharedPressure = calculateSharedPressure(density, this->densities[i]);
+					pressureForce += sharedPressure * dir * slope * WATER_MASS / density;
+				}
+			}
+		}
 	}
 
 	return (pressureForce);
@@ -545,27 +568,53 @@ glm::vec3	WaterSimulation::calculateViscosityForce(int particuleIndex)
 {
 	glm::vec3	viscosityForce, position, velocity, velocityDir;
 	float		velocityLength, dst, influence;
-	std::vector<int>	particulesNear;
+	int			px, py, pz, gx, gy, gz, gid;
 
 	viscosityForce = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	position = this->predictedPositions[particuleIndex];
 	velocity = this->velocities[particuleIndex];
-	particulesNear = this->getParticulesNear(position);
+	px = position.x / SMOOTHING_RADIUS;
+	py = position.y / SMOOTHING_RADIUS;
+	pz = position.z / SMOOTHING_RADIUS;
 
-	for (int i : particulesNear)
+
+	for (int cx = -1; cx <= 1; cx++)
 	{
-		if (i == particuleIndex)
+		gx = px + cx;
+		if (gx < 0 || gx >= this->gridW)
 			continue;
 
-		velocityDir = this->velocities[i] - velocity;
-		velocityLength = velocityDir.length();
-		if (velocityLength == 0.0f)
-			continue;
-		velocityDir /= velocityLength;
-		dst = (position - this->predictedPositions[i]).length();
-		influence = viscositySmoothingKernel(dst);
-		viscosityForce += velocityDir * influence;
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= this->gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= this->gridD)
+					continue;
+
+				gid = gx + gz * this->gridW + gy * this->idHsize;
+
+				for (const int &i : this->grid[gid])
+				{
+					if (i == particuleIndex)
+						continue;
+
+					velocityDir = this->velocities[i] - velocity;
+					velocityLength = vec3Length(velocityDir);
+					if (velocityLength == 0.0f)
+						continue;
+					velocityDir /= velocityLength;
+					dst = vec3Length(position - this->predictedPositions[i]);
+					influence = viscositySmoothingKernel(dst);
+					viscosityForce += velocityDir * influence;
+				}
+			}
+		}
 	}
 
 	return (viscosityForce * VISCOSITY_FORCE);

@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/07 13:05:07 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/07 16:24:05 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,9 @@
 # define WIN_TITLE "mod1"
 
 # define MAX_XY 100
-# define MAX_HEIGHT 50
+// # define MAX_HEIGHT 50
 // # define MAP_SIZE 200
+# define MAX_HEIGHT 40
 # define MAP_SIZE 50
 # define TERRAIN_PRECISION 0.01
 
@@ -41,19 +42,18 @@
 # define CAMERA_SPRINT_FACTOR 4.2
 # define CAMERA_ROTATION_SPEED 42.0
 
-# define WATER_GRAVITY 0.01
-# define WATER_MASS 500.0f
+# define GRAVITY_FORCE 10.0f
+# define WATER_MASS 1.0f
 # define COLLISION_ENERGY_KEEP 0.7
-# define SMOOTHING_RADIUS 20.0f
-// # define SMOOTHING_RADIUS 10.0f
+// # define SMOOTHING_RADIUS 20.0f
+# define SMOOTHING_RADIUS 10.0f
 // # define SMOOTHING_RADIUS 5.0f
-# define TARGET_DENSITY 0.1f
+# define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
-# define VISCOSITY_FORCE 0.1f
+# define VISCOSITY_FORCE 1.0f
 
 # define PRINT_FPS_TIME 1.0
-// # define MINIMUM_SIMULATION_UPDATE 0.1
-# define MINIMUM_SIMULATION_UPDATE 0.01
+# define MINIMUM_SIMULATION_UPDATE 0.1
 
 # define PI 3.1415926535f
 
@@ -64,13 +64,20 @@ const float		WATER_RADIUS2 = WATER_RADIUS * WATER_RADIUS;
 const float		WATER_MAX_XZ = MAP_SIZE - WATER_RADIUS;
 const float		WATER_MAX_HEIGHT = MAP_MAX_HEIGHT - WATER_RADIUS;
 const glm::vec3	WATER_COLOR = glm::vec3(0.0, 0.0, 0.8);
+const float		SMOOTHING_RADIUS5 = SMOOTHING_RADIUS * SMOOTHING_RADIUS
+								* SMOOTHING_RADIUS * SMOOTHING_RADIUS
+								* SMOOTHING_RADIUS;
+const float		SMOOTHING_RADIUS6 = SMOOTHING_RADIUS * SMOOTHING_RADIUS
+								* SMOOTHING_RADIUS * SMOOTHING_RADIUS
+								* SMOOTHING_RADIUS * SMOOTHING_RADIUS;
 const float		SMOOTHING_RADIUS9 = SMOOTHING_RADIUS * SMOOTHING_RADIUS
 								* SMOOTHING_RADIUS * SMOOTHING_RADIUS
 								* SMOOTHING_RADIUS * SMOOTHING_RADIUS
 								* SMOOTHING_RADIUS * SMOOTHING_RADIUS
 								* SMOOTHING_RADIUS;
-const float		SMOOTHING_VOLUME = (64.0f * PI * SMOOTHING_RADIUS9) / 315.0f;
-const float		SMOOTHING_SCALE = (315.0f * 2.0f) / (64.0f * PI * SMOOTHING_RADIUS9);
+const float		SMOOTHING_SCALE = 15.0f / (2 * PI * SMOOTHING_RADIUS5);
+const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * SMOOTHING_RADIUS5);
+const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * SMOOTHING_RADIUS9);
 
 std::vector<Vec3>	parse(char *name);
 

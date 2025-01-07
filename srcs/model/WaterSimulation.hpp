@@ -42,8 +42,6 @@ private:
 	void		generateTriangleOverScreen(void);
 	void		generateFlatGrid(void);
 
-	std::vector<int>	getParticulesNear(glm::vec3 position);
-
 	float		calculateDensity(glm::vec3 position);
 	glm::vec3	calculatePressureForce(int particuleIndex);
 	glm::vec3	calculateViscosityForce(int particuleIndex);

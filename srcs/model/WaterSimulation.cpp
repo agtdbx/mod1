@@ -12,13 +12,10 @@ static float	vec3Length(glm::vec3 vec)
 
 static float	smoothingKernel(float dst)
 {
-	float	tmp;
-
 	if (dst > SMOOTHING_RADIUS)
 		return (0.0);
 
-	tmp = SMOOTHING_RADIUS - dst;
-	return ((tmp * tmp) / SMOOTHING_VOLUME);
+	return (pow(SMOOTHING_RADIUS - dst, 2) * SMOOTHING_SCALE);
 }
 
 
@@ -27,7 +24,7 @@ static float	smoothingKernelDerivate(float dst)
 	if (dst > SMOOTHING_RADIUS)
 		return (0.0);
 
-	return ((dst - SMOOTHING_RADIUS) * SMOOTHING_SCALE);
+	return ((dst - SMOOTHING_RADIUS) * SMOOTHING_DERIVATE_SCALE);
 }
 
 
@@ -38,10 +35,8 @@ static float	viscositySmoothingKernel(float dst)
 	if (dst > SMOOTHING_RADIUS)
 		return (0.0);
 
-	// value = (dst * dst) / WATER_RADIUS2;
 	value = WATER_RADIUS2 - (dst * dst);
-	return ((value * value * value) / SMOOTHING_VOLUME);
-	// return (value * value * value);
+	return ((value * value * value) * SMOOTHING_VISCOSITY_SCALE);
 }
 
 
@@ -78,12 +73,10 @@ WaterSimulation::WaterSimulation(void)
 		&& (int)MAP_MAX_HEIGHT % smoothing_radius != 0)
 		this->gridH++;
 	this->gridD = this->gridW;
+	this->idHsize = this->gridW * this->gridD;
 	this->gridSize = this->gridW * this->gridH * this->gridD;
-	this->idHsize = this->gridW * this->gridH;
 	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
-
-	printf("GRID SIZE %i %i %i (total %i)\n", this->gridW, this->gridH, this->gridD, this->gridSize);
 
 	for (int i = 0; i < this->gridSize; i++)
 	{
@@ -182,7 +175,7 @@ void	WaterSimulation::addWater(glm::vec3 position)
 void	WaterSimulation::tick(float delta)
 {
 	int			gx, gy, gz, gid;
-	// glm::vec3	pressureForce, pressureAcceleration, viscosityForce;
+	glm::vec3	pressureForce, pressureAcceleration, viscosityForce;
 
 	// Clear grid
 	for (int i = 0; i < this->gridSize; i++)
@@ -192,7 +185,7 @@ void	WaterSimulation::tick(float delta)
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		// Apply gravity
-		// this->velocities[i] += glm::vec3(0, -0.1, 0) * delta;
+		this->velocities[i] += glm::vec3(0, -GRAVITY_FORCE, 0) * delta;
 		// Compute predicted position
 		this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
 		// Check if particule is out of the map on x axis
@@ -220,33 +213,27 @@ void	WaterSimulation::tick(float delta)
 	}
 
 	// Compute densities
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
-	// }
-
-	float	density = this->calculateDensity(glm::vec3(25, 12.5, 25));
-	printf("SMOOTHING_RADIUS : %2.1f, density : %.3f\n", SMOOTHING_RADIUS, density);
-	// SMOOTHING_RADIUS : 5.0, density : 0.525
-	// SMOOTHING_RADIUS : 10.0, density : 0.033
-	// SMOOTHING_RADIUS : 20.0, density : 0.002
+	for (int i = 0; i < this->nbParticules; i++)
+	{
+		this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
+	}
 
 	// Calculate and apply pressure
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	if (this->densities[i] == 0.0f)
-	// 	{
-	// 		this->velocities[i] = glm::vec3(0.0f, 0.0f, 0.0f);
-	// 		continue;
-	// 	}
+	for (int i = 0; i < this->nbParticules; i++)
+	{
+		if (this->densities[i] == 0.0f)
+		{
+			this->velocities[i] = glm::vec3(0.0f, 0.0f, 0.0f);
+			continue;
+		}
 
-	// 	pressureForce = this->calculatePressureForce(i);
-	// 	pressureAcceleration = pressureForce / this->densities[i];
-	// 	this->velocities[i] += pressureAcceleration * delta;
+		pressureForce = this->calculatePressureForce(i);
+		pressureAcceleration = pressureForce / this->densities[i];
+		this->velocities[i] += pressureAcceleration * delta;
 
-	// 	viscosityForce = calculateViscosityForce(i);
-	// 	this->velocities[i] += viscosityForce * delta;
-	// }
+		viscosityForce = calculateViscosityForce(i);
+		this->velocities[i] += viscosityForce * delta;
+	}
 
 	// Update positions with screen collision
 	for (int i = 0; i < this->nbParticules; i++)
@@ -259,34 +246,40 @@ void	WaterSimulation::tick(float delta)
 		if (this->positions[i].x < WATER_RADIUS)
 		{
 			this->positions[i].x = WATER_RADIUS;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].x *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].x >= WATER_MAX_XZ)
 		{
 			this->positions[i].x = WATER_MAX_XZ;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].x *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on y axis
 		if (this->positions[i].y < WATER_RADIUS)
 		{
 			this->positions[i].y = WATER_RADIUS;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].y *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].y >= WATER_MAX_HEIGHT)
 		{
 			this->positions[i].y = WATER_MAX_HEIGHT;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].y *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 		// Check if particule is out of the map on z axis
 		if (this->positions[i].z < WATER_RADIUS)
 		{
 			this->positions[i].z = WATER_RADIUS;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].z *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 		else if (this->positions[i].z >= WATER_MAX_XZ)
 		{
 			this->positions[i].z = WATER_MAX_XZ;
-			this->velocities[i] *= -COLLISION_ENERGY_KEEP;
+			this->velocities[i].z *= -1.0f;
+			this->velocities[i] *= COLLISION_ENERGY_KEEP;
 		}
 	}
 }

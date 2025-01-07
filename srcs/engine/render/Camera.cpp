@@ -21,7 +21,7 @@ Camera::Camera(void)
 	// this->yaw = -0.144872f;
 	// this->roll = 0.0f;
 
-	this->position = glm::vec3(-41.578556f, 32.878662f, 25.848389f);
+	this->position = glm::vec3(-59.018436, 52.559010, 26.158541);
 	this->pitch = -21.300074f;
 	this->yaw = -1.018648f;
 	this->roll = 0.0f;

@@ -23,6 +23,8 @@ public:
 	glm::vec3	getLightPosition(void);
 	float		getPlaneWidth(void);
 	float		getPlaneHeight(void);
+	
+	void		setPosition(glm::vec3);
 
 	Camera	&operator=(const Camera &obj);
 

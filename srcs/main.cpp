@@ -9,6 +9,7 @@
 #include <engine/render/Camera.hpp>
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
+#include <model/Button.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -53,6 +54,7 @@ int	main(int argc, char **argv)
 	TextureManager	textureManager;
 	WaterSimulation	simulation;
 	Camera			camera;
+	Button			test(5, 5, 100, 100);
 
 	try
 	{
@@ -95,6 +97,7 @@ int	main(int argc, char **argv)
 		computation(&inputManager, &camera, &simulation);
 
 		// Drawing part
+		test.renderMesh(camera, shaderManager);
 		draw(context.window, &camera, &terrain,
 			&shaderManager, &simulation);
 	}

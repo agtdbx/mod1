@@ -117,6 +117,12 @@ float	Camera::getPlaneHeight(void)
 
 //---- Setters -----------------------------------------------------------------
 
+void		Camera::setPosition(glm::vec3 n_vec)
+{
+	this->position = n_vec;
+}
+
+
 //---- Operators ---------------------------------------------------------------
 
 Camera	&Camera::operator=(const Camera &obj)

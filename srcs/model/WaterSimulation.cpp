@@ -4,7 +4,7 @@
 
 //**** STATIC FUNCTIONS ********************************************************
 
-static float	vec3Length(glm::vec3 vec)
+static float	vec4Length(glm::vec4 vec)
 {
 	return (sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
@@ -176,26 +176,28 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 
 void	WaterSimulation::addWater(glm::vec3 position)
 {
-	this->positions.push_back(position);
-	this->predictedPositions.push_back(position);
-	this->velocities.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	this->positions.push_back(glm::vec4(position, 0.0f));
+	this->predictedPositions.push_back(glm::vec4(position, 0.0f));
+	this->velocities.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 	this->densities.push_back(0.0);
 	this->nbParticules++;
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 }
 
 
-void	WaterSimulation::tick(float delta)
+void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 {
-	this->computePredictedPositions(delta);
+	this->applyGravityAndEnergyLose(shaderManager, delta);
 
-	this->putParticlesInGrid();
+	this->computePredictedPositions(shaderManager, delta);
 
-	this->computeDensity();
+	this->putParticlesInGrid(shaderManager);
 
-	this->calculatesAndApplyPressure(delta);
+	this->computeDensity(shaderManager);
 
-	this->updatePositions(delta);
+	this->calculatesAndApplyPressure(shaderManager, delta);
+
+	this->updatePositions(shaderManager, delta);
 }
 
 
@@ -255,7 +257,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, this->textureBufferPositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
 	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 0);
 
 	int mapSizeLoc = glGetUniformLocation(shaderId, "mapSize");
@@ -370,7 +372,7 @@ void	WaterSimulation::generateFlatGrid(void)
 void	WaterSimulation::positionsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules,
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
 					this->positions.data(), GL_DYNAMIC_DRAW);
 }
 
@@ -378,7 +380,7 @@ void	WaterSimulation::positionsToBuffer(void)
 void	WaterSimulation::positionsFromBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
-	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec3) * this->nbParticules,
+	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * this->nbParticules,
 						this->positions.data());
 }
 
@@ -386,7 +388,7 @@ void	WaterSimulation::positionsFromBuffer(void)
 void	WaterSimulation::predictedPositionsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules,
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
 					this->predictedPositions.data(), GL_DYNAMIC_DRAW);
 }
 
@@ -394,7 +396,7 @@ void	WaterSimulation::predictedPositionsToBuffer(void)
 void	WaterSimulation::predictedPositionsFromBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec3) * this->nbParticules,
+	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * this->nbParticules,
 						this->predictedPositions.data());
 }
 
@@ -402,7 +404,7 @@ void	WaterSimulation::predictedPositionsFromBuffer(void)
 void	WaterSimulation::velocitiesToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferVelocities);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * this->nbParticules,
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
 					this->velocities.data(), GL_DYNAMIC_DRAW);
 }
 
@@ -410,7 +412,7 @@ void	WaterSimulation::velocitiesToBuffer(void)
 void	WaterSimulation::velocitiesFromBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferVelocities);
-	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec3) * this->nbParticules,
+	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * this->nbParticules,
 						this->velocities.data());
 }
 
@@ -463,39 +465,101 @@ void	WaterSimulation::gridOffsetsFromBuffer(void)
 }
 
 
-void	WaterSimulation::computePredictedPositions(float delta)
+void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, float delta)
 {
 	for (int i = 0; i < this->nbParticules; i++)
 	{
-		// Apply gravity
+		// Apply energy lose
 		this->velocities[i] *= ENERGY_LOSE;
-		this->velocities[i] += glm::vec3(0, -GRAVITY_FORCE, 0) * delta;
-
-		// Compute predicted position
-		this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
-
-		// Check if particule is out of the map on x axis
-		if (this->predictedPositions[i].x < WATER_RADIUS)
-			this->predictedPositions[i].x = WATER_RADIUS;
-		else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
-			this->predictedPositions[i].x = WATER_MAX_XZ;
-
-		// Check if particule is out of the map on y axis
-		if (this->predictedPositions[i].y < WATER_RADIUS)
-			this->predictedPositions[i].y = WATER_RADIUS;
-		else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
-			this->predictedPositions[i].y = WATER_MAX_HEIGHT;
-
-		// Check if particule is out of the map on z axis
-		if (this->predictedPositions[i].z < WATER_RADIUS)
-			this->predictedPositions[i].z = WATER_RADIUS;
-		else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
-			this->predictedPositions[i].z = WATER_MAX_XZ;
+		// Apply gravity
+		this->velocities[i] += glm::vec4(0, -GRAVITY_FORCE, 0, 0) * delta;
 	}
 }
 
 
-void	WaterSimulation::putParticlesInGrid(void)
+void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, float delta)
+{
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("predictedPositions");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	// Vectors to buffers
+	this->positionsToBuffer();
+	this->velocitiesToBuffer();
+	this->predictedPositionsToBuffer();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	int deltaLoc = glGetUniformLocation(shaderId, "delta");
+	glUniform1f(deltaLoc, delta);
+
+	int waterRadiusLoc = glGetUniformLocation(shaderId, "waterRadius");
+	glUniform1f(waterRadiusLoc, WATER_RADIUS);
+
+	int waterMaxXZLoc = glGetUniformLocation(shaderId, "waterMaxXZ");
+	glUniform1f(waterMaxXZLoc, WATER_MAX_XZ);
+
+	int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
+	glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glUniform1i(glGetUniformLocation(shaderId, "velocitiesBuffer"), 2);
+
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePredictedPositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
+	glBindImageTexture(0, this->texturePredictedPositions, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_RGBA32F);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+	// Buffer to vector
+	this->predictedPositionsFromBuffer();
+
+
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	// Compute predicted position
+	// 	this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
+
+	// 	// Check if particule is out of the map on x axis
+	// 	if (this->predictedPositions[i].x < WATER_RADIUS)
+	// 		this->predictedPositions[i].x = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
+	// 		this->predictedPositions[i].x = WATER_MAX_XZ;
+
+	// 	// Check if particule is out of the map on y axis
+	// 	if (this->predictedPositions[i].y < WATER_RADIUS)
+	// 		this->predictedPositions[i].y = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
+	// 		this->predictedPositions[i].y = WATER_MAX_HEIGHT;
+
+	// 	// Check if particule is out of the map on z axis
+	// 	if (this->predictedPositions[i].z < WATER_RADIUS)
+	// 		this->predictedPositions[i].z = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
+	// 		this->predictedPositions[i].z = WATER_MAX_XZ;
+	// }
+}
+
+
+void	WaterSimulation::putParticlesInGrid(ShaderManager *shaderManager)
 {
 	int	gx, gy, gz, gid;
 
@@ -520,7 +584,7 @@ void	WaterSimulation::putParticlesInGrid(void)
 }
 
 
-void	WaterSimulation::computeDensity(void)
+void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 {
 	for (int i = 0; i < this->nbParticules; i++)
 	{
@@ -529,15 +593,15 @@ void	WaterSimulation::computeDensity(void)
 }
 
 
-void	WaterSimulation::calculatesAndApplyPressure(float delta)
+void	WaterSimulation::calculatesAndApplyPressure(ShaderManager *shaderManager, float delta)
 {
-	glm::vec3	pressureForce, pressureAcceleration, viscosityForce;
+	glm::vec4	pressureForce, pressureAcceleration, viscosityForce;
 
 	for (int i = 0; i < this->nbParticules; i++)
 	{
 		if (this->densities[i] == 0.0f)
 		{
-			this->velocities[i] = glm::vec3(0.0f, 0.0f, 0.0f);
+			this->velocities[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			continue;
 		}
 
@@ -551,7 +615,7 @@ void	WaterSimulation::calculatesAndApplyPressure(float delta)
 }
 
 
-void	WaterSimulation::updatePositions(float delta)
+void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 {
 	for (int i = 0; i < this->nbParticules; i++)
 	{
@@ -605,7 +669,7 @@ void	WaterSimulation::updatePositions(float delta)
 }
 
 
-float	WaterSimulation::calculateDensity(glm::vec3 position)
+float	WaterSimulation::calculateDensity(glm::vec4 position)
 {
 	float	density, dst, influence;
 	int		px, py, pz, gx, gy, gz, gid;
@@ -637,7 +701,7 @@ float	WaterSimulation::calculateDensity(glm::vec3 position)
 
 				for (const int &i : this->grid[gid])
 				{
-					dst = vec3Length(this->positions[i] - position);
+					dst = vec4Length(this->positions[i] - position);
 					influence = smoothingKernel(dst);
 					density += WATER_MASS * influence;
 				}
@@ -649,13 +713,13 @@ float	WaterSimulation::calculateDensity(glm::vec3 position)
 }
 
 
-glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
+glm::vec4	WaterSimulation::calculatePressureForce(int particuleIndex)
 {
-	glm::vec3	pressureForce, position, dir;
+	glm::vec4	pressureForce, position, dir;
 	float		density, dst, slope, sharedPressure;
 	int			px, py, pz, gx, gy, gz, gid;
 
-	pressureForce = glm::vec3(0.0f, 0.0f, 0.0f);
+	pressureForce = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	position = this->predictedPositions[particuleIndex];
 	density = this->densities[particuleIndex];
@@ -689,9 +753,9 @@ glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
 						continue;
 
 					dir = this->predictedPositions[i] - position;
-					dst = vec3Length(dir);
+					dst = vec4Length(dir);
 					if (dst == 0.0f)
-						dir = glm::vec3(0.0f, 1.0f, 0.0f);
+						dir = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 					else
 						dir /= dst;
 					slope = smoothingKernelDerivate(dst);
@@ -706,13 +770,13 @@ glm::vec3	WaterSimulation::calculatePressureForce(int particuleIndex)
 }
 
 
-glm::vec3	WaterSimulation::calculateViscosityForce(int particuleIndex)
+glm::vec4	WaterSimulation::calculateViscosityForce(int particuleIndex)
 {
-	glm::vec3	viscosityForce, position, velocity, velocityDir;
+	glm::vec4	viscosityForce, position, velocity, velocityDir;
 	float		velocityLength, dst, influence;
 	int			px, py, pz, gx, gy, gz, gid;
 
-	viscosityForce = glm::vec3(0.0f, 0.0f, 0.0f);
+	viscosityForce = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	position = this->predictedPositions[particuleIndex];
 	velocity = this->velocities[particuleIndex];
@@ -747,11 +811,11 @@ glm::vec3	WaterSimulation::calculateViscosityForce(int particuleIndex)
 						continue;
 
 					velocityDir = this->velocities[i] - velocity;
-					velocityLength = vec3Length(velocityDir);
+					velocityLength = vec4Length(velocityDir);
 					if (velocityLength == 0.0f)
 						continue;
 					velocityDir /= velocityLength;
-					dst = vec3Length(position - this->predictedPositions[i]);
+					dst = vec4Length(position - this->predictedPositions[i]);
 					influence = viscositySmoothingKernel(dst);
 					viscosityForce += velocityDir * influence;
 				}

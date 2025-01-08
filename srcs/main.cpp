@@ -17,7 +17,8 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
-				WaterSimulation	*simulation);
+				WaterSimulation	*simulation,
+				ShaderManager *shaderManager);
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
@@ -71,7 +72,9 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		shaderManager.addShader("terrain", "data/shaders/terrain.glslv", "data/shaders/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water.glslv", "data/shaders/water.glslf");
-		shaderManager.addComputeShader("density", "data/shaders/density.glslc");
+		shaderManager.addComputeShader("test", "data/shaders/test.glslc"); // TODO: REMOVE
+		shaderManager.addComputeShader("test3", "data/shaders/test3.glslc"); // TODO: REMOVE
+		shaderManager.addComputeShader("predictedPositions", "data/shaders/predictedPositions.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -94,9 +97,9 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	// ComputeShader	*computeDensityShader = shaderManager.getComputeShader("density");
+	// ComputeShader	*computeTestShader = shaderManager.getComputeShader("test");
 
-	// if (computeDensityShader)
+	// if (computeTestShader)
 	// {
 	// 	printf("compute shader get\n");
 
@@ -113,6 +116,8 @@ int	main(int argc, char **argv)
 	// 	glGenBuffers(1, &textureBuffer);
 	// 	glGenTextures(1, &texture);
 
+	// 	computeTestShader->use();
+
 	// 	// Fill texture from data
 	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
 	// 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * dataSize,
@@ -124,11 +129,9 @@ int	main(int argc, char **argv)
 	// 	glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
 
 	// 	printf("compute shader use\n");
-	// 	computeDensityShader->use();
 	// 	printf("compute shader start compute\n");
 
-	// 	int workGroupSize = 256; // Choose a reasonable local size
-	// 	int numGroups = (dataSize + workGroupSize - 1) / workGroupSize;
+	// 	int numGroups = (dataSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	// 	glDispatchCompute((unsigned int)numGroups, 1, 1);
 
 	// 	// make sure writing to image has finished before read
@@ -150,6 +153,61 @@ int	main(int argc, char **argv)
 	// 	printf("]\n");
 	// }
 
+	// computeTestShader = shaderManager.getComputeShader("test3");
+	// if (computeTestShader)
+	// {
+	// 	printf("compute shader get\n");
+
+	// 	// Create data
+	// 	std::vector<glm::vec4>	data;
+	// 	const int				dataSize = 10;
+
+	// 	for (int i = 0; i < dataSize; i++)
+	// 		data.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+	// 	// Create texture
+	// 	unsigned int textureBuffer, texture;
+
+	// 	glGenBuffers(1, &textureBuffer);
+	// 	glGenTextures(1, &texture);
+
+	// 	computeTestShader->use();
+
+	// 	// Fill texture from data
+	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+	// 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * dataSize,
+	// 					data.data(), GL_DYNAMIC_DRAW);
+	// 	glActiveTexture(GL_TEXTURE0);
+	// 	glBindTexture(GL_TEXTURE_BUFFER, texture);
+	// 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, textureBuffer);
+
+	// 	glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+	// 	printf("compute shader use\n");
+	// 	printf("compute shader start compute\n");
+
+	// 	int numGroups = (dataSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
+	// 	glDispatchCompute((unsigned int)numGroups, 1, 1);
+
+	// 	// make sure writing to image has finished before read
+	// 	printf("compute shader wait end compute\n");
+	// 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// 	printf("compute shader end compute\n");
+
+	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+	// 	// Get data from texture
+	// 	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * dataSize, data.data());
+
+	// 	printf("[");
+	// 	for (int i = 0; i < dataSize; i++)
+	// 	{
+	// 		if (i != 0)
+	// 			printf(", ");
+	// 		printf("(%i %i %i)", (int)data[i].x, (int)data[i].y, (int)data[i].z);
+	// 	}
+	// 	printf("]\n");
+	// }
+
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))
 	{
@@ -160,7 +218,7 @@ int	main(int argc, char **argv)
 			break;
 
 		// Compute part
-		computation(&inputManager, &camera, &simulation);
+		computation(&inputManager, &camera, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -187,7 +245,8 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
-				WaterSimulation	*simulation)
+				WaterSimulation	*simulation,
+				ShaderManager *shaderManager)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
@@ -253,7 +312,7 @@ static void	computation(
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
-	simulation->tick(delta);
+	simulation->tick(shaderManager, delta);
 }
 
 

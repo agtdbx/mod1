@@ -21,13 +21,13 @@ public:
 	WaterSimulation	&operator=(const WaterSimulation &obj);
 
 	void	addWater(glm::vec3 position);
-	void	tick(float delta);
+	void	tick(ShaderManager *shaderManager, float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager);
 
 private:
-	std::vector<glm::vec3>	positions;
-	std::vector<glm::vec3>	predictedPositions;
-	std::vector<glm::vec3>	velocities;
+	std::vector<glm::vec4>	positions;
+	std::vector<glm::vec4>	predictedPositions;
+	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
 	std::vector<float>		gridFlat, gridOffsets;
@@ -58,15 +58,16 @@ private:
 	void		gridOffsetsToBuffer(void);
 	void		gridOffsetsFromBuffer(void);
 
-	void		computePredictedPositions(float delta);
-	void		putParticlesInGrid(void);
-	void		computeDensity(void);
-	void		calculatesAndApplyPressure(float delta);
-	void		updatePositions(float delta);
+	void		applyGravityAndEnergyLose(ShaderManager *shaderManager, float delta);
+	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
+	void		putParticlesInGrid(ShaderManager *shaderManager);
+	void		computeDensity(ShaderManager *shaderManager);
+	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
+	void		updatePositions(ShaderManager *shaderManager, float delta);
 
-	float		calculateDensity(glm::vec3 position);
-	glm::vec3	calculatePressureForce(int particuleIndex);
-	glm::vec3	calculateViscosityForce(int particuleIndex);
+	float		calculateDensity(glm::vec4 position);
+	glm::vec4	calculatePressureForce(int particuleIndex);
+	glm::vec4	calculateViscosityForce(int particuleIndex);
 };
 
 #endif

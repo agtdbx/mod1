@@ -83,7 +83,6 @@ void	ComputeShader::load(std::string cShaderPath)
 	if(!success)
 	{
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
-		printf("tkt %s\n", infoLog);
 		std::string	infoString(infoLog);
 		throw std::invalid_argument("Compute shader compilation failed : " + infoString);
 	}

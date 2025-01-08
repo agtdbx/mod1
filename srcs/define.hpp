@@ -6,7 +6,7 @@
 /*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/08 14:29:22 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:38:39 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@
 # define WIN_TITLE "mod1"
 
 # define MAX_XY 100
-# define MAX_HEIGHT 50
-# define MAP_SIZE 200
-// # define MAX_HEIGHT 40
-// # define MAP_SIZE 50
+// # define MAX_HEIGHT 50
+// # define MAP_SIZE 200
+# define MAX_HEIGHT 40
+# define MAP_SIZE 50
 # define TERRAIN_PRECISION 0.01
 
 # define CAMERA_FOV 45.0f

@@ -54,7 +54,6 @@ int	main(int argc, char **argv)
 	WaterSimulation	simulation;
 	Camera			camera;
 
-	context.setDrawMode(false);
 	try
 	{
 		terrain.loadFromFile(argv[1]);
@@ -70,18 +69,18 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	// int	nbWater[] = {10, 10, 10};
-	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	// for (int i = 0; i < nbWater[0]; i++)
-	// {
-	// 	for (int j = 0; j < nbWater[2]; j++)
-	// 	{
-	// 		for (int k = 0; k < nbWater[1]; k++)
-	// 		{
-	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
-	// 		}
-	// 	}
-	// }
+	int	nbWater[] = {10, 10, 10};
+	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
+	for (int i = 0; i < nbWater[0]; i++)
+	{
+		for (int j = 0; j < nbWater[2]; j++)
+		{
+			for (int k = 0; k < nbWater[1]; k++)
+			{
+				simulation.addWater(glm::vec3(i, k, j) + offset);
+			}
+		}
+	}
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))

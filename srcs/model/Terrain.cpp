@@ -14,6 +14,8 @@ Terrain::Terrain(const Terrain &obj)
 	this->parameterPoints = obj.parameterPoints;
 	this->heightmap = obj.heightmap;
 	this->mesh = obj.mesh;
+	this->squaresPoints = obj.squaresPoints;
+
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -38,6 +40,7 @@ Terrain	&Terrain::operator=(const Terrain &obj)
 	this->parameterPoints = obj.parameterPoints;
 	this->heightmap = obj.heightmap;
 	this->mesh = obj.mesh;
+	this->squaresPoints = obj.squaresPoints;
 
 	return (*this);
 }
@@ -210,8 +213,10 @@ void	Terrain::createMesh(void)
 			{
 				for (int x_n = x; x_n < MAP_SIZE - 1; x_n++)
 				{
+					bool test = checkIsInDequekSave(triangleSave, vertices[y_n * MAP_SIZE + x_n]);
 					if (vertices[y_n * MAP_SIZE + x_n].normal != testVect or vertices[y_n * MAP_SIZE + (x_n + 1)].normal != testVect or
-						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect)
+						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect
+						or test)
 					{
 						if (len1 == MAP_SIZE + 42)
 						{
@@ -231,14 +236,15 @@ void	Terrain::createMesh(void)
 					}
 					else if (y_n == x_n && x_n == MAP_SIZE - 2)
 					{
-						if (len1 == 0)
-							len1 = 1;
+						// if (len1 == 0)
+						// 	len1 = 1;
 						if (len1 == MAP_SIZE + 42)
 						{
 							len1 = x_n - x;
 						}
 						pair1.first = &vertices[y * MAP_SIZE + x];
-						pair1.second = &vertices[y_n * MAP_SIZE + x + len1];	
+						std::cout << "test :" <<  (y_n +1 ) * MAP_SIZE + x + len1 + 1 << std::endl;
+						pair1.second = &vertices[(y_n + 1 ) * MAP_SIZE + x + len1 + 1 ];	
 					}
 				}
 				if (pair1.first)
@@ -254,8 +260,11 @@ void	Terrain::createMesh(void)
 			{
 				for (int y_n = y; y_n < MAP_SIZE - 1; y_n++)
 				{
+					bool test = checkIsInDequekSave(triangleSave, vertices[y_n * MAP_SIZE + x_n]);
+
 					if (vertices[y_n * MAP_SIZE + x_n].normal != testVect or vertices[y_n * MAP_SIZE + (x_n + 1)].normal != testVect or
-						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect)
+						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect
+						or test)
 					{
 						if (len2 == MAP_SIZE + 42)
 						{
@@ -275,14 +284,14 @@ void	Terrain::createMesh(void)
 					}
 					else if (y_n == x_n && x_n == MAP_SIZE - 2)
 					{
-						if (len2 == 0)
-							len2 = 1;
+						// if (len2 == 0)
+						// 	len2 = 1;
 						if (len2 == MAP_SIZE + 42)
 						{
 							len2 = y_n - y;
 						}
 						pair2.first = &vertices[y * MAP_SIZE + x];
-						pair2.second = &vertices[(y + len2) * MAP_SIZE + x_n];		
+						pair2.second = &vertices[(y + len2 + 1) * MAP_SIZE + x_n + 1];		
 					}
 				}
 				if (pair2.first)
@@ -290,8 +299,13 @@ void	Terrain::createMesh(void)
 				if (len2 == MAP_SIZE + 42)
 					len2 = MAP_SIZE - 2 - y;
 			}
-			int T1 = (pair1.first->pos.x + pair1.second->pos.x) * (pair1.first->pos.z + pair1.second->pos.z);
-			int T2 = (pair2.first->pos.x + pair2.second->pos.x) * (pair2.first->pos.z + pair2.second->pos.z);
+			// std::cout << "test : " << pair1.first << std::endl;
+			int T1 = 0;
+			int T2 = 0;
+			if (pair1.first)
+				T1 = (pair1.first->pos.x + pair1.second->pos.x) * (pair1.first->pos.z + pair1.second->pos.z);
+			if (pair2.first)
+				T2 = (pair2.first->pos.x + pair2.second->pos.x) * (pair2.first->pos.z + pair2.second->pos.z);
 			if (T1  > T2)
 			{
 				id_tl = pair1.first->pos.z * MAP_SIZE + pair1.first->pos.x;
@@ -310,7 +324,15 @@ void	Terrain::createMesh(void)
 			}
 			indices.push_back((t_tri_id){id_tl, id_tr, id_dr});
 			indices.push_back((t_tri_id){id_tl, id_dr, id_dl});
+
 		}
 	}
+	std::cout << "nb triangle : " << indices.size() << std::endl;
 	this->mesh = Mesh(vertices, indices);
+	for (std::pair<Point &, Point &>  pair : triangleSave)
+	{
+		std::cout << "square : " << pair.first.pos << " to " << pair.second.pos << "" <<std::endl;
+		this->squaresPoints.push_back(glm::vec3(pair.first.pos.x, pair.first.pos.y, pair.first.pos.z));
+		this->squaresPoints.push_back(glm::vec3(pair.second.pos.x, pair.second.pos.y, pair.second.pos.z));
+	}
 }

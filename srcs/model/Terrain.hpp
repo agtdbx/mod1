@@ -22,6 +22,7 @@ public:
 private:
 	std::vector<Vec3>					parameterPoints;
 	std::vector<std::vector<double>>	heightmap;
+	std::vector<glm::vec3>				squaresPoints;
 	Mesh								mesh;
 
 	void	initEmptyMap(void);

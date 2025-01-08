@@ -266,7 +266,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	glUniform3fv(waterColorLoc, 1, glm::value_ptr(WATER_COLOR));
 
 	int smoothingRadiusLoc = glGetUniformLocation(shaderId, "smoothingRadius");
-	glUniform1i(smoothingRadiusLoc, SMOOTHING_RADIUS);
+	glUniform1f(smoothingRadiusLoc, SMOOTHING_RADIUS);
 
 	int nbPositionsLoc = glGetUniformLocation(shaderId, "nbPositions");
 	glUniform1i(nbPositionsLoc, this->nbParticules);
@@ -495,81 +495,81 @@ void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, fl
 
 void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, float delta)
 {
-	// ComputeShader	*computeShader;
-	// unsigned int	shaderId;
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
 
-	// // Get the compute shader
-	// computeShader = shaderManager->getComputeShader("predictedPositions");
-	// if (!computeShader)
-	// 	return ;
-	// shaderId = computeShader->getShaderId();
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("predictedPositions");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
 
-	// // Vectors to buffers
-	// this->positionsToBuffer();
-	// this->velocitiesToBuffer();
+	// Vectors to buffers
+	this->positionsToBuffer();
+	this->velocitiesToBuffer();
 
-	// computeShader->use();
+	computeShader->use();
 
-	// // Compute shader inputs setup
-	// int deltaLoc = glGetUniformLocation(shaderId, "delta");
-	// glUniform1f(deltaLoc, delta);
+	// Compute shader inputs setup
+	int deltaLoc = glGetUniformLocation(shaderId, "delta");
+	glUniform1f(deltaLoc, delta);
 
-	// int waterRadiusLoc = glGetUniformLocation(shaderId, "waterRadius");
-	// glUniform1f(waterRadiusLoc, WATER_RADIUS);
+	int waterRadiusLoc = glGetUniformLocation(shaderId, "waterRadius");
+	glUniform1f(waterRadiusLoc, WATER_RADIUS);
 
-	// int waterMaxXZLoc = glGetUniformLocation(shaderId, "waterMaxXZ");
-	// glUniform1f(waterMaxXZLoc, WATER_MAX_XZ);
+	int waterMaxXZLoc = glGetUniformLocation(shaderId, "waterMaxXZ");
+	glUniform1f(waterMaxXZLoc, WATER_MAX_XZ);
 
-	// int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
-	// glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
+	int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
+	glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
 
-	// glActiveTexture(GL_TEXTURE1);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	// glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 1);
 
-	// glActiveTexture(GL_TEXTURE2);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
-	// glUniform1i(glGetUniformLocation(shaderId, "velocitiesBuffer"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glUniform1i(glGetUniformLocation(shaderId, "velocitiesBuffer"), 2);
 
-	// // Compute shader output setup
-	// glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->texturePredictedPositions);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
-	// glBindImageTexture(0, this->texturePredictedPositions, 0, GL_FALSE, 0,
-	// 						GL_WRITE_ONLY, GL_RGBA32F);
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePredictedPositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
+	glBindImageTexture(0, this->texturePredictedPositions, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_RGBA32F);
 
-	// // Run compute shader
-	// glDispatchCompute((unsigned int)this->numGroups, 1, 1);
-	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-	// // Buffer to vector
-	// this->predictedPositionsFromBuffer();
+	// Buffer to vector
+	this->predictedPositionsFromBuffer();
 
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		// Compute predicted position
-		this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	// Compute predicted position
+	// 	this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
 
-		// Check if particule is out of the map on x axis
-		if (this->predictedPositions[i].x < WATER_RADIUS)
-			this->predictedPositions[i].x = WATER_RADIUS;
-		else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
-			this->predictedPositions[i].x = WATER_MAX_XZ;
+	// 	// Check if particule is out of the map on x axis
+	// 	if (this->predictedPositions[i].x < WATER_RADIUS)
+	// 		this->predictedPositions[i].x = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
+	// 		this->predictedPositions[i].x = WATER_MAX_XZ;
 
-		// Check if particule is out of the map on y axis
-		if (this->predictedPositions[i].y < WATER_RADIUS)
-			this->predictedPositions[i].y = WATER_RADIUS;
-		else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
-			this->predictedPositions[i].y = WATER_MAX_HEIGHT;
+	// 	// Check if particule is out of the map on y axis
+	// 	if (this->predictedPositions[i].y < WATER_RADIUS)
+	// 		this->predictedPositions[i].y = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
+	// 		this->predictedPositions[i].y = WATER_MAX_HEIGHT;
 
-		// Check if particule is out of the map on z axis
-		if (this->predictedPositions[i].z < WATER_RADIUS)
-			this->predictedPositions[i].z = WATER_RADIUS;
-		else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
-			this->predictedPositions[i].z = WATER_MAX_XZ;
-	}
+	// 	// Check if particule is out of the map on z axis
+	// 	if (this->predictedPositions[i].z < WATER_RADIUS)
+	// 		this->predictedPositions[i].z = WATER_RADIUS;
+	// 	else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
+	// 		this->predictedPositions[i].z = WATER_MAX_XZ;
+	// }
 }
 
 

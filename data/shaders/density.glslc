@@ -1,0 +1,14 @@
+#version 430 core
+
+layout (local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+layout(r32f, binding = 0) uniform imageBuffer imgBuffer;
+
+void main()
+{
+	int index = int(gl_GlobalInvocationID.x);
+	float value = float(gl_GlobalInvocationID.x);
+
+	// Write the value to the buffer
+	imageStore(imgBuffer, index, vec4(value, 0.0, 0.0, 1.0));
+}

@@ -13,6 +13,13 @@ ComputeShader::ComputeShader(void)
 }
 
 
+ComputeShader::ComputeShader(std::string cShaderPath)
+{
+	this->id = -1;
+	this->load(cShaderPath);
+}
+
+
 ComputeShader::ComputeShader(const ComputeShader &obj)
 {
 	this->id = obj.id;
@@ -65,7 +72,7 @@ void	ComputeShader::load(std::string cShaderPath)
 	const char		*cShaderCode = shaderCode.c_str();
 	unsigned int	computeShader;
 	int				success;
-	char			infoLog[512];
+	char			infoLog[512] = {0};
 
 	// compute shader
 	computeShader = glCreateShader(GL_COMPUTE_SHADER);
@@ -73,12 +80,12 @@ void	ComputeShader::load(std::string cShaderPath)
 	glCompileShader(computeShader);
 
 	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
-
 	if(!success)
 	{
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
+		printf("tkt %s\n", infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Fragment shader compilation failed : " + infoString);
+		throw std::invalid_argument("Compute shader compilation failed : " + infoString);
 	}
 
 	// shader Program
@@ -91,7 +98,7 @@ void	ComputeShader::load(std::string cShaderPath)
 	{
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("Shader program linking failed : " + infoString);
+		throw std::invalid_argument("Shader program linking failed : " + infoString);
 	}
 
 	glDeleteShader(computeShader);

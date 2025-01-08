@@ -47,6 +47,17 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	// TODO: REMOVE
+	// int	max_x_gpu_worker, max_y_gpu_worker, max_z_gpu_worker, max_gpu_group;
+	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &max_x_gpu_worker);
+	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &max_y_gpu_worker);
+	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &max_z_gpu_worker);
+	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &max_gpu_group);
+	// printf("max_x_gpu_worker : %i\n", max_x_gpu_worker);
+	// printf("max_y_gpu_worker : %i\n", max_y_gpu_worker);
+	// printf("max_z_gpu_worker : %i\n", max_z_gpu_worker);
+	// printf("max_gpu_group : %i\n", max_gpu_group);
+
 	InputManager	inputManager(context.window);
 	Terrain			terrain;
 	ShaderManager	shaderManager;
@@ -60,6 +71,7 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		shaderManager.addShader("terrain", "data/shaders/terrain.glslv", "data/shaders/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water.glslv", "data/shaders/water.glslf");
+		shaderManager.addComputeShader("density", "data/shaders/density.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -80,6 +92,64 @@ int	main(int argc, char **argv)
 				simulation.addWater(glm::vec3(i, k, j) + offset);
 			}
 		}
+	}
+
+	ComputeShader	*computeDensityShader = shaderManager.getComputeShader("density");
+
+	if (computeDensityShader)
+	{
+		printf("compute shader get\n");
+
+		// Create data
+		std::vector<float>	data;
+		const int			dataSize = 100000;
+
+		for (int i = 0; i < dataSize; i++)
+			data.push_back(0.0f);
+
+		// Create texture
+		unsigned int textureBuffer, texture;
+
+		glGenBuffers(1, &textureBuffer);
+		glGenTextures(1, &texture);
+
+		// Fill texture from data
+		glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+		glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * dataSize,
+						data.data(), GL_DYNAMIC_DRAW);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_BUFFER, texture);
+		glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, textureBuffer);
+
+		glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+
+		printf("compute shader use\n");
+		computeDensityShader->use();
+		printf("compute shader start compute\n");
+
+		int workGroupSize = 256; // Choose a reasonable local size
+		int numGroups = (dataSize + workGroupSize - 1) / workGroupSize;
+		glDispatchCompute((unsigned int)numGroups, 1, 1);
+
+		// make sure writing to image has finished before read
+		printf("compute shader wait end compute\n");
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		printf("compute shader end compute\n");
+
+		glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+		data.resize(dataSize);
+		// Get data from texture
+		glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(float) * dataSize, data.data());
+		glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+		printf("[");
+		for (int i = 0; i < dataSize; i++)
+		{
+			if (i != 0)
+				printf(", ");
+			printf("%i", (int)data[i]);
+		}
+		printf("]\n");
 	}
 
 	// Main loop

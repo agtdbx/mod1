@@ -405,22 +405,22 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 void	WaterSimulation::generateTextureBuffer(void)
 {
 	glGenBuffers(1, &this->textureBufferPositions);
-	glGenTextures(1, &texturePositions);
+	glGenTextures(1, &this->texturePositions);
 
 	glGenBuffers(1, &this->textureBufferPredictedPositions);
-	glGenTextures(1, &texturePredictedPositions);
+	glGenTextures(1, &this->texturePredictedPositions);
 
 	glGenBuffers(1, &this->textureBufferVelocities);
-	glGenTextures(1, &textureVelocities);
+	glGenTextures(1, &this->textureVelocities);
 
 	glGenBuffers(1, &this->textureBufferDensities);
-	glGenTextures(1, &textureDensities);
+	glGenTextures(1, &this->textureDensities);
 
 	glGenBuffers(1, &this->textureBufferGridFlat);
-	glGenTextures(1, &textureGridFlat);
+	glGenTextures(1, &this->textureGridFlat);
 
 	glGenBuffers(1, &this->textureBufferGridOffsets);
-	glGenTextures(1, &textureGridOffsets);
+	glGenTextures(1, &this->textureGridOffsets);
 }
 
 

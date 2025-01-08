@@ -79,7 +79,7 @@ void	WaterShader::load(std::string vShaderPath, std::string fShaderPath)
 		char infoLog[512];
 		glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 		std::string	infoString(infoLog);
-		throw new std::invalid_argument("WaterShader program linking failed : " + infoString);
+		throw std::invalid_argument("WaterShader program linking failed : " + infoString);
 	}
 
 	// Delete base shader because there are useless now

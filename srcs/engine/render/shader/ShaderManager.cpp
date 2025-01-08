@@ -54,6 +54,19 @@ Shader	*ShaderManager::getShader(std::string shaderName)
 }
 
 
+ComputeShader	*ShaderManager::getComputeShader(std::string shaderName)
+{
+	std::unordered_map<std::string, ComputeShader>::iterator	checkShader;
+
+	checkShader = this->computeShaders.find(shaderName);
+
+	if (checkShader == this->computeShaders.end())
+		return (NULL);
+
+	return (&checkShader->second);
+}
+
+
 WaterShader	*ShaderManager::getWaterShader(void)
 {
 	return (&this->waterShader);
@@ -78,6 +91,10 @@ ShaderManager	&ShaderManager::operator=(const ShaderManager &obj)
 	this->VBO = -1;
 	this->EBO = -1;
 
+	this->shaders = obj.shaders;
+	this->waterShader = obj.waterShader;
+	this->computeShaders = obj.computeShaders;
+
 	return (*this);
 }
 
@@ -100,6 +117,26 @@ void	ShaderManager::addShader(
 	Shader	shader(vShaderFile, fShaderFile);
 
 	this->shaders.insert(std::pair<std::string, Shader>(shaderName, shader));
+}
+
+
+void	ShaderManager::addComputeShader(
+						std::string shaderName,
+						std::string cShaderFile)
+{
+	std::unordered_map<std::string, ComputeShader>::const_iterator	checkShader;
+
+	checkShader = this->computeShaders.find(shaderName);
+
+	// If shader exist, error
+	if (checkShader != this->computeShaders.end())
+		throw std::invalid_argument("Compute shader name '" + shaderName
+										+ "' is already took");
+
+	ComputeShader	computeShader(cShaderFile);
+
+	this->computeShaders.insert(
+			std::pair<std::string, ComputeShader>(shaderName, computeShader));
 }
 
 

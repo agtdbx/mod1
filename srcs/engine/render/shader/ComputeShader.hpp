@@ -9,6 +9,7 @@ class ComputeShader
 {
 public:
 	ComputeShader(void);
+	ComputeShader(std::string cShaderPath);
 	ComputeShader(const ComputeShader &obj);
 	~ComputeShader();
 

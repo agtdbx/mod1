@@ -203,17 +203,17 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 		this->needToUpdateBuffers = false;
 	}
 
-	this->applyGravityAndEnergyLose(shaderManager, delta);
+	this->applyGravityAndEnergyLose(shaderManager, delta); // cpu
 
-	this->computePredictedPositions(shaderManager, delta);
+	this->computePredictedPositions(shaderManager, delta); // gpu
 
-	this->putParticlesInGrid(shaderManager);
+	this->putParticlesInGrid(shaderManager); // cpu
 
-	this->computeDensity(shaderManager);
+	this->computeDensity(shaderManager); // gpu
 
-	this->calculatesAndApplyPressure(shaderManager, delta);
+	this->calculatesAndApplyPressure(shaderManager, delta); // cpu
 
-	this->updatePositions(shaderManager, delta);
+	this->updatePositions(shaderManager, delta); // cpu
 }
 
 
@@ -600,81 +600,78 @@ void	WaterSimulation::putParticlesInGrid(ShaderManager *shaderManager)
 
 void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 {
-	// ComputeShader	*computeShader;
-	// unsigned int	shaderId;
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
 
-	// // Get the compute shader
-	// computeShader = shaderManager->getComputeShader("densities");
-	// if (!computeShader)
-	// 	return ;
-	// shaderId = computeShader->getShaderId();
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("densities");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
 
-	// this->densitiesToBuffer();
+	computeShader->use();
 
-	// // Compute shader inputs setup
-	// int smoothingRadiusLoc = glGetUniformLocation(shaderId, "smoothingRadius");
-	// glUniform1f(smoothingRadiusLoc, SMOOTHING_RADIUS);
+	// Compute shader inputs setup
+	int smoothingRadiusLoc = glGetUniformLocation(shaderId, "smoothingRadius");
+	glUniform1f(smoothingRadiusLoc, SMOOTHING_RADIUS);
 
-	// int smoothingScaleLoc = glGetUniformLocation(shaderId, "smoothingScale");
-	// glUniform1f(smoothingScaleLoc, SMOOTHING_SCALE);
+	int smoothingScaleLoc = glGetUniformLocation(shaderId, "smoothingScale");
+	glUniform1f(smoothingScaleLoc, SMOOTHING_SCALE);
 
-	// int waterMassLoc = glGetUniformLocation(shaderId, "waterMass");
-	// glUniform1f(waterMassLoc, WATER_MASS);
+	int waterMassLoc = glGetUniformLocation(shaderId, "waterMass");
+	glUniform1f(waterMassLoc, WATER_MASS);
 
-	// int gridWLoc = glGetUniformLocation(shaderId, "gridW");
-	// glUniform1i(gridWLoc, this->gridW);
+	int gridWLoc = glGetUniformLocation(shaderId, "gridW");
+	glUniform1i(gridWLoc, this->gridW);
 
-	// int gridHLoc = glGetUniformLocation(shaderId, "gridH");
-	// glUniform1i(gridHLoc, this->gridH);
+	int gridHLoc = glGetUniformLocation(shaderId, "gridH");
+	glUniform1i(gridHLoc, this->gridH);
 
-	// int gridDLoc = glGetUniformLocation(shaderId, "gridD");
-	// glUniform1i(gridDLoc, this->gridD);
+	int gridDLoc = glGetUniformLocation(shaderId, "gridD");
+	glUniform1i(gridDLoc, this->gridD);
 
-	// int idHsizeLoc = glGetUniformLocation(shaderId, "idHsize");
-	// glUniform1i(idHsizeLoc, this->idHsize);
+	int idHsizeLoc = glGetUniformLocation(shaderId, "idHsize");
+	glUniform1i(idHsizeLoc, this->idHsize);
 
-	// int gridSizeLoc = glGetUniformLocation(shaderId, "gridSize");
-	// glUniform1i(gridSizeLoc, this->gridFlatSize);
+	int gridSizeLoc = glGetUniformLocation(shaderId, "gridSize");
+	glUniform1i(gridSizeLoc, this->gridFlatSize);
 
-	// glActiveTexture(GL_TEXTURE1);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridFlat);
-	// glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridFlat);
+	glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
 
-	// int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
-	// glUniform1i(offsetsSizeLoc, this->gridOffsetsSize);
+	int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
+	glUniform1i(offsetsSizeLoc, this->gridOffsetsSize);
 
-	// glActiveTexture(GL_TEXTURE2);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridOffsets);
-	// glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridOffsets);
+	glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
 
-	// glActiveTexture(GL_TEXTURE3);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	// glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 3);
 
-	// // Compute shader output setup
-	// glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_BUFFER, this->textureDensities);
-	// glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferDensities);
-	// glBindImageTexture(0, this->textureDensities, 0, GL_FALSE, 0,
-	// 						GL_WRITE_ONLY, GL_R32F);
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureDensities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferDensities);
+	glBindImageTexture(0, this->textureDensities, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_R32F);
 
-	// // Run compute shader
-	// glDispatchCompute((unsigned int)this->numGroups, 1, 1);
-	// glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-	// // Buffer to vector
-	// this->densitiesFromBuffer();
+	// Buffer to vector
+	this->densitiesFromBuffer();
 
-	// if (this->densities[0] == -1.0f)
-	// 	printf("askdjkasjdl\n");
-
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
-	}
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
+	// }
 }
 
 

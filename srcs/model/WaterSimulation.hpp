@@ -31,6 +31,7 @@ private:
 	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
 	std::vector<float>		gridFlat, gridOffsets;
+	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize, idHsize, numGroups;

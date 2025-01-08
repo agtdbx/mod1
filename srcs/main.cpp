@@ -94,63 +94,61 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	ComputeShader	*computeDensityShader = shaderManager.getComputeShader("density");
+	// ComputeShader	*computeDensityShader = shaderManager.getComputeShader("density");
 
-	if (computeDensityShader)
-	{
-		printf("compute shader get\n");
+	// if (computeDensityShader)
+	// {
+	// 	printf("compute shader get\n");
 
-		// Create data
-		std::vector<float>	data;
-		const int			dataSize = 100000;
+	// 	// Create data
+	// 	std::vector<float>	data;
+	// 	const int			dataSize = 10;
 
-		for (int i = 0; i < dataSize; i++)
-			data.push_back(0.0f);
+	// 	for (int i = 0; i < dataSize; i++)
+	// 		data.push_back(0.0f);
 
-		// Create texture
-		unsigned int textureBuffer, texture;
+	// 	// Create texture
+	// 	unsigned int textureBuffer, texture;
 
-		glGenBuffers(1, &textureBuffer);
-		glGenTextures(1, &texture);
+	// 	glGenBuffers(1, &textureBuffer);
+	// 	glGenTextures(1, &texture);
 
-		// Fill texture from data
-		glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-		glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * dataSize,
-						data.data(), GL_DYNAMIC_DRAW);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_BUFFER, texture);
-		glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, textureBuffer);
+	// 	// Fill texture from data
+	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+	// 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * dataSize,
+	// 					data.data(), GL_DYNAMIC_DRAW);
+	// 	glActiveTexture(GL_TEXTURE0);
+	// 	glBindTexture(GL_TEXTURE_BUFFER, texture);
+	// 	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, textureBuffer);
 
-		glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+	// 	glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
 
-		printf("compute shader use\n");
-		computeDensityShader->use();
-		printf("compute shader start compute\n");
+	// 	printf("compute shader use\n");
+	// 	computeDensityShader->use();
+	// 	printf("compute shader start compute\n");
 
-		int workGroupSize = 256; // Choose a reasonable local size
-		int numGroups = (dataSize + workGroupSize - 1) / workGroupSize;
-		glDispatchCompute((unsigned int)numGroups, 1, 1);
+	// 	int workGroupSize = 256; // Choose a reasonable local size
+	// 	int numGroups = (dataSize + workGroupSize - 1) / workGroupSize;
+	// 	glDispatchCompute((unsigned int)numGroups, 1, 1);
 
-		// make sure writing to image has finished before read
-		printf("compute shader wait end compute\n");
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-		printf("compute shader end compute\n");
+	// 	// make sure writing to image has finished before read
+	// 	printf("compute shader wait end compute\n");
+	// 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// 	printf("compute shader end compute\n");
 
-		glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-		data.resize(dataSize);
-		// Get data from texture
-		glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(float) * dataSize, data.data());
-		glBindBuffer(GL_TEXTURE_BUFFER, 0);
+	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
+	// 	// Get data from texture
+	// 	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(float) * dataSize, data.data());
 
-		printf("[");
-		for (int i = 0; i < dataSize; i++)
-		{
-			if (i != 0)
-				printf(", ");
-			printf("%i", (int)data[i]);
-		}
-		printf("]\n");
-	}
+	// 	printf("[");
+	// 	for (int i = 0; i < dataSize; i++)
+	// 	{
+	// 		if (i != 0)
+	// 			printf(", ");
+	// 		printf("%i", (int)data[i]);
+	// 	}
+	// 	printf("]\n");
+	// }
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))

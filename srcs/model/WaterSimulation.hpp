@@ -30,17 +30,22 @@ private:
 	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
-	std::vector<float>		gridFlat, gridOffsets;
+	std::vector<std::vector<int>> renderGrid;
+	std::vector<float>		gridFlat, gridOffsets, renderGridFlat, renderGridOffsets;
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridFlatSize, gridOffsetsSize, idHsize, numGroups;
+							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
+							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
+							renderGridFlatSize, renderGridOffsetsSize;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
 							textureBufferGridFlat, textureGridFlat,
-							textureBufferGridOffsets, textureGridOffsets;
+							textureBufferGridOffsets, textureGridOffsets,
+							textureBufferRenderGridFlat, textureRenderGridFlat,
+							textureBufferRenderGridOffsets, textureRenderGridOffsets;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
@@ -55,9 +60,9 @@ private:
 	void		densitiesToBuffer(void);
 	void		densitiesFromBuffer(void);
 	void		gridFlatToBuffer(void);
-	void		gridFlatFromBuffer(void);
 	void		gridOffsetsToBuffer(void);
-	void		gridOffsetsFromBuffer(void);
+	void		renderGridFlatToBuffer(void);
+	void		renderGridOffsetsToBuffer(void);
 
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);

@@ -3,28 +3,28 @@
 out vec4		FragColor;
 in vec2			pointPos;
 
-uniform vec3	lightPos;
-uniform vec3	cameraPos;
-uniform vec3	cameraFront;
-uniform vec3	cameraRight;
-uniform vec3	cameraUp;
-uniform float	cameraFar;
-uniform float	planeWidth;
-uniform float	planeHeight;
-uniform float	waterRadius2;
-uniform vec3	waterColor;
-uniform float	smoothingRadius;
-uniform int		nbPositions;
-uniform samplerBuffer positionsBuffer;
-uniform int		mapSize;
-uniform int		mapHeight;
-uniform int		gridW;
-uniform int		gridH;
-uniform int		gridD;
-uniform int		gridSize;
-uniform samplerBuffer gridBuffer;
-uniform int		offsetsSize;
-uniform samplerBuffer offsetsBuffer;
+uniform vec3			lightPos;
+uniform vec3			cameraPos;
+uniform vec3			cameraFront;
+uniform vec3			cameraRight;
+uniform vec3			cameraUp;
+uniform float			cameraFar;
+uniform float			planeWidth;
+uniform float			planeHeight;
+uniform float			waterRadius2;
+uniform vec3			waterColor;
+uniform float			renderCellSize;
+uniform int				nbPositions;
+uniform samplerBuffer	positionsBuffer;
+uniform int				mapSize;
+uniform int				mapHeight;
+uniform int				renderGridW;
+uniform int				renderGridH;
+uniform int				renderGridD;
+uniform int				renderGridSize;
+uniform int				renderOffsetsSize;
+uniform samplerBuffer	renderGridBuffer;
+uniform samplerBuffer	renderOffsetsBuffer;
 
 vec3	normalRight =	vec3( 1.0,  0.0,  0.0);
 vec3	normalLeft =	vec3(-1.0,  0.0,  0.0);
@@ -142,7 +142,7 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 	vec3	p_luf, p_ruf, p_ldf, p_rdf, p_lub, p_rub, p_ldb, p_rdb;
 	float	dotRes, nabla, dst;
 	int		offsetId, startId, endId, waterId;
-	int		Hsize = gridW * gridD;
+	int		Hsize = renderGridW * renderGridD;
 
 	intersectionInfo.dst = cameraFar;
 	intersectionInfo.id = -1;
@@ -160,37 +160,37 @@ s_intersection_info	getIntersectionPointWithWater(vec3 rayPos, vec3 rayDir)
 							p_lub, p_rub, p_ldb, p_rdb))
 		return (intersectionInfo);
 
-	for (int cx = 0; cx < gridW; cx++)
+	for (int cx = 0; cx < renderGridW; cx++)
 	{
-		for (int cy = 0; cy < gridH; cy++)
+		for (int cy = 0; cy < renderGridH; cy++)
 		{
-			for (int cz = 0; cz < gridD; cz++)
+			for (int cz = 0; cz < renderGridD; cz++)
 			{
-				p_luf = vec3(cx,     cy + 1, cz    ) * smoothingRadius;
-				p_ruf = vec3(cx + 1, cy + 1, cz    ) * smoothingRadius;
-				p_ldf = vec3(cx,     cy,     cz    ) * smoothingRadius;
-				p_rdf = vec3(cx + 1, cy,     cz    ) * smoothingRadius;
-				p_lub = vec3(cx,     cy + 1, cz + 1) * smoothingRadius;
-				p_rub = vec3(cx + 1, cy + 1, cz + 1) * smoothingRadius;
-				p_ldb = vec3(cx,     cy,     cz + 1) * smoothingRadius;
-				p_rdb = vec3(cx + 1, cy,     cz + 1) * smoothingRadius;
+				p_luf = vec3(cx,     cy + 1, cz    ) * renderCellSize;
+				p_ruf = vec3(cx + 1, cy + 1, cz    ) * renderCellSize;
+				p_ldf = vec3(cx,     cy,     cz    ) * renderCellSize;
+				p_rdf = vec3(cx + 1, cy,     cz    ) * renderCellSize;
+				p_lub = vec3(cx,     cy + 1, cz + 1) * renderCellSize;
+				p_rub = vec3(cx + 1, cy + 1, cz + 1) * renderCellSize;
+				p_ldb = vec3(cx,     cy,     cz + 1) * renderCellSize;
+				p_rdb = vec3(cx + 1, cy,     cz + 1) * renderCellSize;
 
 				if (!intersectWithCube(rayPos, rayDir,
 							p_luf, p_ruf, p_ldf, p_rdf,
 							p_lub, p_rub, p_ldb, p_rdb))
 					continue;
 
-				offsetId = cx + cz * gridW + cy * Hsize;
+				offsetId = cx + cz * renderGridW + cy * Hsize;
 
-				startId = int(texelFetch(offsetsBuffer, offsetId).r);
-				if (offsetId + 1 < offsetsSize)
-					endId = int(texelFetch(offsetsBuffer, offsetId + 1).r);
+				startId = int(texelFetch(renderOffsetsBuffer, offsetId).r);
+				if (offsetId + 1 < renderOffsetsSize)
+					endId = int(texelFetch(renderOffsetsBuffer, offsetId + 1).r);
 				else
-					endId = gridSize;
+					endId = renderGridSize;
 
 				for (int i = startId; i < endId; i++)
 				{
-					waterId = int(texelFetch(gridBuffer, i).r);
+					waterId = int(texelFetch(renderGridBuffer, i).r);
 					pos = texelFetch(positionsBuffer, waterId).rgb;
 					vec = rayPos - pos;
 					dotRes = dot(rayDir, vec);

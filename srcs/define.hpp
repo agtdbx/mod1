@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/09 20:24:10 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/10 00:06:39 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,15 @@
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
 # define COLLISION_ENERGY_KEEP 0.7
-# define SMOOTHING_RADIUS 10.0f
+# define SMOOTHING_RADIUS 5.0f
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
-# define VISCOSITY_FORCE 0.5f
+# define VISCOSITY_FORCE 0.1f
+
+# define RENDER_CELL_SIZE 10.0f
 
 # define PRINT_FPS_TIME 1.0f
-# define MINIMUM_SIMULATION_UPDATE 0.1f
-# define MINIMUM_SIMULATION_UPDATE 0.1f
+# define MINIMUM_SIMULATION_UPDATE 0.05f
 
 # define WORK_GROUP_SIZE 8
 
@@ -61,7 +62,7 @@
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;
-const float		WATER_RADIUS = 0.5;
+const float		WATER_RADIUS = 1.0f;
 const float		WATER_RADIUS2 = WATER_RADIUS * WATER_RADIUS;
 const float		WATER_MAX_XZ = MAP_SIZE - WATER_RADIUS;
 const float		WATER_MAX_HEIGHT = MAP_MAX_HEIGHT - WATER_RADIUS;

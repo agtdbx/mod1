@@ -60,7 +60,7 @@ int	main(int argc, char **argv)
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
-		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
+		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");

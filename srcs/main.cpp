@@ -48,17 +48,6 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	// TODO: REMOVE
-	// int	max_x_gpu_worker, max_y_gpu_worker, max_z_gpu_worker, max_gpu_group;
-	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &max_x_gpu_worker);
-	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &max_y_gpu_worker);
-	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &max_z_gpu_worker);
-	// glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &max_gpu_group);
-	// printf("max_x_gpu_worker : %i\n", max_x_gpu_worker);
-	// printf("max_y_gpu_worker : %i\n", max_y_gpu_worker);
-	// printf("max_z_gpu_worker : %i\n", max_z_gpu_worker);
-	// printf("max_gpu_group : %i\n", max_gpu_group);
-
 	InputManager	inputManager(context.window);
 	Terrain			terrain;
 	ShaderManager	shaderManager;
@@ -76,6 +65,7 @@ int	main(int argc, char **argv)
 		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager.addComputeShader("velocityEffect", "data/shaders/simulation/velocityEffect.glslc");
 		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
+		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
 	}
 	catch (std::exception &e)
 	{

@@ -65,10 +65,6 @@ private:
 	void		computeDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, float delta);
-
-	float		calculateDensity(glm::vec4 position);
-	glm::vec4	calculatePressureForce(int particuleIndex);
-	glm::vec4	calculateViscosityForce(int particuleIndex);
 };
 
 #endif

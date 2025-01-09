@@ -6,7 +6,7 @@
 /*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/09 12:35:40 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/09 17:01:25 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@
 # define SMOOTHING_RADIUS 10.0f
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
-# define VISCOSITY_FORCE 2.0f
-# define ENERGY_LOSE 0.97f
+# define VISCOSITY_FORCE 5.0f
+# define ENERGY_LOSE 0.5f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.1f

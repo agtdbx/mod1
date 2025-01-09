@@ -2,60 +2,6 @@
 
 #include <engine/render/shader/WaterShader.hpp>
 
-//**** STATIC FUNCTIONS ********************************************************
-
-static float	vec4Length(glm::vec4 vec)
-{
-	return (sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
-}
-
-
-static float	smoothingKernel(float dst)
-{
-	if (dst > SMOOTHING_RADIUS)
-		return (0.0);
-
-	return (pow(SMOOTHING_RADIUS - dst, 2) * SMOOTHING_SCALE);
-}
-
-
-static float	smoothingKernelDerivate(float dst)
-{
-	if (dst > SMOOTHING_RADIUS)
-		return (0.0);
-
-	return ((dst - SMOOTHING_RADIUS) * SMOOTHING_DERIVATE_SCALE);
-}
-
-
-static float	viscositySmoothingKernel(float dst)
-{
-	float	value;
-
-	if (dst > SMOOTHING_RADIUS)
-		return (0.0);
-
-	value = WATER_RADIUS2 - (dst * dst);
-	return ((value * value * value) * SMOOTHING_VISCOSITY_SCALE);
-}
-
-
-static float	convertDensityToPressure(float density)
-{
-	return ((density - TARGET_DENSITY) * PRESSURE_MULTIPLIER);
-}
-
-
-static float	calculateSharedPressure(float densityA, float densityB)
-{
-	float	pressureA, pressureB;
-
-	pressureA = convertDensityToPressure(densityA);
-	pressureB = convertDensityToPressure(densityB);
-
-	return ((pressureA + pressureB) / 2.0f);
-}
-
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
@@ -492,8 +438,6 @@ void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, fl
 		return ;
 	shaderId = computeShader->getShaderId();
 
-	this->velocitiesToBuffer();
-
 	computeShader->use();
 
 	// Compute shader inputs setup
@@ -501,7 +445,7 @@ void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, fl
 	glUniform1f(deltaLoc, delta);
 
 	int energyLoseLoc = glGetUniformLocation(shaderId, "energyLose");
-	glUniform1f(energyLoseLoc, ENERGY_LOSE);
+	glUniform1f(energyLoseLoc, 1.0f - (ENERGY_LOSE * delta));
 
 	int gravityForceLoc = glGetUniformLocation(shaderId, "gravityForce");
 	glUniform1f(gravityForceLoc, GRAVITY_FORCE);
@@ -516,17 +460,6 @@ void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, fl
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	// Buffer to vector
-	this->velocitiesFromBuffer();
-
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	// Apply energy lose
-	// 	this->velocities[i] *= ENERGY_LOSE;
-	// 	// Apply gravity
-	// 	this->velocities[i] += glm::vec4(0, -GRAVITY_FORCE, 0, 0) * delta;
-	// }
 }
 
 
@@ -540,10 +473,6 @@ void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, fl
 	if (!computeShader)
 		return ;
 	shaderId = computeShader->getShaderId();
-
-	// Vectors to buffers
-	this->positionsToBuffer();
-	this->velocitiesToBuffer();
 
 	computeShader->use();
 
@@ -583,30 +512,6 @@ void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, fl
 
 	// Buffer to vector
 	this->predictedPositionsFromBuffer();
-
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	// Compute predicted position
-	// 	this->predictedPositions[i] = this->positions[i] + this->velocities[i] * delta;
-
-	// 	// Check if particule is out of the map on x axis
-	// 	if (this->predictedPositions[i].x < WATER_RADIUS)
-	// 		this->predictedPositions[i].x = WATER_RADIUS;
-	// 	else if (this->predictedPositions[i].x >= WATER_MAX_XZ)
-	// 		this->predictedPositions[i].x = WATER_MAX_XZ;
-
-	// 	// Check if particule is out of the map on y axis
-	// 	if (this->predictedPositions[i].y < WATER_RADIUS)
-	// 		this->predictedPositions[i].y = WATER_RADIUS;
-	// 	else if (this->predictedPositions[i].y >= WATER_MAX_HEIGHT)
-	// 		this->predictedPositions[i].y = WATER_MAX_HEIGHT;
-
-	// 	// Check if particule is out of the map on z axis
-	// 	if (this->predictedPositions[i].z < WATER_RADIUS)
-	// 		this->predictedPositions[i].z = WATER_RADIUS;
-	// 	else if (this->predictedPositions[i].z >= WATER_MAX_XZ)
-	// 		this->predictedPositions[i].z = WATER_MAX_XZ;
-	// }
 }
 
 
@@ -645,9 +550,6 @@ void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 	if (!computeShader)
 		return ;
 	shaderId = computeShader->getShaderId();
-
-	this->densitiesToBuffer();
-	this->positionsFromBuffer();
 
 	computeShader->use();
 
@@ -704,36 +606,98 @@ void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	// Buffer to vector
-	this->densitiesFromBuffer();
-
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	this->densities[i] = this->calculateDensity(this->predictedPositions[i]);
-	// }
 }
 
 
 void	WaterSimulation::calculatesAndApplyPressure(ShaderManager *shaderManager, float delta)
 {
-	glm::vec4	pressureForce, pressureAcceleration, viscosityForce;
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
 
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		if (this->densities[i] == 0.0f)
-		{
-			this->velocities[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			continue;
-		}
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("pressure");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
 
-		pressureForce = this->calculatePressureForce(i);
-		pressureAcceleration = pressureForce / this->densities[i];
-		this->velocities[i] += pressureAcceleration * delta;
+	computeShader->use();
 
-		viscosityForce = calculateViscosityForce(i);
-		this->velocities[i] += viscosityForce * delta;
-	}
+	// Compute shader inputs setup
+	int deltaLoc = glGetUniformLocation(shaderId, "delta");
+	glUniform1f(deltaLoc, delta);
+
+	int smoothingRadiusLoc = glGetUniformLocation(shaderId, "smoothingRadius");
+	glUniform1f(smoothingRadiusLoc, SMOOTHING_RADIUS);
+
+	int smoothingDerivateScaleLoc = glGetUniformLocation(shaderId, "smoothingDerivateScale");
+	glUniform1f(smoothingDerivateScaleLoc, SMOOTHING_DERIVATE_SCALE);
+
+	int smoothingViscosityScaleLoc = glGetUniformLocation(shaderId, "smoothingViscosityScale");
+	glUniform1f(smoothingViscosityScaleLoc, SMOOTHING_VISCOSITY_SCALE);
+
+	int waterMassLoc = glGetUniformLocation(shaderId, "waterMass");
+	glUniform1f(waterMassLoc, WATER_MASS);
+
+	int waterRadius2Loc = glGetUniformLocation(shaderId, "waterRadius2");
+	glUniform1f(waterRadius2Loc, WATER_RADIUS2);
+
+	int targetDensityLoc = glGetUniformLocation(shaderId, "targetDensity");
+	glUniform1f(targetDensityLoc, TARGET_DENSITY);
+
+	int pressureMultiplierLoc = glGetUniformLocation(shaderId, "pressureMultiplier");
+	glUniform1f(pressureMultiplierLoc, PRESSURE_MULTIPLIER);
+
+	int viscosityStrengthLoc = glGetUniformLocation(shaderId, "viscosityStrength");
+	glUniform1f(viscosityStrengthLoc, VISCOSITY_FORCE);
+
+	int gridWLoc = glGetUniformLocation(shaderId, "gridW");
+	glUniform1i(gridWLoc, this->gridW);
+
+	int gridHLoc = glGetUniformLocation(shaderId, "gridH");
+	glUniform1i(gridHLoc, this->gridH);
+
+	int gridDLoc = glGetUniformLocation(shaderId, "gridD");
+	glUniform1i(gridDLoc, this->gridD);
+
+	int idHsizeLoc = glGetUniformLocation(shaderId, "idHsize");
+	glUniform1i(idHsizeLoc, this->idHsize);
+
+	int gridSizeLoc = glGetUniformLocation(shaderId, "gridSize");
+	glUniform1i(gridSizeLoc, this->gridFlatSize);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridFlat);
+	glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
+
+	int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
+	glUniform1i(offsetsSizeLoc, this->gridOffsetsSize);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridOffsets);
+	glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePredictedPositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "predictedPositionsBuffer"), 3);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureDensities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferDensities);
+	glUniform1i(glGetUniformLocation(shaderId, "densitiesBuffer"), 4);
+
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glBindImageTexture(0, this->textureVelocities, 0, GL_FALSE, 0,
+							GL_READ_WRITE, GL_RGBA32F);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 
@@ -747,10 +711,6 @@ void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 	if (!computeShader)
 		return ;
 	shaderId = computeShader->getShaderId();
-
-	// Vectors to buffers
-	this->positionsToBuffer();
-	this->velocitiesToBuffer();
 
 	computeShader->use();
 
@@ -785,216 +745,4 @@ void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	// Buffer to vector
-	this->positionsFromBuffer();
-	this->velocitiesFromBuffer();
-
-	// for (int i = 0; i < this->nbParticules; i++)
-	// {
-	// 	// Update particule position
-	// 	this->positions[i] += this->velocities[i] * delta;
-
-	// 	// Check if particule is out of the map on x axis
-	// 	if (this->positions[i].x < WATER_RADIUS)
-	// 	{
-	// 		this->positions[i].x = WATER_RADIUS;
-	// 		this->velocities[i].x *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-	// 	else if (this->positions[i].x >= WATER_MAX_XZ)
-	// 	{
-	// 		this->positions[i].x = WATER_MAX_XZ;
-	// 		this->velocities[i].x *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-
-	// 	// Check if particule is out of the map on y axis
-	// 	if (this->positions[i].y < WATER_RADIUS)
-	// 	{
-	// 		this->positions[i].y = WATER_RADIUS;
-	// 		this->velocities[i].y *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-	// 	else if (this->positions[i].y >= WATER_MAX_HEIGHT)
-	// 	{
-	// 		this->positions[i].y = WATER_MAX_HEIGHT;
-	// 		this->velocities[i].y *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-
-	// 	// Check if particule is out of the map on z axis
-	// 	if (this->positions[i].z < WATER_RADIUS)
-	// 	{
-	// 		this->positions[i].z = WATER_RADIUS;
-	// 		this->velocities[i].z *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-	// 	else if (this->positions[i].z >= WATER_MAX_XZ)
-	// 	{
-	// 		this->positions[i].z = WATER_MAX_XZ;
-	// 		this->velocities[i].z *= -1.0f;
-	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
-	// 	}
-	// }
-
-	this->positionsToBuffer();
-}
-
-
-float	WaterSimulation::calculateDensity(glm::vec4 position)
-{
-	float	density, dst, influence;
-	int		px, py, pz, gx, gy, gz, gid;
-
-	density = 0.0f;
-	px = position.x / SMOOTHING_RADIUS;
-	py = position.y / SMOOTHING_RADIUS;
-	pz = position.z / SMOOTHING_RADIUS;
-
-	for (int cx = -1; cx <= 1; cx++)
-	{
-		gx = px + cx;
-		if (gx < 0 || gx >= this->gridW)
-			continue;
-
-		for (int cy = -1; cy <= 1; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= this->gridH)
-				continue;
-
-			for (int cz = -1; cz <= 1; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= this->gridD)
-					continue;
-
-				gid = gx + gz * this->gridW + gy * this->idHsize;
-
-				for (const int &i : this->grid[gid])
-				{
-					dst = vec4Length(this->positions[i] - position);
-					influence = smoothingKernel(dst);
-					density += WATER_MASS * influence;
-				}
-			}
-		}
-	}
-
-	return (density);
-}
-
-
-glm::vec4	WaterSimulation::calculatePressureForce(int particuleIndex)
-{
-	glm::vec4	pressureForce, position, dir;
-	float		density, dst, slope, sharedPressure;
-	int			px, py, pz, gx, gy, gz, gid;
-
-	pressureForce = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	position = this->predictedPositions[particuleIndex];
-	density = this->densities[particuleIndex];
-	px = position.x / SMOOTHING_RADIUS;
-	py = position.y / SMOOTHING_RADIUS;
-	pz = position.z / SMOOTHING_RADIUS;
-
-	for (int cx = -1; cx <= 1; cx++)
-	{
-		gx = px + cx;
-		if (gx < 0 || gx >= this->gridW)
-			continue;
-
-		for (int cy = -1; cy <= 1; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= this->gridH)
-				continue;
-
-			for (int cz = -1; cz <= 1; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= this->gridD)
-					continue;
-
-				gid = gx + gz * this->gridW + gy * this->idHsize;
-
-				for (const int &i : this->grid[gid])
-				{
-					if (i == particuleIndex)
-						continue;
-
-					dir = this->predictedPositions[i] - position;
-					dst = vec4Length(dir);
-					if (dst == 0.0f)
-						dir = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-					else
-						dir /= dst;
-					slope = smoothingKernelDerivate(dst);
-					sharedPressure = calculateSharedPressure(density, this->densities[i]);
-					pressureForce += sharedPressure * dir * slope * WATER_MASS / density;
-				}
-			}
-		}
-	}
-
-	return (pressureForce);
-}
-
-
-glm::vec4	WaterSimulation::calculateViscosityForce(int particuleIndex)
-{
-	glm::vec4	viscosityForce, position, velocity, velocityDir;
-	float		velocityLength, dst, influence;
-	int			px, py, pz, gx, gy, gz, gid;
-
-	viscosityForce = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	position = this->predictedPositions[particuleIndex];
-	velocity = this->velocities[particuleIndex];
-	px = position.x / SMOOTHING_RADIUS;
-	py = position.y / SMOOTHING_RADIUS;
-	pz = position.z / SMOOTHING_RADIUS;
-
-
-	for (int cx = -1; cx <= 1; cx++)
-	{
-		gx = px + cx;
-		if (gx < 0 || gx >= this->gridW)
-			continue;
-
-		for (int cy = -1; cy <= 1; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= this->gridH)
-				continue;
-
-			for (int cz = -1; cz <= 1; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= this->gridD)
-					continue;
-
-				gid = gx + gz * this->gridW + gy * this->idHsize;
-
-				for (const int &i : this->grid[gid])
-				{
-					if (i == particuleIndex)
-						continue;
-
-					velocityDir = this->velocities[i] - velocity;
-					velocityLength = vec4Length(velocityDir);
-					if (velocityLength == 0.0f)
-						continue;
-					velocityDir /= velocityLength;
-					dst = vec4Length(position - this->predictedPositions[i]);
-					influence = viscositySmoothingKernel(dst);
-					viscosityForce += velocityDir * influence;
-				}
-			}
-		}
-	}
-
-	return (viscosityForce * VISCOSITY_FORCE);
 }

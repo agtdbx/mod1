@@ -17,8 +17,9 @@ public:
 	Shader			*getShader(std::string shaderName);
 	WaterShader		*getWaterShader(void);
 	MenuShader		*getMenuShader(void);
-	unsigned int	getVAOId(int ind);
-	unsigned int	getEBOId(int ind);
+	unsigned int	getVAOId();
+	unsigned int	getVBOId();
+	unsigned int	getEBOId();
 
 	ShaderManager	&operator=(const ShaderManager &obj);
 
@@ -34,7 +35,7 @@ public:
 				std::string fShaderFile);
 
 private:
-	unsigned int							VAO[2], VBO[2], EBO[2];
+	unsigned int							VAO, VBO, EBO;
 	std::unordered_map<std::string, Shader>	shaders;
 	WaterShader								waterShader;
 	MenuShader								menuShader;

@@ -204,14 +204,14 @@ static void	draw(
 
 	// Draw mesh
 	// waterManager->draw(camera, shaderManager);
-	terrain->renderMesh(camera, shaderManager);
 	// glBindVertexArray(0);
 
-	simulation->draw(camera, shaderManager);
 
-	Button			test(0, 0, WIN_W, WIN_H);
+	Button	test(10, 10, 100, 50);
 
 	test.renderMesh(shaderManager);
+	terrain->renderMesh(camera, shaderManager);
+	simulation->draw(camera, shaderManager);
 
 	// Display the new image
 	glfwSwapBuffers(window);

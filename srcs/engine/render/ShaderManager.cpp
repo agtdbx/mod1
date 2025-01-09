@@ -10,16 +10,17 @@
 ShaderManager::ShaderManager(void)
 {
 	// Allocate memory for vertice array into gpu
-	glGenVertexArrays(2, this->VAO);
-	// glBindVertexArray(this->VAO);
+	glGenVertexArrays(1, &this->VAO);
+	glBindVertexArray(this->VAO);
 
 	// Allocate memory into gpu
-	glGenBuffers(2, this->VBO);
-	// glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+	glGenBuffers(1, &this->VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
 	// Allocate buffer for indices
-	glGenBuffers(2, this->EBO);
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+	glGenBuffers(1, &this->EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this->EBO);
+
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -27,13 +28,13 @@ ShaderManager::ShaderManager(void)
 ShaderManager::~ShaderManager()
 {
 	if (this->VAO >= 0)
-		glDeleteVertexArrays(2, this->VAO);
+		glDeleteVertexArrays(1, &this->VAO);
 	this->VAO = -1;
 	if (this->VBO >= 0)
-		glDeleteBuffers(2, this->VBO);
+		glDeleteBuffers(1, &this->VBO);
 	this->VBO = -1;
 	if (this->EBO >= 0)
-		glDeleteBuffers(2, this->EBO);
+		glDeleteBuffers(1, &this->EBO);
 	this->EBO = -1;
 }
 
@@ -76,14 +77,19 @@ MenuShader	*ShaderManager::getMenuShader(void)
 // 	return (this->EBO);
 // }
 
-unsigned int	ShaderManager::getVAOId(int ind)
+unsigned int	ShaderManager::getVAOId()
 {
-	return (this->VAO[ind]);
+	return (this->VAO);
 }
 
-unsigned int	ShaderManager::getEBOId(int ind)
+unsigned int	ShaderManager::getVBOId()
 {
-	return (this->EBO[ind]);
+	return (this->VBO);
+}
+
+unsigned int	ShaderManager::getEBOId()
+{
+	return (this->EBO);
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -95,9 +101,9 @@ ShaderManager	&ShaderManager::operator=(const ShaderManager &obj)
 	if (this == &obj)
 		return (*this);
 
-	// this->VAO = -1;
-	// this->VBO = -1;
-	// this->EBO = -1;
+	this->VAO = -1;
+	this->VBO = -1;
+	this->EBO = -1;
 
 	return (*this);
 }

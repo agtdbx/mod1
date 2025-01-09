@@ -58,7 +58,7 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 
 	menuShader = shaderManager->getMenuShader();
 
-	points.push_back(Point2D(Vec2(x_screen + width, y_screen), 0.5, 0.5, 0.5));
+	points.push_back(Point2D(Vec2(x_screen, y_screen), 0.5, 0.5, 0.5));
 	points.push_back(Point2D(Vec2(x_screen + width, y_screen), 0.5, 0.5, 0.5));
 	points.push_back(Point2D(Vec2(x_screen, y_screen + height),  0.5, 0.5, 0.5));
 	points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), 0.5, 0.5, 0.5));
@@ -69,28 +69,30 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	for (Point2D &point : points)
 	{
 		float x = (point.pos.x  / WIN_W) * 2 - 1;
-		float y = (point.pos.y  / WIN_H) * 2 - 1;
+		float y = ((WIN_H - point.pos.y)  / WIN_H) * 2 - 1;
 
 		vertices.push_back(x);
 		vertices.push_back(y);
-		// vertices.push_back(point.r);
-		// vertices.push_back(point.g);
-		// vertices.push_back(point.b);
+		vertices.push_back(point.r);
+		vertices.push_back(point.g);
+		vertices.push_back(point.b);
 
 		printf("POINT (%.3f, %.3f) = {%f %f %f}\n", x, y, point.r, point.g, point.b);
 	}
 	
-
+	// glBindVertexArray(shaderManager->getVAOId(1));
+	// glBindBuffer(GL_ARRAY_BUFFER, shaderManager->getVBOId(1));
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shaderManager->getEBOId());
-
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shaderManager->getEBOId(1));
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW);
 	menuShader->use();
+
+
 	glBindVertexArray(shaderManager->getVAOId());
 	
-	// glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	// glBindVertexArray(0);
 	// std::cout << "test" << std::endl;
 	// this->mesh.draw(&Button::camera, shaderManager.getShader("terrain"), shaderManager.getVAOId());
 	// this->mesh.draw(&camera, shaderManager.getShader("terrain"), shaderManager.getVAOId());

@@ -125,6 +125,14 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 
 void	WaterSimulation::addWater(glm::vec3 position)
 {
+	if (this->needToUpdateBuffers == false)
+	{
+		this->positionsFromBuffer();
+		this->predictedPositionsFromBuffer();
+		this->velocitiesFromBuffer();
+		this->densitiesFromBuffer();
+	}
+
 	this->positions.push_back(glm::vec4(position, 0.0f));
 	this->predictedPositions.push_back(glm::vec4(position, 0.0f));
 	this->velocities.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));

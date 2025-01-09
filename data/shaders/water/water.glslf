@@ -1,4 +1,4 @@
-#version 420 core
+#version 430 core
 
 out vec4		FragColor;
 in vec2			pointPos;
@@ -13,7 +13,7 @@ uniform float	planeWidth;
 uniform float	planeHeight;
 uniform float	waterRadius2;
 uniform vec3	waterColor;
-uniform int		smoothingRadius;
+uniform float	smoothingRadius;
 uniform int		nbPositions;
 uniform samplerBuffer positionsBuffer;
 uniform int		mapSize;

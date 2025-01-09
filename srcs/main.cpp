@@ -3,7 +3,7 @@
 
 #include <define.hpp>
 #include <engine/inputs/InputManager.hpp>
-#include <engine/render/ShaderManager.hpp>
+#include <engine/render/shader/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/Camera.hpp>
@@ -17,7 +17,8 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
-				WaterSimulation	*simulation);
+				WaterSimulation	*simulation,
+				ShaderManager *shaderManager);
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
@@ -58,8 +59,12 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shaderManager.addShader("terrain", "data/shaders/terrain.vs", "data/shaders/terrain.fs");
-		shaderManager.loadWaterShaderFiles("data/shaders/water.vs", "data/shaders/water.fs");
+		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
+		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
+		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
+		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
+		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
+		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -69,7 +74,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	int	nbWater[] = {10, 10, 10};
+	int	nbWater[] = {16, 16, 16};
 	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
 	for (int i = 0; i < nbWater[0]; i++)
 	{
@@ -92,7 +97,7 @@ int	main(int argc, char **argv)
 			break;
 
 		// Compute part
-		computation(&inputManager, &camera, &simulation);
+		computation(&inputManager, &camera, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -119,7 +124,8 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
-				WaterSimulation	*simulation)
+				WaterSimulation	*simulation,
+				ShaderManager *shaderManager)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
@@ -185,7 +191,7 @@ static void	computation(
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
-	simulation->tick(delta);
+	simulation->tick(shaderManager, delta);
 }
 
 

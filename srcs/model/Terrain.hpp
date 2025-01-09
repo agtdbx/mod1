@@ -4,7 +4,7 @@
 # include <define.hpp>
 # include <engine/render/Mesh.hpp>
 # include <engine/render/Camera.hpp>
-# include <engine/render/ShaderManager.hpp>
+# include <engine/render/shader/ShaderManager.hpp>
 # include <engine/render/TextureManager.hpp>
 
 class Terrain

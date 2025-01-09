@@ -4,8 +4,9 @@
 # include <string>
 # include <unordered_map>
 
-# include <engine/render/Shader.hpp>
-# include <engine/render/WaterShader.hpp>
+# include <engine/render/shader/Shader.hpp>
+# include <engine/render/shader/WaterShader.hpp>
+# include <engine/render/shader/ComputeShader.hpp>
 
 class ShaderManager
 {
@@ -14,6 +15,7 @@ public:
 	~ShaderManager();
 
 	Shader			*getShader(std::string shaderName);
+	ComputeShader	*getComputeShader(std::string shaderName);
 	WaterShader		*getWaterShader(void);
 	unsigned int	getVAOId(void);
 
@@ -23,14 +25,18 @@ public:
 				std::string shaderName,
 				std::string vShaderFile,
 				std::string fShaderFile);
+	void	addComputeShader(
+				std::string shaderName,
+				std::string cShaderFile);
 	void	loadWaterShaderFiles(
 				std::string vShaderFile,
 				std::string fShaderFile);
 
 private:
-	unsigned int							VAO, VBO, EBO;
-	std::unordered_map<std::string, Shader>	shaders;
-	WaterShader								waterShader;
+	unsigned int									VAO, VBO, EBO;
+	std::unordered_map<std::string, Shader>			shaders;
+	std::unordered_map<std::string, ComputeShader>	computeShaders;
+	WaterShader										waterShader;
 };
 
 #endif

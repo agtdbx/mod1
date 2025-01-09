@@ -3,7 +3,7 @@
 
 # include <define.hpp>
 # include <engine/render/Mesh.hpp>
-# include <engine/render/Camera.hpp>
+# include <engine/inputs/Mouse.hpp>
 # include <engine/OpenGLContext.hpp>
 # include <engine/render/ShaderManager.hpp>
 # include <model/Point2D.hpp>
@@ -11,19 +11,32 @@
 class Button
 {
 public:
-	Button(float x, float y, float width, float height);
+
+	static Mouse * mouse;
+
+	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg);
+	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, glm::vec3 baseColor, glm::vec3 underlineColor);
 	Button(const Button &obj);
 	~Button();
 
 	Button	&operator=(const Button &obj);
 
 	void	renderMesh( ShaderManager *shaderManager);
+	void	active();
+	void	desactive();
+	bool	isActive();
+	void	press();
+	void	setArg(void *arg);
+	
 
 private:
-	const float	x_screen, y_screen, width, height;
-	static  Camera camera;
-	
-	// void	updateMesh(OpenGLContext &);
+	const float		x_screen, y_screen, width, height;
+	glm::vec3		baseColor, underlineColor;
+	void			(*functionToExecute)(void *);
+	void			*arg;
+	bool			active_B;
+
+	bool			mouseOnButton();
 
 
 };

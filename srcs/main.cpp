@@ -25,6 +25,8 @@ static void	draw(
 				Terrain *terrain,
 				ShaderManager *shaderManager,
 				WaterSimulation	*simulation);
+void	addWater(void * arg);
+
 
 int	main(int argc, char **argv)
 {
@@ -54,6 +56,8 @@ int	main(int argc, char **argv)
 	TextureManager	textureManager;
 	WaterSimulation	simulation;
 	Camera			camera;
+
+	Button::mouse = &inputManager.mouse;
 
 	try
 	{
@@ -93,6 +97,8 @@ int	main(int argc, char **argv)
 		if (inputManager.escape.isPressed())
 			break;
 
+		// if (inputManager.mouse.)
+		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
 		computation(&inputManager, &camera, &simulation);
 
@@ -207,7 +213,7 @@ static void	draw(
 	// glBindVertexArray(0);
 
 
-	Button	test(10, 10, 100, 50);
+	Button	test(10, 10, 100, 50,addWater, simulation);
 
 	test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);
@@ -215,4 +221,11 @@ static void	draw(
 
 	// Display the new image
 	glfwSwapBuffers(window);
+}
+
+
+void	addWater(void * arg)
+{
+	WaterSimulation & simulation = *((WaterSimulation *)(arg));
+	simulation.addWater(glm::vec3(5, 5, 5));
 }

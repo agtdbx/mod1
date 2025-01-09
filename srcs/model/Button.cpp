@@ -10,19 +10,38 @@
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
-Camera Button::camera = Camera();
+Mouse *Button::mouse = NULL;
 
-Button::Button(float x, float y, float width, float height)
+Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
-	Button::camera.setPosition(glm::vec3(0,0,0));
-
+	this->arg = arg;
+	this->active_B = true;
+	this->functionToExecute = functionToExecute;
+	this->baseColor = glm::vec3(0.5,0.5,0.5);
+	this->underlineColor = glm::vec3(0.4,0.4,0.4);;
 }
+
+Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, glm::vec3 baseColor, glm::vec3 underlineColor)
+:x_screen(x), y_screen(y), width(width), height(height)
+{
+	this->arg = arg;
+	this->active_B = true;
+	this->functionToExecute = functionToExecute;
+	this->baseColor = baseColor;
+	this->underlineColor = underlineColor;
+}
+
 
 
 Button::Button(const Button &obj)
 :x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
 {
+	this->arg = obj.arg;
+	this->active_B = obj.active_B;
+	this->functionToExecute = obj.functionToExecute;
+	this->baseColor = obj.baseColor;
+	this->underlineColor = obj.underlineColor;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -36,7 +55,28 @@ Button::~Button()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
+bool	Button::isActive()
+{
+	return this->active_B;
+}
+
+
 //---- Setters -----------------------------------------------------------------
+
+void	Button::active()
+{
+	this->active_B = true;
+}
+
+void	Button::desactive()
+{
+	this->active_B = false;
+}
+
+void	Button::setArg(void *arg)
+{
+	this->arg = arg;
+}
 
 //---- Operators ---------------------------------------------------------------
 
@@ -49,6 +89,8 @@ Button	&Button::operator=(const Button &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
+
+
 void	Button::renderMesh( ShaderManager *shaderManager)
 {
 	MenuShader					*menuShader;
@@ -58,14 +100,24 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 
 	menuShader = shaderManager->getMenuShader();
 
-	points.push_back(Point2D(Vec2(x_screen, y_screen), 0.5, 0.5, 0.5));
-	points.push_back(Point2D(Vec2(x_screen + width, y_screen), 0.5, 0.5, 0.5));
-	points.push_back(Point2D(Vec2(x_screen, y_screen + height),  0.5, 0.5, 0.5));
-	points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), 0.5, 0.5, 0.5));
-	// indices.push_back((t_tri_id){0, 1, 2});
-	// indices.push_back((t_tri_id){3, 1, 2});
+	if (Button::mouse && this->active_B && this->mouseOnButton())
+	{
+		points.push_back(Point2D(Vec2(x_screen, y_screen), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
+		points.push_back(Point2D(Vec2(x_screen + width, y_screen), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
+		points.push_back(Point2D(Vec2(x_screen, y_screen + height),  this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
+		points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
+		if (Button::mouse->left.isPressed())
+			this->press();
+	}
+	else
+	{
+		points.push_back(Point2D(Vec2(x_screen, y_screen), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
+		points.push_back(Point2D(Vec2(x_screen + width, y_screen), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
+		points.push_back(Point2D(Vec2(x_screen, y_screen + height),  this->baseColor[0], this->baseColor[1], this->baseColor[2]));
+		points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
+	}
 
-	printf("\n\n\n\n");
+
 	for (Point2D &point : points)
 	{
 		float x = (point.pos.x  / WIN_W) * 2 - 1;
@@ -76,15 +128,8 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 		vertices.push_back(point.r);
 		vertices.push_back(point.g);
 		vertices.push_back(point.b);
-
-		printf("POINT (%.3f, %.3f) = {%f %f %f}\n", x, y, point.r, point.g, point.b);
 	}
-	
-	// glBindVertexArray(shaderManager->getVAOId(1));
-	// glBindBuffer(GL_ARRAY_BUFFER, shaderManager->getVBOId(1));
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,shaderManager->getEBOId());
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shaderManager->getEBOId(1));
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW);
 	menuShader->use();
 
@@ -92,11 +137,22 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	glBindVertexArray(shaderManager->getVAOId());
 	
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	// glBindVertexArray(0);
-	// std::cout << "test" << std::endl;
-	// this->mesh.draw(&Button::camera, shaderManager.getShader("terrain"), shaderManager.getVAOId());
-	// this->mesh.draw(&camera, shaderManager.getShader("terrain"), shaderManager.getVAOId());
 }
+
+void	Button::press()
+{
+	if (this->active_B)
+		this->functionToExecute(this->arg);
+}
+
+
 
 //**** PRIVATE METHODS *********************************************************
 
+bool 	Button::mouseOnButton()
+{
+	if (Button::mouse->getPos().x >= this->x_screen and Button::mouse->getPos().x < this->x_screen + this->width and
+		Button::mouse->getPos().y >= this->y_screen and Button::mouse->getPos().y < this->y_screen + this->height)
+		return true;
+	return false;
+}

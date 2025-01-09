@@ -10,16 +10,16 @@
 ShaderManager::ShaderManager(void)
 {
 	// Allocate memory for vertice array into gpu
-	glGenVertexArrays(1, &this->VAO);
-	glBindVertexArray(this->VAO);
+	glGenVertexArrays(2, this->VAO);
+	// glBindVertexArray(this->VAO);
 
 	// Allocate memory into gpu
-	glGenBuffers(1, &this->VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+	glGenBuffers(2, this->VBO);
+	// glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
 	// Allocate buffer for indices
-	glGenBuffers(1, &this->EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+	glGenBuffers(2, this->EBO);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -27,13 +27,13 @@ ShaderManager::ShaderManager(void)
 ShaderManager::~ShaderManager()
 {
 	if (this->VAO >= 0)
-		glDeleteVertexArrays(1, &this->VAO);
+		glDeleteVertexArrays(2, this->VAO);
 	this->VAO = -1;
 	if (this->VBO >= 0)
-		glDeleteBuffers(1, &this->VBO);
+		glDeleteBuffers(2, this->VBO);
 	this->VBO = -1;
 	if (this->EBO >= 0)
-		glDeleteBuffers(1, &this->EBO);
+		glDeleteBuffers(2, this->EBO);
 	this->EBO = -1;
 }
 
@@ -60,9 +60,30 @@ WaterShader	*ShaderManager::getWaterShader(void)
 }
 
 
-unsigned int	ShaderManager::getVAOId(void)
+MenuShader	*ShaderManager::getMenuShader(void)
 {
-	return (this->VAO);
+	return (&this->menuShader);
+}
+
+
+// unsigned int	ShaderManager::getVAOId(void)
+// {
+// 	return (this->VAO);
+// }
+
+// unsigned int	ShaderManager::getEBOId(void)
+// {
+// 	return (this->EBO);
+// }
+
+unsigned int	ShaderManager::getVAOId(int ind)
+{
+	return (this->VAO[ind]);
+}
+
+unsigned int	ShaderManager::getEBOId(int ind)
+{
+	return (this->EBO[ind]);
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -74,9 +95,9 @@ ShaderManager	&ShaderManager::operator=(const ShaderManager &obj)
 	if (this == &obj)
 		return (*this);
 
-	this->VAO = -1;
-	this->VBO = -1;
-	this->EBO = -1;
+	// this->VAO = -1;
+	// this->VBO = -1;
+	// this->EBO = -1;
 
 	return (*this);
 }
@@ -108,6 +129,14 @@ void	ShaderManager::loadWaterShaderFiles(
 						std::string fShaderFile)
 {
 	this->waterShader.load(vShaderFile, fShaderFile);
+}
+
+
+void	ShaderManager::loadMenuShaderFiles(
+						std::string vShaderFile,
+						std::string fShaderFile)
+{
+	this->menuShader.load(vShaderFile, fShaderFile);
 }
 
 //**** PRIVATE METHODS *********************************************************

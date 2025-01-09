@@ -6,6 +6,7 @@
 # include <engine/render/Camera.hpp>
 # include <engine/OpenGLContext.hpp>
 # include <engine/render/ShaderManager.hpp>
+# include <model/Point2D.hpp>
 
 class Button
 {
@@ -16,10 +17,9 @@ public:
 
 	Button	&operator=(const Button &obj);
 
-	void	renderMesh(Camera &camera, ShaderManager &shaderManager);
+	void	renderMesh( ShaderManager *shaderManager);
 
 private:
-	Mesh	mesh;
 	const float	x_screen, y_screen, width, height;
 	static  Camera camera;
 	

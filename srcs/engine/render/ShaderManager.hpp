@@ -6,6 +6,7 @@
 
 # include <engine/render/Shader.hpp>
 # include <engine/render/WaterShader.hpp>
+# include <engine/render/MenuShader.hpp>
 
 class ShaderManager
 {
@@ -15,7 +16,9 @@ public:
 
 	Shader			*getShader(std::string shaderName);
 	WaterShader		*getWaterShader(void);
-	unsigned int	getVAOId(void);
+	MenuShader		*getMenuShader(void);
+	unsigned int	getVAOId(int ind);
+	unsigned int	getEBOId(int ind);
 
 	ShaderManager	&operator=(const ShaderManager &obj);
 
@@ -26,11 +29,15 @@ public:
 	void	loadWaterShaderFiles(
 				std::string vShaderFile,
 				std::string fShaderFile);
+	void	loadMenuShaderFiles(
+				std::string vShaderFile,
+				std::string fShaderFile);
 
 private:
-	unsigned int							VAO, VBO, EBO;
+	unsigned int							VAO[2], VBO[2], EBO[2];
 	std::unordered_map<std::string, Shader>	shaders;
 	WaterShader								waterShader;
+	MenuShader								menuShader;
 };
 
 #endif

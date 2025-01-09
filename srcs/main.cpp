@@ -54,7 +54,6 @@ int	main(int argc, char **argv)
 	TextureManager	textureManager;
 	WaterSimulation	simulation;
 	Camera			camera;
-	Button			test(5, 5, 100, 100);
 
 	try
 	{
@@ -62,6 +61,7 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		shaderManager.addShader("terrain", "data/shaders/terrain.vs", "data/shaders/terrain.fs");
 		shaderManager.loadWaterShaderFiles("data/shaders/water.vs", "data/shaders/water.fs");
+		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
 	}
 	catch (std::exception &e)
 	{
@@ -97,7 +97,6 @@ int	main(int argc, char **argv)
 		computation(&inputManager, &camera, &simulation);
 
 		// Drawing part
-		test.renderMesh(camera, shaderManager);
 		draw(context.window, &camera, &terrain,
 			&shaderManager, &simulation);
 	}
@@ -206,7 +205,13 @@ static void	draw(
 	// Draw mesh
 	// waterManager->draw(camera, shaderManager);
 	terrain->renderMesh(camera, shaderManager);
+	// glBindVertexArray(0);
+
 	simulation->draw(camera, shaderManager);
+
+	Button			test(0, 0, WIN_W, WIN_H);
+
+	test.renderMesh(shaderManager);
 
 	// Display the new image
 	glfwSwapBuffers(window);

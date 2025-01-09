@@ -171,7 +171,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	if (this->nbParticules == 0)
 		return ;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 13,
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12,
 					this->triangleOverScreen, GL_STATIC_DRAW);
 
 	shader = shaderManager->getWaterShader();

@@ -149,16 +149,10 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 		this->needToUpdateBuffers = false;
 	}
 
-	this->applyGravityAndEnergyLose(shaderManager, delta); // gpu
-
 	this->computePredictedPositions(shaderManager, delta); // gpu
-
 	this->putParticlesInGrid(shaderManager); // cpu
-
 	this->computeDensity(shaderManager); // gpu
-
-	this->calculatesAndApplyPressure(shaderManager, delta); // cpu -> gpu
-
+	this->calculatesAndApplyPressure(shaderManager, delta); // gpu
 	this->updatePositions(shaderManager, delta); // gpu
 }
 
@@ -427,42 +421,6 @@ void	WaterSimulation::gridOffsetsFromBuffer(void)
 }
 
 
-void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, float delta)
-{
-	ComputeShader	*computeShader;
-	unsigned int	shaderId;
-
-	// Get the compute shader
-	computeShader = shaderManager->getComputeShader("velocityEffect");
-	if (!computeShader)
-		return ;
-	shaderId = computeShader->getShaderId();
-
-	computeShader->use();
-
-	// Compute shader inputs setup
-	int deltaLoc = glGetUniformLocation(shaderId, "delta");
-	glUniform1f(deltaLoc, delta);
-
-	int energyLoseLoc = glGetUniformLocation(shaderId, "energyLose");
-	glUniform1f(energyLoseLoc, 1.0f - (ENERGY_LOSE * delta));
-
-	int gravityForceLoc = glGetUniformLocation(shaderId, "gravityForce");
-	glUniform1f(gravityForceLoc, GRAVITY_FORCE);
-
-	// Compute shader output setup
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
-	glBindImageTexture(0, this->textureVelocities, 0, GL_FALSE, 0,
-							GL_READ_WRITE, GL_RGBA32F);
-
-	// Run compute shader
-	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-}
-
-
 void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, float delta)
 {
 	ComputeShader	*computeShader;
@@ -489,15 +447,13 @@ void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, fl
 	int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
 	glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 1);
+	int gravityForceLoc = glGetUniformLocation(shaderId, "gravityForce");
+	glUniform1f(gravityForceLoc, GRAVITY_FORCE);
 
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
-	glUniform1i(glGetUniformLocation(shaderId, "velocitiesBuffer"), 2);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
+	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 2);
 
 	// Compute shader output setup
 	glActiveTexture(GL_TEXTURE0);
@@ -505,6 +461,12 @@ void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, fl
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
 	glBindImageTexture(0, this->texturePredictedPositions, 0, GL_FALSE, 0,
 							GL_WRITE_ONLY, GL_RGBA32F);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glBindImageTexture(1, this->textureVelocities, 0, GL_FALSE, 0,
+							GL_READ_WRITE, GL_RGBA32F);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);

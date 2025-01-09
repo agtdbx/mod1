@@ -59,7 +59,6 @@ private:
 	void		gridOffsetsToBuffer(void);
 	void		gridOffsetsFromBuffer(void);
 
-	void		applyGravityAndEnergyLose(ShaderManager *shaderManager, float delta);
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);

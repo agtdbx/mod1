@@ -63,9 +63,8 @@ int	main(int argc, char **argv)
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
 		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
-		shaderManager.addComputeShader("velocityEffect", "data/shaders/simulation/velocityEffect.glslc");
-		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
+		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -75,7 +74,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	int	nbWater[] = {10, 10, 10};
+	int	nbWater[] = {16, 16, 16};
 	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
 	for (int i = 0; i < nbWater[0]; i++)
 	{

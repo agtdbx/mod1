@@ -1,0 +1,76 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform imageBuffer positionsBuffer;
+layout(rgba32f, binding = 1) uniform imageBuffer velocitiesBuffer;
+
+uniform	float	delta;
+uniform float	waterRadius;
+uniform float	waterMaxXZ;
+uniform float	waterMaxY;
+uniform float	collisionEnergyKeep;
+
+void main()
+{
+	int		particleIndex = int(gl_GlobalInvocationID.x);
+	vec3	position = imageLoad(positionsBuffer, particleIndex).rgb;
+	vec3	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
+	bool	needUpdateVelocity = false;
+
+	position += velocity * delta;
+
+	// Check if particule is out of the map on x axis
+	if (position.x < waterRadius)
+	{
+		position.x = waterRadius;
+		velocity.x *= -1.0;
+		velocity *= collisionEnergyKeep;
+		needUpdateVelocity = true;
+	}
+	else if (position.x >= waterMaxXZ)
+	{
+		position.x = waterMaxXZ;
+		velocity.x *= -1.0;
+		needUpdateVelocity = true;
+	}
+
+	// Check if particule is out of the map on y axis
+	if (position.y < waterRadius)
+	{
+		position.y = waterRadius;
+		velocity.y *= -1.0;
+		velocity *= collisionEnergyKeep;
+		needUpdateVelocity = true;
+	}
+	else if (position.y >= waterMaxY)
+	{
+		position.y = waterMaxY;
+		velocity.y *= -1.0;
+		velocity *= collisionEnergyKeep;
+		needUpdateVelocity = true;
+	}
+
+	// Check if particule is out of the map on z axis
+	if (position.z < waterRadius)
+	{
+		position.z = waterRadius;
+		velocity.z *= -1.0;
+		velocity *= collisionEnergyKeep;
+		needUpdateVelocity = true;
+	}
+	else if (position.z >= waterMaxXZ)
+	{
+		position.z = waterMaxXZ;
+		velocity.z *= -1.0;
+		velocity *= collisionEnergyKeep;
+		needUpdateVelocity = true;
+	}
+
+	// Update density if needed
+	if (needUpdateVelocity)
+		imageStore(velocitiesBuffer, particleIndex, vec4(velocity, 1.0));
+
+	// Write the value to the buffer
+	imageStore(positionsBuffer, particleIndex, vec4(position, 1.0));
+}

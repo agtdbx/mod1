@@ -70,12 +70,12 @@ int	main(int argc, char **argv)
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
-		shaderManager.addShader("terrain", "data/shaders/terrain.glslv", "data/shaders/terrain.glslf");
-		shaderManager.loadWaterShaderFiles("data/shaders/water.glslv", "data/shaders/water.glslf");
-		shaderManager.addComputeShader("test", "data/shaders/test.glslc"); // TODO: REMOVE
-		shaderManager.addComputeShader("test3", "data/shaders/test3.glslc"); // TODO: REMOVE
-		shaderManager.addComputeShader("predictedPositions", "data/shaders/predictedPositions.glslc");
-		shaderManager.addComputeShader("densities", "data/shaders/densities.glslc");
+		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
+		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
+		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
+		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
+		shaderManager.addComputeShader("velocityEffect", "data/shaders/simulation/velocityEffect.glslc");
+		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -97,117 +97,6 @@ int	main(int argc, char **argv)
 			}
 		}
 	}
-
-	// ComputeShader	*computeTestShader = shaderManager.getComputeShader("test");
-
-	// if (computeTestShader)
-	// {
-	// 	printf("compute shader get\n");
-
-	// 	// Create data
-	// 	std::vector<float>	data;
-	// 	const int			dataSize = 10;
-
-	// 	for (int i = 0; i < dataSize; i++)
-	// 		data.push_back(0.0f);
-
-	// 	// Create texture
-	// 	unsigned int textureBuffer, texture;
-
-	// 	glGenBuffers(1, &textureBuffer);
-	// 	glGenTextures(1, &texture);
-
-	// 	computeTestShader->use();
-
-	// 	// Fill texture from data
-	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-	// 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * dataSize,
-	// 					data.data(), GL_DYNAMIC_DRAW);
-	// 	glActiveTexture(GL_TEXTURE0);
-	// 	glBindTexture(GL_TEXTURE_BUFFER, texture);
-	// 	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, textureBuffer);
-
-	// 	glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-
-	// 	printf("compute shader use\n");
-	// 	printf("compute shader start compute\n");
-
-	// 	int numGroups = (dataSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
-	// 	glDispatchCompute((unsigned int)numGroups, 1, 1);
-
-	// 	// make sure writing to image has finished before read
-	// 	printf("compute shader wait end compute\n");
-	// 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	// 	printf("compute shader end compute\n");
-
-	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-	// 	// Get data from texture
-	// 	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(float) * dataSize, data.data());
-
-	// 	printf("[");
-	// 	for (int i = 0; i < dataSize; i++)
-	// 	{
-	// 		if (i != 0)
-	// 			printf(", ");
-	// 		printf("%i", (int)data[i]);
-	// 	}
-	// 	printf("]\n");
-	// }
-
-	// computeTestShader = shaderManager.getComputeShader("test3");
-	// if (computeTestShader)
-	// {
-	// 	printf("compute shader get\n");
-
-	// 	// Create data
-	// 	std::vector<glm::vec4>	data;
-	// 	const int				dataSize = 10;
-
-	// 	for (int i = 0; i < dataSize; i++)
-	// 		data.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-
-	// 	// Create texture
-	// 	unsigned int textureBuffer, texture;
-
-	// 	glGenBuffers(1, &textureBuffer);
-	// 	glGenTextures(1, &texture);
-
-	// 	computeTestShader->use();
-
-	// 	// Fill texture from data
-	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-	// 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * dataSize,
-	// 					data.data(), GL_DYNAMIC_DRAW);
-	// 	glActiveTexture(GL_TEXTURE0);
-	// 	glBindTexture(GL_TEXTURE_BUFFER, texture);
-	// 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, textureBuffer);
-
-	// 	glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
-	// 	printf("compute shader use\n");
-	// 	printf("compute shader start compute\n");
-
-	// 	int numGroups = (dataSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
-	// 	glDispatchCompute((unsigned int)numGroups, 1, 1);
-
-	// 	// make sure writing to image has finished before read
-	// 	printf("compute shader wait end compute\n");
-	// 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	// 	printf("compute shader end compute\n");
-
-	// 	glBindBuffer(GL_TEXTURE_BUFFER, textureBuffer);
-	// 	// Get data from texture
-	// 	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * dataSize, data.data());
-
-	// 	printf("[");
-	// 	for (int i = 0; i < dataSize; i++)
-	// 	{
-	// 		if (i != 0)
-	// 			printf(", ");
-	// 		printf("(%i %i %i)", (int)data[i].x, (int)data[i].y, (int)data[i].z);
-	// 	}
-	// 	printf("]\n");
-	// }
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))

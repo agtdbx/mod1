@@ -2,7 +2,7 @@
 
 layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 
-layout(r32f, binding = 0) uniform imageBuffer imgBuffer;
+layout(r32f, binding = 0) uniform imageBuffer densitiesBuffer;
 
 uniform float			smoothingRadius;
 uniform float			smoothingScale;
@@ -93,5 +93,5 @@ void main()
 	density = calculateDensity(position);
 
 	// Write the value to the buffer
-	imageStore(imgBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
+	imageStore(densitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
 }

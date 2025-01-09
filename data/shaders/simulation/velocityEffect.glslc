@@ -1,0 +1,23 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform imageBuffer velocitiesBuffer;
+
+uniform float	delta;
+uniform float	energyLose;
+uniform float	gravityForce;
+
+void main()
+{
+	int		particleIndex;
+	vec3	velocity;
+
+	particleIndex = int(gl_GlobalInvocationID.x);
+	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
+	velocity *= energyLose;
+	velocity += vec3(0.0, -gravityForce, 0.0) * delta;
+
+	// Write the value to the buffer
+	imageStore(velocitiesBuffer, particleIndex, vec4(velocity, 1.0));
+}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/08 14:18:17 by gugus            ###   ########.fr       */
+/*   Updated: 2025/01/09 12:35:40 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
 # define VISCOSITY_FORCE 2.0f
-# define ENERGY_LOSE 0.97f;
+# define ENERGY_LOSE 0.97f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.1f

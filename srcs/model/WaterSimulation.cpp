@@ -203,7 +203,7 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 		this->needToUpdateBuffers = false;
 	}
 
-	this->applyGravityAndEnergyLose(shaderManager, delta); // cpu
+	this->applyGravityAndEnergyLose(shaderManager, delta); // gpu
 
 	this->computePredictedPositions(shaderManager, delta); // gpu
 
@@ -211,9 +211,9 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 
 	this->computeDensity(shaderManager); // gpu
 
-	this->calculatesAndApplyPressure(shaderManager, delta); // cpu
+	this->calculatesAndApplyPressure(shaderManager, delta); // cpu -> gpu
 
-	this->updatePositions(shaderManager, delta); // cpu
+	this->updatePositions(shaderManager, delta); // gpu
 }
 
 
@@ -483,13 +483,50 @@ void	WaterSimulation::gridOffsetsFromBuffer(void)
 
 void	WaterSimulation::applyGravityAndEnergyLose(ShaderManager *shaderManager, float delta)
 {
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		// Apply energy lose
-		this->velocities[i] *= ENERGY_LOSE;
-		// Apply gravity
-		this->velocities[i] += glm::vec4(0, -GRAVITY_FORCE, 0, 0) * delta;
-	}
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("velocityEffect");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	this->velocitiesToBuffer();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	int deltaLoc = glGetUniformLocation(shaderId, "delta");
+	glUniform1f(deltaLoc, delta);
+
+	int energyLoseLoc = glGetUniformLocation(shaderId, "energyLose");
+	glUniform1f(energyLoseLoc, ENERGY_LOSE);
+
+	int gravityForceLoc = glGetUniformLocation(shaderId, "gravityForce");
+	glUniform1f(gravityForceLoc, GRAVITY_FORCE);
+
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glBindImageTexture(0, this->textureVelocities, 0, GL_FALSE, 0,
+							GL_READ_WRITE, GL_RGBA32F);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+	// Buffer to vector
+	this->velocitiesFromBuffer();
+
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	// Apply energy lose
+	// 	this->velocities[i] *= ENERGY_LOSE;
+	// 	// Apply gravity
+	// 	this->velocities[i] += glm::vec4(0, -GRAVITY_FORCE, 0, 0) * delta;
+	// }
 }
 
 
@@ -609,6 +646,9 @@ void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 		return ;
 	shaderId = computeShader->getShaderId();
 
+	this->densitiesToBuffer();
+	this->positionsFromBuffer();
+
 	computeShader->use();
 
 	// Compute shader inputs setup
@@ -699,53 +739,104 @@ void	WaterSimulation::calculatesAndApplyPressure(ShaderManager *shaderManager, f
 
 void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 {
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		// Update particule position
-		this->positions[i] += this->velocities[i] * delta;
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
 
-		// Check if particule is out of the map on x axis
-		if (this->positions[i].x < WATER_RADIUS)
-		{
-			this->positions[i].x = WATER_RADIUS;
-			this->velocities[i].x *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
-		else if (this->positions[i].x >= WATER_MAX_XZ)
-		{
-			this->positions[i].x = WATER_MAX_XZ;
-			this->velocities[i].x *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("updatePositions");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
 
-		// Check if particule is out of the map on y axis
-		if (this->positions[i].y < WATER_RADIUS)
-		{
-			this->positions[i].y = WATER_RADIUS;
-			this->velocities[i].y *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
-		else if (this->positions[i].y >= WATER_MAX_HEIGHT)
-		{
-			this->positions[i].y = WATER_MAX_HEIGHT;
-			this->velocities[i].y *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
+	// Vectors to buffers
+	this->positionsToBuffer();
+	this->velocitiesToBuffer();
 
-		// Check if particule is out of the map on z axis
-		if (this->positions[i].z < WATER_RADIUS)
-		{
-			this->positions[i].z = WATER_RADIUS;
-			this->velocities[i].z *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
-		else if (this->positions[i].z >= WATER_MAX_XZ)
-		{
-			this->positions[i].z = WATER_MAX_XZ;
-			this->velocities[i].z *= -1.0f;
-			this->velocities[i] *= COLLISION_ENERGY_KEEP;
-		}
-	}
+	computeShader->use();
+
+	// Compute shader inputs setup
+	int deltaLoc = glGetUniformLocation(shaderId, "delta");
+	glUniform1f(deltaLoc, delta);
+
+	int waterRadiusLoc = glGetUniformLocation(shaderId, "waterRadius");
+	glUniform1f(waterRadiusLoc, WATER_RADIUS);
+
+	int waterMaxXZLoc = glGetUniformLocation(shaderId, "waterMaxXZ");
+	glUniform1f(waterMaxXZLoc, WATER_MAX_XZ);
+
+	int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
+	glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
+
+	int collisionEnergyKeepLoc = glGetUniformLocation(shaderId, "collisionEnergyKeep");
+	glUniform1f(collisionEnergyKeepLoc, COLLISION_ENERGY_KEEP);
+
+	// Compute shader output setup
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
+	glBindImageTexture(0, this->texturePositions, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_RGBA32F);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
+	glBindImageTexture(1, this->textureVelocities, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_RGBA32F);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+	// Buffer to vector
+	this->positionsFromBuffer();
+	this->velocitiesFromBuffer();
+
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	// Update particule position
+	// 	this->positions[i] += this->velocities[i] * delta;
+
+	// 	// Check if particule is out of the map on x axis
+	// 	if (this->positions[i].x < WATER_RADIUS)
+	// 	{
+	// 		this->positions[i].x = WATER_RADIUS;
+	// 		this->velocities[i].x *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+	// 	else if (this->positions[i].x >= WATER_MAX_XZ)
+	// 	{
+	// 		this->positions[i].x = WATER_MAX_XZ;
+	// 		this->velocities[i].x *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+
+	// 	// Check if particule is out of the map on y axis
+	// 	if (this->positions[i].y < WATER_RADIUS)
+	// 	{
+	// 		this->positions[i].y = WATER_RADIUS;
+	// 		this->velocities[i].y *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+	// 	else if (this->positions[i].y >= WATER_MAX_HEIGHT)
+	// 	{
+	// 		this->positions[i].y = WATER_MAX_HEIGHT;
+	// 		this->velocities[i].y *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+
+	// 	// Check if particule is out of the map on z axis
+	// 	if (this->positions[i].z < WATER_RADIUS)
+	// 	{
+	// 		this->positions[i].z = WATER_RADIUS;
+	// 		this->velocities[i].z *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+	// 	else if (this->positions[i].z >= WATER_MAX_XZ)
+	// 	{
+	// 		this->positions[i].z = WATER_MAX_XZ;
+	// 		this->velocities[i].z *= -1.0f;
+	// 		this->velocities[i] *= COLLISION_ENERGY_KEEP;
+	// 	}
+	// }
 
 	this->positionsToBuffer();
 }

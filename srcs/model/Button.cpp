@@ -12,9 +12,10 @@
 
 Mouse *Button::mouse = NULL;
 
-Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg)
+Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
+	this->texture = texture;
 	this->arg = arg;
 	this->active_B = true;
 	this->functionToExecute = functionToExecute;
@@ -22,9 +23,10 @@ Button::Button(float x, float y, float width, float height, void (*functionToExe
 	this->underlineColor = glm::vec3(0.4,0.4,0.4);;
 }
 
-Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, glm::vec3 baseColor, glm::vec3 underlineColor)
+Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture, glm::vec3 baseColor, glm::vec3 underlineColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
+		this->texture = texture;
 	this->arg = arg;
 	this->active_B = true;
 	this->functionToExecute = functionToExecute;
@@ -37,6 +39,7 @@ Button::Button(float x, float y, float width, float height, void (*functionToExe
 Button::Button(const Button &obj)
 :x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
 {
+		this->texture = obj.texture;
 	this->arg = obj.arg;
 	this->active_B = obj.active_B;
 	this->functionToExecute = obj.functionToExecute;
@@ -97,6 +100,7 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	std::vector<Point2D>		points;
 	std::vector<float>			vertices;
 	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
+	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
 
 	menuShader = shaderManager->getMenuShader();
 
@@ -117,9 +121,9 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 		points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
 	}
 
-
-	for (Point2D &point : points)
+	for (int i = 0; i < 4; i++)
 	{
+		Point2D &point = points[i];
 		float x = (point.pos.x  / WIN_W) * 2 - 1;
 		float y = ((WIN_H - point.pos.y)  / WIN_H) * 2 - 1;
 
@@ -128,11 +132,17 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 		vertices.push_back(point.r);
 		vertices.push_back(point.g);
 		vertices.push_back(point.b);
+		vertices.push_back(texturePos[i][0]);
+		vertices.push_back(texturePos[i][1]);
 	}
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indices, GL_STATIC_DRAW);
-	menuShader->use();
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texture);
+
+
+	menuShader->use();
 
 	glBindVertexArray(shaderManager->getVAOId());
 	

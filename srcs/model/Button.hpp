@@ -6,6 +6,7 @@
 # include <engine/inputs/Mouse.hpp>
 # include <engine/OpenGLContext.hpp>
 # include <engine/render/ShaderManager.hpp>
+# include <engine/render/TextureManager.hpp>
 # include <model/Point2D.hpp>
 
 class Button
@@ -14,8 +15,8 @@ public:
 
 	static Mouse * mouse;
 
-	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg);
-	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, glm::vec3 baseColor, glm::vec3 underlineColor);
+	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture);
+	Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture, glm::vec3 baseColor, glm::vec3 underlineColor);
 	Button(const Button &obj);
 	~Button();
 
@@ -31,6 +32,7 @@ public:
 
 private:
 	const float		x_screen, y_screen, width, height;
+	unsigned int	texture;
 	glm::vec3		baseColor, underlineColor;
 	void			(*functionToExecute)(void *);
 	void			*arg;

@@ -30,10 +30,8 @@
 # define WIN_TITLE "mod1"
 
 # define MAX_XY 100
-// # define MAX_HEIGHT 50
-// # define MAP_SIZE 200
-# define MAX_HEIGHT 40
-# define MAP_SIZE 50
+# define MAX_HEIGHT 50
+# define MAP_SIZE 200
 # define TERRAIN_PRECISION 0.01
 
 # define CAMERA_FOV 45.0f
@@ -51,7 +49,7 @@
 # define PRESSURE_MULTIPLIER 100.0f
 # define VISCOSITY_FORCE 0.1f
 
-# define RENDER_CELL_SIZE 10.0f
+# define RENDER_CELL_SIZE 20.0f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.05f

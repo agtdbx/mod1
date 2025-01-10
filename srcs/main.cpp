@@ -18,6 +18,8 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				bool isRainning,
+				bool isFilling,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager);
 static void	draw(
@@ -28,6 +30,11 @@ static void	draw(
 				std::vector<Button>	*buttonVector,
 				WaterSimulation	*simulation);
 void	addWater(void * arg);
+void	changeBoolStatus(void *arg);
+void	updateRain(WaterSimulation *simulation);
+void	fillingPool(WaterSimulation *simulation);
+void	generateWave(void *arg);
+void	resetPool(void *arg);
 
 
 int	main(int argc, char **argv)
@@ -93,27 +100,27 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	buttonVector.push_back(Button(WIN_W - 110, 10, 100, 50,addWater, &simulation, textureManager.getTexture("rain")));
-	buttonVector.push_back(Button(WIN_W - 110, 70, 100, 50,addWater, &simulation, textureManager.getTexture("filling")));
-	buttonVector.push_back(Button(WIN_W - 110, 130, 100, 50,addWater, &simulation, textureManager.getTexture("wave")));
-	buttonVector.push_back(Button(WIN_W - 110, 190, 100, 50,addWater, &simulation, textureManager.getTexture("reset")));
+	buttonVector.push_back(Button(WIN_W - 110, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
+	buttonVector.push_back(Button(WIN_W - 110, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
+	buttonVector.push_back(Button(WIN_W - 110, 130, 100, 50,generateWave, &simulation, textureManager.getTexture("wave")));
+	buttonVector.push_back(Button(WIN_W - 110, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
 
 
 
 
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	int	nbWater[] = {32, 32, 32};
-	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	for (int i = 0; i < nbWater[0]; i++)
-	{
-		for (int j = 0; j < nbWater[2]; j++)
-		{
-			for (int k = 0; k < nbWater[1]; k++)
-			{
-				simulation.addWater(glm::vec3(i, k, j) + offset);
-			}
-		}
-	}
+	// int	nbWater[] = {32, 32, 32};
+	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
+	// for (int i = 0; i < nbWater[0]; i++)
+	// {
+	// 	for (int j = 0; j < nbWater[2]; j++)
+	// 	{
+	// 		for (int k = 0; k < nbWater[1]; k++)
+	// 		{
+	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
+	// 		}
+	// 	}
+	// }
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))
@@ -127,7 +134,7 @@ int	main(int argc, char **argv)
 		// if (inputManager.mouse.)
 		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
-		computation(&inputManager, &camera, &simulation, &shaderManager);
+		computation(&inputManager, &camera, isRainning, isFilling, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -154,11 +161,15 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				bool isRainning,
+				bool isFilling,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
+	static double	timeRainningParticuleAdd = 0.0;
+	static double	timeFillingParticuleAdd = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
@@ -180,7 +191,37 @@ static void	computation(
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
 		deltas.clear();
+
 	}
+	timeRainningParticuleAdd += delta;
+
+	if (timeRainningParticuleAdd >= RAIN_TIME_BEFORE_NEW_PARTICULE)
+	{
+		timeRainningParticuleAdd -= RAIN_TIME_BEFORE_NEW_PARTICULE;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		if (isRainning)
+			updateRain(simulation);
+	}
+	timeFillingParticuleAdd += delta;
+
+	if (timeFillingParticuleAdd >= FILLING_TIME_BEFORE_NEW_PARTICULE)
+	{
+		timeFillingParticuleAdd -= FILLING_TIME_BEFORE_NEW_PARTICULE;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		if (isFilling)
+			fillingPool(simulation);
+	}
+
 
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/10 00:06:39 by gugus            ###   ########.fr       */
+/*   Updated: 2025/01/10 17:54:01 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,13 @@
 
 # define PI 3.1415926535f
 
+# define RAIN_INTENSITY 10
+# define RAIN_TIME_BEFORE_NEW_PARTICULE 0.1f
+# define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
+# define FILLING_INTENSITY 10
+# define WAVE_VELOCITY 10,0,0,10
+# define WAVE_THICKNESS 5
+
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;
 const float		WATER_RADIUS = 1.0f;
@@ -70,5 +77,8 @@ const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIUS, 9));
 
 std::vector<Vec3>	parse(char *name);
+
+
+
 
 #endif

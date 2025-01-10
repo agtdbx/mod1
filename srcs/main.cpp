@@ -48,8 +48,8 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	Terrain	terrain;
 	InputManager	inputManager(context.window);
-	Terrain			terrain;
 	ShaderManager	shaderManager;
 	TextureManager	textureManager;
 	WaterSimulation	simulation;
@@ -73,19 +73,19 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	// simulation.addWater(glm::vec3(5, 5, 5));
-	int	nbWater[] = {32, 32, 32};
-	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	for (int i = 0; i < nbWater[0]; i++)
-	{
-		for (int j = 0; j < nbWater[2]; j++)
-		{
-			for (int k = 0; k < nbWater[1]; k++)
-			{
-				simulation.addWater(glm::vec3(i, k, j) + offset);
-			}
-		}
-	}
+	simulation.addWater(glm::vec3(70, 50, 70));
+	// int	nbWater[] = {32, 32, 32};
+	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
+	// for (int i = 0; i < nbWater[0]; i++)
+	// {
+	// 	for (int j = 0; j < nbWater[2]; j++)
+	// 	{
+	// 		for (int k = 0; k < nbWater[1]; k++)
+	// 		{
+	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
+	// 		}
+	// 	}
+	// }
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))
@@ -127,7 +127,7 @@ static void	computation(
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
 {
-	static std::vector<double> deltas;
+	static int		nbCall = 0;
 	static double	timePrintFps = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
@@ -137,19 +137,14 @@ static void	computation(
 	lastTime = currentTime;
 
 	timePrintFps += delta;
-	deltas.push_back(delta);
+	nbCall++;
 	if (timePrintFps >= PRINT_FPS_TIME)
 	{
-		timePrintFps -= PRINT_FPS_TIME;
-		double avg = 0.0;
-		for (double dtime : deltas)
-		{
-			avg += dtime;
-		}
-		avg /= deltas.size();
+		double	avg = timePrintFps / (double)nbCall;
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
-		deltas.clear();
+		timePrintFps -= PRINT_FPS_TIME;
+		nbCall = 0;
 	}
 
 	// To avoid big simulation step

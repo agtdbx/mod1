@@ -7,12 +7,25 @@
 # include <engine/render/shader/ShaderManager.hpp>
 # include <engine/render/TextureManager.hpp>
 
+typedef struct s_rectangle
+{
+	int	x;
+	int	y;
+	int	width;
+	int	height;
+}	t_rectangle;
+
 class Terrain
 {
 public:
 	Terrain(void);
 	Terrain(const Terrain &obj);
 	~Terrain();
+
+	LUuint	getTextureBufferTerrainGridFlat(void);
+	LUuint	getTextureTerrainGridFlat(void);
+	LUuint	getTextureBufferTerrainGridOffsets(void);
+	LUuint	getTextureTerrainGridOffsets(void);
 
 	Terrain	&operator=(const Terrain &obj);
 
@@ -22,12 +35,17 @@ public:
 private:
 	std::vector<Vec3>					parameterPoints;
 	std::vector<std::vector<double>>	heightmap;
-	std::vector<glm::vec3>				squaresPoints;
+	std::vector<t_rectangle>			rectangles;
 	Mesh								mesh;
+	int									terrainGridW, terrainGridH, terrainGridD,
+										terrainIdHsize;
+	GLuint								textureBufferTerrainGridFlat, textureTerrainGridFlat,
+										textureBufferTerrainGridOffsets, textureTerrainGridOffsets;
 
 	void	initEmptyMap(void);
 	void	interpolate(void);
 	void	createMesh(void);
+	void	generateGridTextures(void);
 };
 
 #endif

@@ -8,3 +8,4 @@ subprojects/glm-*
 subprojects/glew-*
 subprojects/glfw-*
 subprojects/packagecache
+.nfs*

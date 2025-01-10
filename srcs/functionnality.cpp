@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 17:54:49 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:10:50 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@ void	changeBoolStatus(void *arg)
 
 void	updateRain(WaterSimulation *simulation)
 {
-	// std::cout << "Rainning" << std::endl; 
-	// WaterSimulation *simulation = ((WaterSimulation *)(arg));
+
 	static Random	random;
 	for (size_t i = 0; i < RAIN_INTENSITY; i++)
 	{
@@ -34,8 +33,7 @@ void	updateRain(WaterSimulation *simulation)
 
 void	fillingPool(WaterSimulation *simulation)
 {
-	// WaterSimulation *simulation = ((WaterSimulation *)(arg));
-	// std::cout << "Filling" << std::endl; 
+
 	static Random	random;
 	for (size_t i = 0; i < FILLING_INTENSITY; i++)
 	{
@@ -51,6 +49,18 @@ void	fillingPool(WaterSimulation *simulation)
 void	generateWave(void *arg)
 {
 	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	
+	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
+	{
+		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		{
+			for (float z = 0; z < WAVE_THICKNESS; z += WATER_RADIUS * 2)
+			{
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 42.0f));
+			
+			}
+		}
+	}
 	
 }
 

@@ -171,7 +171,7 @@ void	WaterSimulation::addWater(glm::vec3 position)
 	this->needToUpdateBuffers = true;
 }
 
-void	WaterSimulation::addWater(glm::vec3 position, glm::vec4 velociy)
+void	WaterSimulation::addWater(glm::vec3 position, glm::vec3 velocity)
 {
 	if (this->needToUpdateBuffers == false)
 	{
@@ -183,7 +183,7 @@ void	WaterSimulation::addWater(glm::vec3 position, glm::vec4 velociy)
 
 	this->positions.push_back(glm::vec4(position, 0.0f));
 	this->predictedPositions.push_back(glm::vec4(position, 0.0f));
-	this->velocities.push_back(velociy);
+	this->velocities.push_back(glm::vec4(velocity, 0.0f));
 	this->densities.push_back(0.0);
 	this->nbParticules++;
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;

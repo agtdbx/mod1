@@ -21,7 +21,7 @@ public:
 	WaterSimulation	&operator=(const WaterSimulation &obj);
 
 	void	addWater(glm::vec3 position);
-	void	addWater(glm::vec3 position, glm::vec4 velociy);
+	void	addWater(glm::vec3 position, glm::vec3 velociy);
 	void	tick(ShaderManager *shaderManager, float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager);
 	void	clear();

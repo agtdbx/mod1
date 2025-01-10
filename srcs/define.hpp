@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/10 17:54:01 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/10 21:09:46 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
-# define COLLISION_ENERGY_KEEP 0.7
+# define COLLISION_ENERGY_KEEP 0.5
 # define SMOOTHING_RADIUS 5.0f
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
@@ -63,7 +63,8 @@
 # define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_INTENSITY 10
 # define WAVE_VELOCITY 10,0,0,10
-# define WAVE_THICKNESS 5
+# define WAVE_THICKNESS 10
+# define WAVE_HEIGHT 10
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;

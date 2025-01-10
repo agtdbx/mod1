@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 21:10:50 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/10 23:20:36 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,20 @@ void	fillingPool(WaterSimulation *simulation)
 	static Random	random;
 	for (size_t i = 0; i < FILLING_INTENSITY; i++)
 	{
-		simulation->addWater(glm::vec3(1.0f + random.random(),				i + WATER_RADIUS,	1.0f + random.random()));
-		simulation->addWater(glm::vec3(MAP_SIZE - 1.0f - random.random(),	i + WATER_RADIUS,	1.0f + random.random()));
-		simulation->addWater(glm::vec3(1.0f + random.random(),				i + WATER_RADIUS,	MAP_SIZE - 1.0f - random.random()));
-		simulation->addWater(glm::vec3(MAP_SIZE - 1.0f - random.random(),	i + WATER_RADIUS,	MAP_SIZE - 1.0f - random.random()));
+		float deviationFactor = (random.random() - 0.5) * (FILLING_VELOCITY/2) * 5;
+		// std::cout << "deviationFactor : " << deviationFactor << std::endl;
+		simulation->addWater(glm::vec3(1.0f + random.random(),				i + WATER_RADIUS,	1.0f + random.random()),
+							 glm::vec3(FILLING_VELOCITY + deviationFactor, 0.0f, FILLING_VELOCITY - deviationFactor));
+
+		simulation->addWater(glm::vec3(MAP_SIZE - 1.0f - random.random(),	i + WATER_RADIUS,	1.0f + random.random()),
+							 glm::vec3(-FILLING_VELOCITY + deviationFactor, 0.0f, FILLING_VELOCITY + deviationFactor));
+
+		simulation->addWater(glm::vec3(1.0f + random.random(),				i + WATER_RADIUS,	MAP_SIZE - 1.0f - random.random()),
+							 glm::vec3(FILLING_VELOCITY + deviationFactor, 0.0f, -FILLING_VELOCITY + deviationFactor));
+
+		simulation->addWater(glm::vec3(MAP_SIZE - 1.0f - random.random(),	i + WATER_RADIUS,	MAP_SIZE - 1.0f - random.random()),
+							 glm::vec3(-FILLING_VELOCITY + deviationFactor, 0.0f, -FILLING_VELOCITY - deviationFactor));
+
 	}
 	
 

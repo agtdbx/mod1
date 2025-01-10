@@ -11,7 +11,7 @@ void main()
 {
 	vec4 textureColor = texture(texture1, TexCoord).rgba;
 
-	if (textureColor.a == 0.0)
+	if ( textureColor.a == 0.0)
 		textureColor = vec4(pointColor, 1.0);
 	FragColor = textureColor;
 }

@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/10 21:09:46 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/10 23:12:55 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,22 @@
 # define RAIN_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_INTENSITY 10
+# define FILLING_VELOCITY 20
 # define WAVE_VELOCITY 10,0,0,10
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
+
+# define COLOR_000000 glm::vec3(0.0f, 0.0f, 0.0f)
+# define COLOR_666666 glm::vec3(0.4f, 0.4f, 0.4f)
+# define COLOR_6C3737 glm::vec3(0.423529412f, 0.215686275f, 0.215686275f)
+# define COLOR_7F7F7F glm::vec3(0.5f, 0.5f, 0.5f)
+# define COLOR_FFFFFF glm::vec3(1.0f, 1.0f, 1.0f)
+
+# define DEFAULT_PANNEL_COLOR COLOR_7F7F7F
+# define DEFAULT_BUTTON_UNDERLINE_COLOR COLOR_666666
+# define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
+
+# define PANNEL_COLOR COLOR_6C3737
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;

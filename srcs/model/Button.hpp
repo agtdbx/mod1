@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Button.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/10 21:51:07 by lflandri          #+#    #+#             */
+/*   Updated: 2025/01/10 22:30:18 by lflandri         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef BUTTON_HPP
 # define BUTTON_HPP
 
@@ -22,21 +34,25 @@ public:
 
 	Button	&operator=(const Button &obj);
 
-	void	renderMesh( ShaderManager *shaderManager);
-	void	active();
-	void	desactive();
+	void		renderMesh( ShaderManager *shaderManager);
+	glm::vec2	getPos();
+	void		active();
+	void		desactive();
 	bool	isActive();
 	void	press();
 	void	setArg(void *arg);
+	void	setSwitchMode(bool isSwitch);
+	void	setPos(float x, float y);
+
 	
 
 private:
-	const float		x_screen, y_screen, width, height;
+	float		x_screen, y_screen, width, height;
 	unsigned int	texture;
 	glm::vec3		baseColor, underlineColor;
 	void			(*functionToExecute)(void *);
 	void			*arg;
-	bool			active_B;
+	bool			active_B, isSwitch, isON;
 
 	bool			mouseOnButton();
 

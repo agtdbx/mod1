@@ -10,6 +10,7 @@
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
 #include <model/Button.hpp>
+#include <model/Pannel.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -28,6 +29,7 @@ static void	draw(
 				Terrain *terrain,
 				ShaderManager *shaderManager,
 				std::vector<Button>	*buttonVector,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation);
 void	addWater(void * arg);
 void	changeBoolStatus(void *arg);
@@ -67,6 +69,7 @@ int	main(int argc, char **argv)
 	Camera			camera;
 
 	std::vector<Button>	buttonVector;
+	std::vector<Pannel> pannelVector;
 	bool				isRainning = false;
 	bool				isFilling = false;
 
@@ -82,6 +85,7 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("reset", "data/textures/resetButton.png");
 		textureManager.addTexture("filling", "data/textures/fillingButton.png");
 		textureManager.addTexture("wave", "data/textures/waveButton.png");
+		textureManager.addTexture("noTexture", "data/textures/noTexture.png");
 		
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
@@ -100,10 +104,13 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	buttonVector.push_back(Button(WIN_W - 110, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
-	buttonVector.push_back(Button(WIN_W - 110, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
-	buttonVector.push_back(Button(WIN_W - 110, 130, 100, 50,generateWave, &simulation, textureManager.getTexture("wave")));
-	buttonVector.push_back(Button(WIN_W - 110, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
+	pannelVector.push_back(Pannel(WIN_W - 120, 0, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
+	pannelVector[0].addButton(Button(10, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
+	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
+	pannelVector[0].addButton(Button(10, 130, 100, 50,generateWave, &simulation, textureManager.getTexture("wave")));
+	pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
+	pannelVector[0][0].setSwitchMode(true);
+	pannelVector[0][1].setSwitchMode(true);
 
 
 
@@ -138,7 +145,7 @@ int	main(int argc, char **argv)
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &buttonVector, &simulation);
+			&shaderManager, &buttonVector, &pannelVector, &simulation);
 	}
 
 	context.close();
@@ -272,6 +279,7 @@ static void	draw(
 				Terrain *terrain,
 				ShaderManager *shaderManager,
 				std::vector<Button>	*buttonVector,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation)
 {
 	// Clear window
@@ -288,6 +296,11 @@ static void	draw(
 	{
 		button.renderMesh(shaderManager);
 	}
+	for (Pannel & pannel : *pannelVector)
+	{
+		pannel.renderMesh(shaderManager);
+	}
+
 
 	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);

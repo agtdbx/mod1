@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Button.cpp                                         :+:      :+:    :+:   */
+/*   Pannel.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 23:09:28 by lflandri         ###   ########.fr       */
+/*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
+/*   Updated: 2025/01/10 23:07:53 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <model/Button.hpp>
+#include <model/Pannel.hpp>
 
 // #include <GL/glew.h>
 // #include <GLFW/glfw3.h>
@@ -22,52 +22,38 @@
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
-Mouse *Button::mouse = NULL;
+Mouse *Pannel::mouse = NULL;
 
-Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture)
+Pannel::Pannel(float x, float y, float width, float height, unsigned int texture)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
-	this->isON = false;
-	this->isSwitch = false;
+	this->padding = 0;
 	this->texture = texture;
-	this->arg = arg;
-	this->active_B = true;
-	this->functionToExecute = functionToExecute;
-	this->baseColor = DEFAULT_BUTTON_BASE_COLOR;
-	this->underlineColor = DEFAULT_BUTTON_UNDERLINE_COLOR;
+	this->baseColor = DEFAULT_PANNEL_COLOR;
 }
 
-Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture, glm::vec3 baseColor, glm::vec3 underlineColor)
+Pannel::Pannel(float x, float y, float width, float height, unsigned int texture, glm::vec3 baseColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
-	this->isON = false;
-	this->isSwitch = false;
+	this->padding = 0;
 	this->texture = texture;
-	this->arg = arg;
-	this->active_B = true;
-	this->functionToExecute = functionToExecute;
 	this->baseColor = baseColor;
-	this->underlineColor = underlineColor;
 }
 
 
 
-Button::Button(const Button &obj)
+Pannel::Pannel(const Pannel &obj)
 :x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
 {
-	this->isON = obj.isON;
-	this->isSwitch = obj.isSwitch;
+	this->padding = obj.padding;
 	this->texture = obj.texture;
-	this->arg = obj.arg;
-	this->active_B = obj.active_B;
-	this->functionToExecute = obj.functionToExecute;
 	this->baseColor = obj.baseColor;
-	this->underlineColor = obj.underlineColor;
+	buttonList = obj.buttonList;
 }
 
 //---- Destructor --------------------------------------------------------------
 
-Button::~Button()
+Pannel::~Pannel()
 {
 
 }
@@ -76,43 +62,10 @@ Button::~Button()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
-glm::vec2	Button::getPos()
-{
-	return glm::vec2(this->x_screen, this->y_screen);
-}
-
-
-bool	Button::isActive()
-{
-	return this->active_B;
-}
-
-
-
 
 //---- Setters -----------------------------------------------------------------
 
-void	Button::active()
-{
-	this->active_B = true;
-}
-
-void	Button::desactive()
-{
-	this->active_B = false;
-}
-
-void	Button::setArg(void *arg)
-{
-	this->arg = arg;
-}
-
-void	Button::setSwitchMode(bool isSwitch)
-{
-	this->isSwitch = isSwitch;
-}
-
-void	Button::setPos(float x, float y)
+void	Pannel::setPos(float x, float y)
 {
 	this->x_screen = x;
 	this->y_screen = y;
@@ -121,48 +74,43 @@ void	Button::setPos(float x, float y)
 
 //---- Operators ---------------------------------------------------------------
 
-Button	&Button::operator=(const Button &obj)
+Pannel	&Pannel::operator=(const Pannel &obj)
 {
 	if (this == &obj)
 		return (*this);
 	return (*this);
 }
 
+
+Button& Pannel::operator[](int index)
+{
+    if (index >= this->buttonList.size() || index < 0)
+	{
+		throw std::range_error("Pannel error : can't get button of gived index");
+    }
+    return this->buttonList[index];
+}
+
 //**** PUBLIC METHODS **********************************************************
 
 
 
-void	Button::renderMesh( ShaderManager *shaderManager)
+void	Pannel::renderMesh( ShaderManager *shaderManager)
 {
 	MenuShader					*menuShader;
 	std::vector<Point2D>		points;
 	std::vector<float>			vertices;
 	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
 	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
-	glm::vec3 *					color;
+	glm::vec3 *					color = &this->baseColor;
+
+	for (Button & button : this->buttonList)
+	{
+		button.renderMesh(shaderManager);
+	}
 
 	menuShader = shaderManager->getMenuShader();
 
-	if (Button::mouse && this->active_B && this->mouseOnButton())
-	{
-		if (this->isSwitch && this->isON)
-			color = &this->baseColor;
-		else
-			color = &this->underlineColor;
-		if (Button::mouse->left.isPressed())
-		{
-			if (this->isSwitch)
-				this->isON = !this->isON;
-			this->press();
-		}
-	}
-	else
-	{
-		if (this->isSwitch && this->isON)
-			color = &this->underlineColor;
-		else
-			color = &this->baseColor;
-	}
 	points.push_back(Point2D(Vec2(x_screen, y_screen), (*color)[0], (*color)[1], (*color)[2]));
 	points.push_back(Point2D(Vec2(x_screen + width, y_screen), (*color)[0], (*color)[1], (*color)[2]));
 	points.push_back(Point2D(Vec2(x_screen, y_screen + height),  (*color)[0], (*color)[1], (*color)[2]));
@@ -196,20 +144,15 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void	Button::press()
+void	Pannel::addButton(Button  b)
 {
-	if (this->active_B)
-		this->functionToExecute(this->arg);
+	unsigned int indButton = this->buttonList.size();
+	this->buttonList.push_back(b);
+	Button & newButton = this->buttonList[indButton];
+	glm::vec2 posButton= newButton.getPos();
+	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
-
 
 
 //**** PRIVATE METHODS *********************************************************
 
-bool 	Button::mouseOnButton()
-{
-	if (Button::mouse->getPos().x >= this->x_screen and Button::mouse->getPos().x < this->x_screen + this->width and
-		Button::mouse->getPos().y >= this->y_screen and Button::mouse->getPos().y < this->y_screen + this->height)
-		return true;
-	return false;
-}

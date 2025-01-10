@@ -9,6 +9,7 @@
 #include <engine/render/Camera.hpp>
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
+#include <model/Button.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -24,7 +25,10 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
+				std::vector<Button>	*buttonVector,
 				WaterSimulation	*simulation);
+void	addWater(void * arg);
+
 
 int	main(int argc, char **argv)
 {
@@ -55,12 +59,27 @@ int	main(int argc, char **argv)
 	WaterSimulation	simulation;
 	Camera			camera;
 
+	std::vector<Button>	buttonVector;
+	bool				isRainning = false;
+	bool				isFilling = false;
+
+	
+
+	Button::mouse = &inputManager.mouse;
+
 	try
 	{
 		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
+		textureManager.addTexture("rain", "data/textures/rainButton.png");
+		textureManager.addTexture("reset", "data/textures/resetButton.png");
+		textureManager.addTexture("filling", "data/textures/fillingButton.png");
+		textureManager.addTexture("wave", "data/textures/waveButton.png");
+		
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
+		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
+
 		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
@@ -73,6 +92,15 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
+
+	buttonVector.push_back(Button(WIN_W - 110, 10, 100, 50,addWater, &simulation, textureManager.getTexture("rain")));
+	buttonVector.push_back(Button(WIN_W - 110, 70, 100, 50,addWater, &simulation, textureManager.getTexture("filling")));
+	buttonVector.push_back(Button(WIN_W - 110, 130, 100, 50,addWater, &simulation, textureManager.getTexture("wave")));
+	buttonVector.push_back(Button(WIN_W - 110, 190, 100, 50,addWater, &simulation, textureManager.getTexture("reset")));
+
+
+
+
 	// simulation.addWater(glm::vec3(5, 5, 5));
 	int	nbWater[] = {32, 32, 32};
 	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
@@ -96,12 +124,14 @@ int	main(int argc, char **argv)
 		if (inputManager.escape.isPressed())
 			break;
 
+		// if (inputManager.mouse.)
+		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
 		computation(&inputManager, &camera, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &simulation);
+			&shaderManager, &buttonVector, &simulation);
 	}
 
 	context.close();
@@ -200,6 +230,7 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
+				std::vector<Button>	*buttonVector,
 				WaterSimulation	*simulation)
 {
 	// Clear window
@@ -208,9 +239,26 @@ static void	draw(
 
 	// Draw mesh
 	// waterManager->draw(camera, shaderManager);
+	// glBindVertexArray(0);
+
+
+	// Button	test(10, 10, 100, 50,addWater, simulation, textureManager->getTexture("rain"));
+	for (Button & button : *buttonVector)
+	{
+		button.renderMesh(shaderManager);
+	}
+
+	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);
 	simulation->draw(camera, shaderManager);
 
 	// Display the new image
 	glfwSwapBuffers(window);
+}
+
+
+void	addWater(void * arg)
+{
+	WaterSimulation & simulation = *((WaterSimulation *)(arg));
+	simulation.addWater(glm::vec3(5, 5, 5));
 }

@@ -19,7 +19,8 @@ ShaderManager::ShaderManager(void)
 
 	// Allocate buffer for indices
 	glGenBuffers(1, &this->EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this->EBO);
+
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -73,9 +74,35 @@ WaterShader	*ShaderManager::getWaterShader(void)
 }
 
 
-unsigned int	ShaderManager::getVAOId(void)
+MenuShader	*ShaderManager::getMenuShader(void)
+{
+	return (&this->menuShader);
+}
+
+
+// unsigned int	ShaderManager::getVAOId(void)
+// {
+// 	return (this->VAO);
+// }
+
+// unsigned int	ShaderManager::getEBOId(void)
+// {
+// 	return (this->EBO);
+// }
+
+unsigned int	ShaderManager::getVAOId()
 {
 	return (this->VAO);
+}
+
+unsigned int	ShaderManager::getVBOId()
+{
+	return (this->VBO);
+}
+
+unsigned int	ShaderManager::getEBOId()
+{
+	return (this->EBO);
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -145,6 +172,14 @@ void	ShaderManager::loadWaterShaderFiles(
 						std::string fShaderFile)
 {
 	this->waterShader.load(vShaderFile, fShaderFile);
+}
+
+
+void	ShaderManager::loadMenuShaderFiles(
+						std::string vShaderFile,
+						std::string fShaderFile)
+{
+	this->menuShader.load(vShaderFile, fShaderFile);
 }
 
 //**** PRIVATE METHODS *********************************************************

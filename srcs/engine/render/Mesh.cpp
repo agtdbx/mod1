@@ -280,7 +280,6 @@ void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 {
 	if (this->vertices == NULL || this ->indices == NULL || shader == NULL)
 		return ;
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
 
@@ -298,6 +297,7 @@ void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 	glBindVertexArray(VAOid);
 
 	glDrawElements(GL_TRIANGLES, this->nbIndices, GL_UNSIGNED_INT, 0);
+
 }
 
 

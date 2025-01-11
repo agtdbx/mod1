@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 23:07:53 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/11 04:24:32 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 Mouse *Pannel::mouse = NULL;
 
 Pannel::Pannel(float x, float y, float width, float height, unsigned int texture)
-:x_screen(x), y_screen(y), width(width), height(height)
+:x_screen(x), y_screen(y), width(width), height(height), x_toGo(x), y_toGo(y)
 {
 	this->padding = 0;
 	this->texture = texture;
@@ -33,7 +33,7 @@ Pannel::Pannel(float x, float y, float width, float height, unsigned int texture
 }
 
 Pannel::Pannel(float x, float y, float width, float height, unsigned int texture, glm::vec3 baseColor)
-:x_screen(x), y_screen(y), width(width), height(height)
+:x_screen(x), y_screen(y), width(width), height(height), x_toGo(x), y_toGo(y)
 {
 	this->padding = 0;
 	this->texture = texture;
@@ -43,7 +43,7 @@ Pannel::Pannel(float x, float y, float width, float height, unsigned int texture
 
 
 Pannel::Pannel(const Pannel &obj)
-:x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
+:x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height), x_toGo(obj.x_toGo), y_toGo(obj.y_toGo)
 {
 	this->padding = obj.padding;
 	this->texture = obj.texture;
@@ -70,6 +70,13 @@ void	Pannel::setPos(float x, float y)
 	this->x_screen = x;
 	this->y_screen = y;
 }
+
+void	Pannel::setPosToGo(float x, float y)
+{
+	this->x_toGo = x;
+	this->y_toGo = y;
+}
+
 
 
 //---- Operators ---------------------------------------------------------------
@@ -103,6 +110,7 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
 	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
 	glm::vec3 *					color = &this->baseColor;
+	// std::cout << "draw pos : " << this->x_screen << " | " << this->y_screen << std::endl;
 
 	for (Button & button : this->buttonList)
 	{
@@ -111,10 +119,10 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 
 	menuShader = shaderManager->getMenuShader();
 
-	points.push_back(Point2D(Vec2(x_screen, y_screen), (*color)[0], (*color)[1], (*color)[2]));
-	points.push_back(Point2D(Vec2(x_screen + width, y_screen), (*color)[0], (*color)[1], (*color)[2]));
-	points.push_back(Point2D(Vec2(x_screen, y_screen + height),  (*color)[0], (*color)[1], (*color)[2]));
-	points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(this->x_screen, this->y_screen), (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(this->x_screen + this->width, this->y_screen), (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(this->x_screen, this->y_screen + this->height),  (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(this->x_screen + this->width, this->y_screen + this->height), (*color)[0], (*color)[1], (*color)[2]));
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -153,6 +161,41 @@ void	Pannel::addButton(Button  b)
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
 
+void	Pannel::tick(double delta)
+{
+	if (this->x_toGo == this->x_screen && this->y_toGo == this->y_screen)
+		return ;
+	glm::vec2	velocity(0.0f, 0.0f);
+
+	if (this->x_toGo < this->x_screen)
+		velocity[0] = -1.0f;
+	else if (this->x_toGo > this->x_screen)
+		velocity[0] = 1.0f;
+	if (this->y_toGo < this->y_screen)
+		velocity[1] = -1.0f;
+	else if (this->y_toGo > this->y_screen)
+		velocity[1] = 1.0f;
+
+	velocity *= PANNEL_MOVE_SPEED * delta;
+	if ((this->x_toGo < this->x_screen && this->x_screen + velocity[0]  < this->x_toGo)
+		|| (this->x_toGo > this->x_screen && this->x_screen + velocity[0]  > this->x_toGo))
+			velocity[0] = this->x_toGo - this->x_screen;
+	if ((this->y_toGo < this->y_screen && this->y_screen + velocity[1]  < this->y_toGo)
+		|| (this->y_toGo > this->y_screen && this->y_screen + velocity[1]  > this->y_toGo))
+			velocity[1] = this->y_toGo - this->y_screen;
+	this->x_screen += velocity[0]; 
+	this->y_screen += velocity[1];
+	this->moveButton(velocity[0], velocity[1]);
+}
+
 
 //**** PRIVATE METHODS *********************************************************
+
+void	Pannel::moveButton(float mvx, float mvy)
+{
+	for (Button & button : this->buttonList)
+	{
+		button.setPos(button.getPos().x + mvx, button.getPos().y + mvy);
+	}
+}
 

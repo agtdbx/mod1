@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:50:55 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 22:55:36 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/11 04:14:26 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,20 @@ public:
 	Pannel	&operator=(const Pannel &obj);
 	Button& operator[](int);
 	void	setPos(float x, float y);
+	void	setPosToGo(float x, float y);
 
 	void	renderMesh( ShaderManager *shaderManager);
 	void	addButton(Button  b);
+	void	tick(double delta);
 	
 
 private:
-	float		x_screen, y_screen, width, height, padding;
+	float		x_screen, y_screen, width, height, padding, x_toGo, y_toGo;
 	glm::vec3		baseColor;
 	unsigned int	texture;
 	std::vector<Button>	buttonList;
+
+	void	moveButton(float mvx, float mvy);
 
 
 

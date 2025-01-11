@@ -21,6 +21,7 @@ static void	computation(
 				Camera *camera,
 				bool isRainning,
 				bool isFilling,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager);
 static void	draw(
@@ -72,6 +73,7 @@ int	main(int argc, char **argv)
 	std::vector<Pannel> pannelVector;
 	bool				isRainning = false;
 	bool				isFilling = false;
+	bool				isPannelHide = false;
 
 	
 
@@ -104,7 +106,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	pannelVector.push_back(Pannel(WIN_W - 120, 0, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
+	pannelVector.push_back(Pannel(WIN_W - 120, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
 	pannelVector[0].addButton(Button(10, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
 	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
 	pannelVector[0].addButton(Button(10, 130, 100, 50,generateWave, &simulation, textureManager.getTexture("wave")));
@@ -137,11 +139,19 @@ int	main(int argc, char **argv)
 		// Close window on escape
 		if (inputManager.escape.isPressed())
 			break;
+		if (inputManager.tab.isPressed())
+		{
+			if (isPannelHide)
+				pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
+			else
+				pannelVector[0].setPosToGo(WIN_W + 1, 0.0f);
+			isPannelHide = !isPannelHide;
+		}
 
 		// if (inputManager.mouse.)
 		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
-		computation(&inputManager, &camera, isRainning, isFilling, &simulation, &shaderManager);
+		computation(&inputManager, &camera, isRainning, isFilling, &pannelVector, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -170,6 +180,7 @@ static void	computation(
 				Camera *camera,
 				bool isRainning,
 				bool isFilling,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
 {
@@ -228,7 +239,11 @@ static void	computation(
 		if (isFilling)
 			fillingPool(simulation);
 	}
-
+	for (Pannel & pannel : *pannelVector)
+	{
+		pannel.tick(delta);
+	}
+	
 
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/10 23:12:55 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/11 04:09:40 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
 
 # define PANNEL_COLOR COLOR_6C3737
+# define PANNEL_MOVE_SPEED 200
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;

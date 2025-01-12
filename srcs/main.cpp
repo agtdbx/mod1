@@ -44,6 +44,18 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	Terrain	terrain;
+
+	try
+	{
+		terrain.loadFromFile(argv[1]);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
+
 	OpenGLContext	context;
 
 	if (!context.isInitGood())
@@ -53,7 +65,6 @@ int	main(int argc, char **argv)
 	}
 
 	InputManager	inputManager(context.window);
-	Terrain			terrain;
 	ShaderManager	shaderManager;
 	TextureManager	textureManager;
 	WaterSimulation	simulation;
@@ -63,19 +74,16 @@ int	main(int argc, char **argv)
 	bool				isRainning = false;
 	bool				isFilling = false;
 
-	
-
 	Button::mouse = &inputManager.mouse;
 
 	try
 	{
-		terrain.loadFromFile(argv[1]);
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
 		textureManager.addTexture("rain", "data/textures/rainButton.png");
 		textureManager.addTexture("reset", "data/textures/resetButton.png");
 		textureManager.addTexture("filling", "data/textures/fillingButton.png");
 		textureManager.addTexture("wave", "data/textures/waveButton.png");
-		
+
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");

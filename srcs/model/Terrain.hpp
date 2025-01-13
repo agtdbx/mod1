@@ -22,10 +22,10 @@ public:
 	Terrain(const Terrain &obj);
 	~Terrain();
 
-	LUuint	getTextureBufferTerrainGridFlat(void);
-	LUuint	getTextureTerrainGridFlat(void);
-	LUuint	getTextureBufferTerrainGridOffsets(void);
-	LUuint	getTextureTerrainGridOffsets(void);
+	GLuint	getTextureBufferTerrainGridFlat(void);
+	GLuint	getTextureTerrainGridFlat(void);
+	GLuint	getTextureBufferTerrainGridOffsets(void);
+	GLuint	getTextureTerrainGridOffsets(void);
 
 	Terrain	&operator=(const Terrain &obj);
 
@@ -35,6 +35,7 @@ public:
 private:
 	std::vector<Vec3>					parameterPoints;
 	std::vector<std::vector<double>>	heightmap;
+	std::vector<Point>					vertices;
 	std::vector<t_rectangle>			rectangles;
 	Mesh								mesh;
 	int									terrainGridW, terrainGridH, terrainGridD,

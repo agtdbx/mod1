@@ -10,8 +10,6 @@
 
 Mesh::Mesh(void)
 {
-	this->vertices = NULL;
-	this->indices = NULL;
 	this->nbVertices = 0;
 	this->nbIndices = 0;
 	this->translation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -26,41 +24,27 @@ Mesh::Mesh(void)
 Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 {
 	this->nbVertices = vertices.size() * 9;
-	this->vertices = new float[this->nbVertices];
 
-	if (this->vertices == NULL)
-		throw new std::invalid_argument("Mesh vertrices alloc failed");
-
-	int	id;
-	for (int i = 0; i < this->nbVertices; i += 9)
+	for (uint i = 0; i < vertices.size(); i++)
 	{
-		id = i / 9;
-		this->vertices[i    ] = vertices[id].pos.x;
-		this->vertices[i + 1] = vertices[id].pos.y;
-		this->vertices[i + 2] = vertices[id].pos.z;
-		this->vertices[i + 3] = vertices[id].normal.x;
-		this->vertices[i + 4] = vertices[id].normal.y;
-		this->vertices[i + 5] = vertices[id].normal.z;
-		this->vertices[i + 6] = vertices[id].r;
-		this->vertices[i + 7] = vertices[id].g;
-		this->vertices[i + 8] = vertices[id].b;
+		this->vertices.push_back(vertices[i].pos.x);
+		this->vertices.push_back(vertices[i].pos.y);
+		this->vertices.push_back(vertices[i].pos.z);
+		this->vertices.push_back(vertices[i].normal.x);
+		this->vertices.push_back(vertices[i].normal.y);
+		this->vertices.push_back(vertices[i].normal.z);
+		this->vertices.push_back(vertices[i].r);
+		this->vertices.push_back(vertices[i].g);
+		this->vertices.push_back(vertices[i].b);
 	}
 
 	this->nbIndices = indices.size() * 3;
-	this->indices = new unsigned int[this->nbIndices];
 
-	if (this->indices == NULL)
+	for (uint i = 0; i < indices.size(); i++)
 	{
-		delete [] this->vertices;
-		throw new std::invalid_argument("Mesh indices alloc failed");
-	}
-
-	for (int i = 0; i < this->nbIndices; i += 3)
-	{
-		id = i / 3;
-		this->indices[i    ] = indices[id].p1;
-		this->indices[i + 1] = indices[id].p2;
-		this->indices[i + 2] = indices[id].p3;
+		this->indices.push_back(indices[i].p1);
+		this->indices.push_back(indices[i].p2);
+		this->indices.push_back(indices[i].p3);
 	}
 
 	this->translation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -75,26 +59,9 @@ Mesh::Mesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 Mesh::Mesh(const Mesh &obj)
 {
 	this->nbVertices = obj.nbVertices;
-	this->vertices = new float[this->nbVertices];
-
-	if (this->vertices == NULL)
-		throw new std::invalid_argument("Mesh vertrices alloc failed");
-
-	for (int i = 0; i < this->nbVertices; i++)
-		this->vertices[i] = obj.vertices[i];
-
+	this->vertices = obj.vertices;
 	this->nbIndices = obj.nbIndices;
-	this->indices = new unsigned int[this->nbIndices];
-
-	if (this->indices == NULL)
-	{
-		delete [] this->vertices;
-		throw new std::invalid_argument("Mesh indices alloc failed");
-	}
-
-	for (int i = 0; i < this->nbIndices; i++)
-		this->indices[i] = obj.indices[i];
-
+	this->indices = obj.indices;
 	this->translation = obj.translation;
 	this->degrees_x = obj.degrees_x;
 	this->degrees_y = obj.degrees_y;
@@ -107,12 +74,6 @@ Mesh::Mesh(const Mesh &obj)
 
 Mesh::~Mesh()
 {
-	if (this->vertices != NULL)
-		delete [] this->vertices;
-	this->vertices = NULL;
-	if (this->indices != NULL)
-		delete [] this->indices;
-	this->indices = NULL;
 }
 
 
@@ -122,85 +83,46 @@ Mesh::~Mesh()
 
 void Mesh::setVertices(std::vector<Point> & vertices)
 {
-	if (this->vertices)
-	{
-		delete [] this->vertices;
-		this->vertices = NULL;
-	}
-
+	this->vertices.clear();
 	this->nbVertices = vertices.size() * 9;
-	this->vertices = new float[this->nbVertices];
-
-	if (this->vertices == NULL)
-		throw new std::invalid_argument("Mesh vertrices alloc failed");
-
-	int	id;
-	for (int i = 0; i < this->nbVertices; i += 9)
+	for (uint i = 0; i < vertices.size(); i++)
 	{
-		id = i / 9;
-		this->vertices[i    ] = vertices[id].pos.x;
-		this->vertices[i + 1] = vertices[id].pos.y;
-		this->vertices[i + 2] = vertices[id].pos.z;
-		this->vertices[i + 3] = vertices[id].normal.x;
-		this->vertices[i + 4] = vertices[id].normal.y;
-		this->vertices[i + 5] = vertices[id].normal.z;
-		this->vertices[i + 6] = vertices[id].r;
-		this->vertices[i + 7] = vertices[id].g;
-		this->vertices[i + 8] = vertices[id].b;
+		this->vertices.push_back(vertices[i].pos.x);
+		this->vertices.push_back(vertices[i].pos.y);
+		this->vertices.push_back(vertices[i].pos.z);
+		this->vertices.push_back(vertices[i].normal.x);
+		this->vertices.push_back(vertices[i].normal.y);
+		this->vertices.push_back(vertices[i].normal.z);
+		this->vertices.push_back(vertices[i].r);
+		this->vertices.push_back(vertices[i].g);
+		this->vertices.push_back(vertices[i].b);
 	}
 }
 
 void	Mesh::setMesh(std::vector<Point> &vertices, std::vector<t_tri_id> &indices)
 {
-	if (this->vertices)
-	{
-		delete [] this->vertices;
-		this->vertices = NULL;
-	}
-
+	this->vertices.clear();
 	this->nbVertices = vertices.size() * 9;
-	this->vertices = new float[this->nbVertices];
-
-	if (this->vertices == NULL)
-		throw new std::invalid_argument("Mesh vertrices alloc failed");
-
-	int	id;
-	for (int i = 0; i < this->nbVertices; i += 9)
+	for (uint i = 0; i < vertices.size(); i++)
 	{
-		id = i / 9;
-		this->vertices[i    ] = vertices[id].pos.x;
-		this->vertices[i + 1] = vertices[id].pos.y;
-		this->vertices[i + 2] = vertices[id].pos.z;
-		this->vertices[i + 3] = vertices[id].normal.x;
-		this->vertices[i + 4] = vertices[id].normal.y;
-		this->vertices[i + 5] = vertices[id].normal.z;
-		this->vertices[i + 6] = vertices[id].r;
-		this->vertices[i + 7] = vertices[id].g;
-		this->vertices[i + 8] = vertices[id].b;
+		this->vertices.push_back(vertices[i].pos.x);
+		this->vertices.push_back(vertices[i].pos.y);
+		this->vertices.push_back(vertices[i].pos.z);
+		this->vertices.push_back(vertices[i].normal.x);
+		this->vertices.push_back(vertices[i].normal.y);
+		this->vertices.push_back(vertices[i].normal.z);
+		this->vertices.push_back(vertices[i].r);
+		this->vertices.push_back(vertices[i].g);
+		this->vertices.push_back(vertices[i].b);
 	}
 
-	if (this->indices)
-	{
-		delete [] this->indices;
-		this->indices = NULL;
-	}
-
+	this->indices.clear();
 	this->nbIndices = indices.size() * 3;
-	this->indices = new unsigned int[this->nbIndices];
-
-	if (this->indices == NULL)
+	for (uint i = 0; i < indices.size(); i++)
 	{
-		delete [] this->vertices;
-		this->vertices = NULL;
-		throw new std::invalid_argument("Mesh indices alloc failed");
-	}
-
-	for (int i = 0; i < this->nbIndices; i += 3)
-	{
-		id = i / 3;
-		this->indices[i    ] = indices[id].p1;
-		this->indices[i + 1] = indices[id].p2;
-		this->indices[i + 2] = indices[id].p3;
+		this->indices.push_back(indices[i].p1);
+		this->indices.push_back(indices[i].p2);
+		this->indices.push_back(indices[i].p3);
 	}
 }
 
@@ -212,34 +134,10 @@ Mesh	&Mesh::operator=(const Mesh &obj)
 	if (this == &obj)
 		return (*this);
 
-	if (this->vertices != NULL)
-		delete [] this->vertices;
-	this->vertices = NULL;
-	if (this->indices != NULL)
-		delete [] this->indices;
-	this->indices = NULL;
-
 	this->nbVertices = obj.nbVertices;
-	this->vertices = new float[this->nbVertices];
-
-	if (this->vertices == NULL)
-		throw new std::invalid_argument("Mesh vertrices alloc failed");
-
-	for (int i = 0; i < this->nbVertices; i++)
-		this->vertices[i] = obj.vertices[i];
-
+	this->vertices = obj.vertices;
 	this->nbIndices = obj.nbIndices;
-	this->indices = new unsigned int[this->nbIndices];
-
-	if (this->indices == NULL)
-	{
-		delete [] this->vertices;
-		throw new std::invalid_argument("Mesh indices alloc failed");
-	}
-
-	for (int i = 0; i < this->nbIndices; i++)
-		this->indices[i] = obj.indices[i];
-
+	this->indices = obj.indices;
 	this->translation = obj.translation;
 	this->degrees_x = obj.degrees_x;
 	this->degrees_y = obj.degrees_y;
@@ -278,11 +176,13 @@ void	Mesh::scale(float scale)
 
 void	Mesh::draw(Camera *camera, Shader *shader, unsigned int VAOid)
 {
-	if (this->vertices == NULL || this ->indices == NULL || shader == NULL)
+	if (shader == NULL)
 		return ;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices, this->vertices, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices, this->indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * this->nbVertices,
+					this->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->nbIndices,
+					this->indices.data(), GL_STATIC_DRAW);
 
 	shader->use();
 

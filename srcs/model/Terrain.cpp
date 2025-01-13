@@ -47,25 +47,25 @@ Terrain::~Terrain()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
-LUuint	Terrain::getTextureBufferTerrainGridFlat(void)
+GLuint	Terrain::getTextureBufferTerrainGridFlat(void)
 {
 	return (this->textureBufferTerrainGridFlat);
 }
 
 
-LUuint	Terrain::getTextureTerrainGridFlat(void)
+GLuint	Terrain::getTextureTerrainGridFlat(void)
 {
 	return (this->textureTerrainGridFlat);
 }
 
 
-LUuint	Terrain::getTextureBufferTerrainGridOffsets(void)
+GLuint	Terrain::getTextureBufferTerrainGridOffsets(void)
 {
 	return (this->textureBufferTerrainGridOffsets);
 }
 
 
-LUuint	Terrain::getTextureTerrainGridOffsets(void)
+GLuint	Terrain::getTextureTerrainGridOffsets(void)
 {
 	return (this->textureTerrainGridOffsets);
 }
@@ -175,22 +175,15 @@ void Terrain::interpolate(void)
 
 void	Terrain::createMesh(void)
 {
-	std::vector<Point>			vertices;
-	std::vector<t_tri_id>		indices;
-	std::vector<bool>			isInRectangle;
+	std::vector<t_tri_id>	indices;
+	std::vector<bool>		isInRectangle;
+	double					r, g, b, height;
+	Vec3					p1, p2, p3, A, B, normal;
+	int						yId, nyId, nx, area, maxArea,
+							maxAreaX, maxAreaY, minLineX;
+	unsigned int			vIds[4];
 
-	double			r, g, b, height;
-	Vec3			p1, p2, p3, A, B, normal;
-	int	yId;
-	int	nyId;
-	int	nx;
-	int	area;
-	int	maxArea;
-	int	maxAreaX;
-	int	maxAreaY;
-	int	minLineX;
-	unsigned int	vIds[4];
-
+	this->vertices.clear();
 	// Vertices creation
 	for (double y = 0; y < MAP_SIZE; y++)
 	{
@@ -221,7 +214,7 @@ void	Terrain::createMesh(void)
 				normal.normalize();
 			}
 
-			vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
+			this->vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
 		}
 	}
 
@@ -240,7 +233,7 @@ void	Terrain::createMesh(void)
 			if (isInRectangle[yId + x])
 				continue;
 
-			Vec3	&testNormal = vertices[yId + x].normal;
+			Vec3	&testNormal = this->vertices[yId + x].normal;
 
 			maxArea = 1;
 			maxAreaX = x + 1;
@@ -252,7 +245,7 @@ void	Terrain::createMesh(void)
 				nx = x;
 				while (nx < MAP_SIZE)
 				{
-					if (vertices[nyId + nx].normal != testNormal)
+					if (this->vertices[nyId + nx].normal != testNormal)
 						break;
 					if (isInRectangle[nyId + nx])
 						break;
@@ -290,7 +283,7 @@ void	Terrain::createMesh(void)
 	}
 
 	// Create mesh
-	this->mesh = Mesh(vertices, indices);
+	this->mesh = Mesh(this->vertices, indices);
 	this->generateGridTextures();
 }
 
@@ -302,16 +295,20 @@ void	Terrain::generateGridTextures(void)
 	this->terrainGridW = MAP_SIZE / terrain_cell_size;
 	if (MAP_SIZE > terrain_cell_size && MAP_SIZE % terrain_cell_size != 0)
 		this->terrainGridW++;
+
 	this->terrainGridH = MAP_MAX_HEIGHT / terrain_cell_size;
 	if (MAP_MAX_HEIGHT > terrain_cell_size
 		&& (int)MAP_MAX_HEIGHT % terrain_cell_size != 0)
 		this->terrainGridH++;
+
 	this->terrainGridD = this->terrainGridW;
 	this->terrainIdHsize = this->terrainGridW * this->terrainGridD;
 
 	// Init terrain grid
 	int terrainGridSize = this->terrainGridW * this->terrainGridH * this->terrainGridD;
 	std::vector<std::vector<int>>	terrainGrid;
+	// 3 vec3 per rectangle (pos, size, normal)
+	std::vector<glm::vec3>	terrainData;
 
 	for (int i = 0; i < terrainGridSize; i++)
 	{
@@ -319,12 +316,31 @@ void	Terrain::generateGridTextures(void)
 		terrainGrid.push_back(terrainGridContent);
 	}
 
-	int	gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ;
+	// int	gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ, vid,
+	// 	gx, gy, gz, cx, cy, cz, gid;
 
-	// TODO : Put texture for terrain vertices
-	// TODO : Fill terrain grid
-	// for (t_rectangle &rectangle : this->rectangles)
+	// // TODO : Put texture for terrain vertices
+	// // TODO : Fill terrain grid
+	// for (uint i = 0; i < this->rectangles.size(); i++)
 	// {
+	// 	t_rectangle &rectangle = this->rectangles[i];
 
+	// 	vid = rectangle.y * MAP_SIZE + rectangle.x;
+	// 	Vec3	pos = this->vertices[vid].pos;
+	// 	Vec3	normal = this->vertices[vid].normal;
+	// 	vid = (rectangle.y + rectangle.height) * MAP_SIZE
+	// 			+ (rectangle.x + rectangle.width);
+	// 	Vec3	endPos = this->vertices[vid].pos;
+	// 	Vec3	size = endPos - pos;
+
+	// 	// Put data in terrainData vector
+	// 	terrainData.push_back(gml::vec3(pos.x, pos.y, pos.z));
+	// 	terrainData.push_back(gml::vec3(size.x, size.y, size.z));
+	// 	terrainData.push_back(gml::vec3(normal.x, normal.y, normal.z));
+
+	// 	if (pos.x <= endPos.x)
+	// 		cx = 1;
+	// 	else
+	// 		cx = -1;
 	// }
 }

@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 23:20:36 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:53:22 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
 #include <model/WaterSimulation.hpp>
+#include <model/Pannel.hpp>
 #include <engine/maths/Random.hpp>
 
 
@@ -56,7 +57,7 @@ void	fillingPool(WaterSimulation *simulation)
 
 }
 
-void	generateWave(void *arg)
+void	generateWaveWest(void *arg)
 {
 	WaterSimulation *simulation = ((WaterSimulation *)(arg));
 	
@@ -72,6 +73,70 @@ void	generateWave(void *arg)
 		}
 	}
 	
+}
+
+void	generateWaveEst(void *arg)
+{
+	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+
+	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
+	{
+		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		{
+			for (float z = MAP_SIZE - WAVE_THICKNESS - 1 ; z < MAP_SIZE; z += WATER_RADIUS * 2)
+			{
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, -42.0f));
+			}
+		}
+	}
+	
+}
+
+void	generateWaveNorth(void *arg)
+{
+	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	
+	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
+	{
+		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		{
+			for (float x = 0; x < WAVE_THICKNESS; x += WATER_RADIUS * 2)
+			{
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(42.0f, 0.0f, 0.0f));
+			
+			}
+		}
+	}
+	
+}
+
+void	generateWaveSouth(void *arg)
+{
+	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+
+	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
+	{
+		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		{
+			for (float x = MAP_SIZE - WAVE_THICKNESS - 1 ; x < MAP_SIZE; x += WATER_RADIUS * 2)
+			{
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(-42.0f, 0.0f, 0.0f));
+			}
+		}
+	}
+	
+}
+
+void	moveWavePannel(void *arg)
+{
+	static bool isHide = true;
+	Pannel *pannel = (Pannel *)arg;
+
+	isHide = !isHide;
+	if (isHide)
+		pannel->addPosToGo(120, 0);
+	else
+		pannel->addPosToGo(-120, 0);
 }
 
 void	resetPool(void *arg)

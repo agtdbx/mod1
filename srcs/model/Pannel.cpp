@@ -6,7 +6,7 @@
 /*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/11 04:24:32 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:17:26 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,11 @@ void	Pannel::setPosToGo(float x, float y)
 	this->y_toGo = y;
 }
 
-
+void	Pannel::addPosToGo(float x, float y)
+{
+	this->x_toGo += x;
+	this->y_toGo += y;
+}
 
 //---- Operators ---------------------------------------------------------------
 

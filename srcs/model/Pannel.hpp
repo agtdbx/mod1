@@ -6,7 +6,7 @@
 /*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:50:55 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/11 04:14:26 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:17:06 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ public:
 	Button& operator[](int);
 	void	setPos(float x, float y);
 	void	setPosToGo(float x, float y);
+	void	addPosToGo(float x, float y);
 
 	void	renderMesh( ShaderManager *shaderManager);
 	void	addButton(Button  b);

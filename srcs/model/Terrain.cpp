@@ -307,8 +307,6 @@ void	Terrain::generateGridTextures(void)
 	// Init terrain grid
 	int terrainGridSize = this->terrainGridW * this->terrainGridH * this->terrainGridD;
 	std::vector<std::vector<int>>	terrainGrid;
-	// 3 vec3 per rectangle (pos, size, normal)
-	std::vector<glm::vec3>	terrainData;
 
 	for (int i = 0; i < terrainGridSize; i++)
 	{
@@ -316,31 +314,83 @@ void	Terrain::generateGridTextures(void)
 		terrainGrid.push_back(terrainGridContent);
 	}
 
-	// int	gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ, vid,
-	// 	gx, gy, gz, cx, cy, cz, gid;
+	float gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ;
+	int	vid, gx, gy, gz, gid;
+	std::unordered_map<int, bool>	idsIn;
+	// 3 vec3 per rectangle (pos, size, normal)
+	std::vector<glm::vec3>	terrainData;
 
-	// // TODO : Put texture for terrain vertices
-	// // TODO : Fill terrain grid
-	// for (uint i = 0; i < this->rectangles.size(); i++)
-	// {
-	// 	t_rectangle &rectangle = this->rectangles[i];
+	for (uint i = 0; i < this->rectangles.size(); i++)
+	{
+		t_rectangle &rectangle = this->rectangles[i];
 
-	// 	vid = rectangle.y * MAP_SIZE + rectangle.x;
-	// 	Vec3	pos = this->vertices[vid].pos;
-	// 	Vec3	normal = this->vertices[vid].normal;
-	// 	vid = (rectangle.y + rectangle.height) * MAP_SIZE
-	// 			+ (rectangle.x + rectangle.width);
-	// 	Vec3	endPos = this->vertices[vid].pos;
-	// 	Vec3	size = endPos - pos;
+		vid = rectangle.y * MAP_SIZE + rectangle.x;
+		Vec3	pos = this->vertices[vid].pos;
+		Vec3	normal = this->vertices[vid].normal;
+		vid = (rectangle.y + rectangle.height) * MAP_SIZE
+				+ (rectangle.x + rectangle.width);
+		Vec3	endPos = this->vertices[vid].pos;
+		Vec3	size = endPos - pos;
 
-	// 	// Put data in terrainData vector
-	// 	terrainData.push_back(gml::vec3(pos.x, pos.y, pos.z));
-	// 	terrainData.push_back(gml::vec3(size.x, size.y, size.z));
-	// 	terrainData.push_back(gml::vec3(normal.x, normal.y, normal.z));
+		// Put data in terrainData vector
+		terrainData.push_back(glm::vec3(pos.x, pos.y, pos.z));
+		terrainData.push_back(glm::vec3(size.x, size.y, size.z));
+		terrainData.push_back(glm::vec3(normal.x, normal.y, normal.z));
 
-	// 	if (pos.x <= endPos.x)
-	// 		cx = 1;
-	// 	else
-	// 		cx = -1;
-	// }
+		if (pos.x <= endPos.x)
+		{
+			gStartX = pos.x;
+			gEndX = endPos.x;
+		}
+		else
+		{
+			gStartX = endPos.x;
+			gEndX = pos.x;
+		}
+
+		if (pos.y <= endPos.y)
+		{
+			gStartY = pos.y;
+			gEndY = endPos.y;
+		}
+		else
+		{
+			gStartY = endPos.y;
+			gEndY = pos.y;
+		}
+
+		if (pos.z <= endPos.z)
+		{
+			gStartZ = pos.z;
+			gEndZ = endPos.z;
+		}
+		else
+		{
+			gStartZ = endPos.z;
+			gEndZ = pos.z;
+		}
+
+		idsIn.clear();
+		float gridStep = 1.0f;
+		for (float x = gStartX; x < gEndX; x += gridStep)
+		{
+			gx = x / TERRAIN_CELL_SIZE;
+			for (float y = gStartY; y < gEndY; y += gridStep)
+			{
+				gy = y / TERRAIN_CELL_SIZE;
+				for (float z = gStartZ; z < gEndZ; z += gridStep)
+				{
+					gz = z / TERRAIN_CELL_SIZE;
+					gid = gx + gz * this->terrainGridW + gy * this->terrainIdHsize;
+					// If the id in already in grid, skip it
+					if (idsIn.find(gid) != idsIn.end())
+						continue;
+
+					terrainGrid[gid].push_back(i);
+					idsIn[gid] = true;
+				}
+			}
+		}
+	}
+	// TODO : Put texture for terrain vertices
 }

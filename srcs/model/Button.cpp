@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Button.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
+/*   Updated: 2025/01/10 23:09:28 by lflandri         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <model/Button.hpp>
 
 // #include <GL/glew.h>
@@ -15,18 +27,22 @@ Mouse *Button::mouse = NULL;
 Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
+	this->isON = false;
+	this->isSwitch = false;
 	this->texture = texture;
 	this->arg = arg;
 	this->active_B = true;
 	this->functionToExecute = functionToExecute;
-	this->baseColor = glm::vec3(0.5,0.5,0.5);
-	this->underlineColor = glm::vec3(0.4,0.4,0.4);;
+	this->baseColor = DEFAULT_BUTTON_BASE_COLOR;
+	this->underlineColor = DEFAULT_BUTTON_UNDERLINE_COLOR;
 }
 
 Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture, glm::vec3 baseColor, glm::vec3 underlineColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
-		this->texture = texture;
+	this->isON = false;
+	this->isSwitch = false;
+	this->texture = texture;
 	this->arg = arg;
 	this->active_B = true;
 	this->functionToExecute = functionToExecute;
@@ -39,7 +55,9 @@ Button::Button(float x, float y, float width, float height, void (*functionToExe
 Button::Button(const Button &obj)
 :x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
 {
-		this->texture = obj.texture;
+	this->isON = obj.isON;
+	this->isSwitch = obj.isSwitch;
+	this->texture = obj.texture;
 	this->arg = obj.arg;
 	this->active_B = obj.active_B;
 	this->functionToExecute = obj.functionToExecute;
@@ -58,10 +76,18 @@ Button::~Button()
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
+glm::vec2	Button::getPos()
+{
+	return glm::vec2(this->x_screen, this->y_screen);
+}
+
+
 bool	Button::isActive()
 {
 	return this->active_B;
 }
+
+
 
 
 //---- Setters -----------------------------------------------------------------
@@ -80,6 +106,18 @@ void	Button::setArg(void *arg)
 {
 	this->arg = arg;
 }
+
+void	Button::setSwitchMode(bool isSwitch)
+{
+	this->isSwitch = isSwitch;
+}
+
+void	Button::setPos(float x, float y)
+{
+	this->x_screen = x;
+	this->y_screen = y;
+}
+
 
 //---- Operators ---------------------------------------------------------------
 
@@ -101,25 +139,34 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	std::vector<float>			vertices;
 	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
 	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
+	glm::vec3 *					color;
 
 	menuShader = shaderManager->getMenuShader();
 
 	if (Button::mouse && this->active_B && this->mouseOnButton())
 	{
-		points.push_back(Point2D(Vec2(x_screen, y_screen), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
-		points.push_back(Point2D(Vec2(x_screen + width, y_screen), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
-		points.push_back(Point2D(Vec2(x_screen, y_screen + height),  this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
-		points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
+		if (this->isSwitch && this->isON)
+			color = &this->baseColor;
+		else
+			color = &this->underlineColor;
 		if (Button::mouse->left.isPressed())
+		{
+			if (this->isSwitch)
+				this->isON = !this->isON;
 			this->press();
+		}
 	}
 	else
 	{
-		points.push_back(Point2D(Vec2(x_screen, y_screen), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
-		points.push_back(Point2D(Vec2(x_screen + width, y_screen), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
-		points.push_back(Point2D(Vec2(x_screen, y_screen + height),  this->baseColor[0], this->baseColor[1], this->baseColor[2]));
-		points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
+		if (this->isSwitch && this->isON)
+			color = &this->underlineColor;
+		else
+			color = &this->baseColor;
 	}
+	points.push_back(Point2D(Vec2(x_screen, y_screen), (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(x_screen + width, y_screen), (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(x_screen, y_screen + height),  (*color)[0], (*color)[1], (*color)[2]));
+	points.push_back(Point2D(Vec2(x_screen + width, y_screen + height), (*color)[0], (*color)[1], (*color)[2]));
 
 	for (int i = 0; i < 4; i++)
 	{

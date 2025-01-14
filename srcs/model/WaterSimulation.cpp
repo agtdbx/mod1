@@ -171,6 +171,25 @@ void	WaterSimulation::addWater(glm::vec3 position)
 	this->needToUpdateBuffers = true;
 }
 
+void	WaterSimulation::addWater(glm::vec3 position, glm::vec3 velocity)
+{
+	if (this->needToUpdateBuffers == false)
+	{
+		this->positionsFromBuffer();
+		this->predictedPositionsFromBuffer();
+		this->velocitiesFromBuffer();
+		this->densitiesFromBuffer();
+	}
+
+	this->positions.push_back(glm::vec4(position, 0.0f));
+	this->predictedPositions.push_back(glm::vec4(position, 0.0f));
+	this->velocities.push_back(glm::vec4(velocity, 0.0f));
+	this->densities.push_back(0.0);
+	this->nbParticules++;
+	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
+	this->needToUpdateBuffers = true;
+}
+
 
 void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 {
@@ -285,6 +304,17 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);
 }
+
+void	WaterSimulation::clear()
+{
+	this->nbParticules = 0;
+	this->positions.clear();
+	this->predictedPositions.clear();
+	this->velocities.clear();
+	this->densities.clear();
+	this->needToUpdateBuffers = true;
+}
+
 
 //**** PRIVATE METHODS *********************************************************
 

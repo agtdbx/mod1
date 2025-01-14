@@ -10,6 +10,7 @@
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
 #include <model/Button.hpp>
+#include <model/Pannel.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -18,6 +19,9 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				bool isRainning,
+				bool isFilling,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager);
 static void	draw(
@@ -26,8 +30,20 @@ static void	draw(
 				Terrain *terrain,
 				ShaderManager *shaderManager,
 				std::vector<Button>	*buttonVector,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation);
 void	addWater(void * arg);
+void	changeBoolStatus(void *arg);
+void	updateRain(WaterSimulation *simulation);
+void	fillingPool(WaterSimulation *simulation);
+void	generateWaveWest(void *arg);
+void	generateWaveEst(void *arg);
+void	moveWavePannel(void *arg);
+void	generateWaveNorth(void *arg);
+void	generateWaveSouth(void *arg);
+void	generateWaveAll(void *arg);
+void	resetPool(void *arg);
+
 
 
 int	main(int argc, char **argv)
@@ -71,8 +87,10 @@ int	main(int argc, char **argv)
 	Camera			camera;
 
 	std::vector<Button>	buttonVector;
+	std::vector<Pannel> pannelVector;
 	bool				isRainning = false;
 	bool				isFilling = false;
+	bool				isPannelHide = false;
 
 	Button::mouse = &inputManager.mouse;
 
@@ -83,7 +101,13 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("reset", "data/textures/resetButton.png");
 		textureManager.addTexture("filling", "data/textures/fillingButton.png");
 		textureManager.addTexture("wave", "data/textures/waveButton.png");
-
+		textureManager.addTexture("noTexture", "data/textures/noTexture.png");
+		textureManager.addTexture("North", "data/textures/North.png");
+		textureManager.addTexture("South", "data/textures/South.png");
+		textureManager.addTexture("West", "data/textures/West.png");
+		textureManager.addTexture("Est", "data/textures/Est.png");
+		textureManager.addTexture("all", "data/textures/all.png");
+		
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
@@ -101,27 +125,37 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	buttonVector.push_back(Button(WIN_W - 110, 10, 100, 50,addWater, &simulation, textureManager.getTexture("rain")));
-	buttonVector.push_back(Button(WIN_W - 110, 70, 100, 50,addWater, &simulation, textureManager.getTexture("filling")));
-	buttonVector.push_back(Button(WIN_W - 110, 130, 100, 50,addWater, &simulation, textureManager.getTexture("wave")));
-	buttonVector.push_back(Button(WIN_W - 110, 190, 100, 50,addWater, &simulation, textureManager.getTexture("reset")));
+	pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
+	pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));
+	pannelVector[0].addButton(Button(10, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
+	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
+	pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &pannelVector[1], textureManager.getTexture("wave")));
+	pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
+	pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, &simulation, textureManager.getTexture("North")));
+	pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &simulation, textureManager.getTexture("West")));
+	pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &simulation, textureManager.getTexture("Est")));
+	pannelVector[1].addButton(Button(10, 190, 100, 50,generateWaveSouth, &simulation, textureManager.getTexture("South")));
+	pannelVector[1].addButton(Button(10, 250, 100, 50,generateWaveAll, &simulation, textureManager.getTexture("all")));
+	pannelVector[0][0].setSwitchMode(true);
+	pannelVector[0][1].setSwitchMode(true);
+	pannelVector[0][2].setSwitchMode(true);
 
 
 
 
 	// simulation.addWater(glm::vec3(5, 5, 5));
-	int	nbWater[] = {32, 32, 32};
-	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	for (int i = 0; i < nbWater[0]; i++)
-	{
-		for (int j = 0; j < nbWater[2]; j++)
-		{
-			for (int k = 0; k < nbWater[1]; k++)
-			{
-				simulation.addWater(glm::vec3(i, k, j) + offset);
-			}
-		}
-	}
+	// int	nbWater[] = {32, 32, 32};
+	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
+	// for (int i = 0; i < nbWater[0]; i++)
+	// {
+	// 	for (int j = 0; j < nbWater[2]; j++)
+	// 	{
+	// 		for (int k = 0; k < nbWater[1]; k++)
+	// 		{
+	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
+	// 		}
+	// 	}
+	// }
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))
@@ -131,15 +165,29 @@ int	main(int argc, char **argv)
 		// Close window on escape
 		if (inputManager.escape.isPressed())
 			break;
+		if (inputManager.tab.isPressed())
+		{
+			if (isPannelHide)
+			{
+				pannelVector[0].setPosToGo(WIN_W, 0.0f);
+				pannelVector[1].addPosToGo(120, 0);
+			}
+			else
+			{
+				pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
+				pannelVector[1].addPosToGo(-120, 0);
+			}
+			isPannelHide = !isPannelHide;
+		}
 
 		// if (inputManager.mouse.)
 		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
-		computation(&inputManager, &camera, &simulation, &shaderManager);
+		computation(&inputManager, &camera, isRainning, isFilling, &pannelVector, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &buttonVector, &simulation);
+			&shaderManager, &buttonVector, &pannelVector, &simulation);
 	}
 
 	context.close();
@@ -162,11 +210,16 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				bool isRainning,
+				bool isFilling,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
+	static double	timeRainningParticuleAdd = 0.0;
+	static double	timeFillingParticuleAdd = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
@@ -188,7 +241,41 @@ static void	computation(
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
 		deltas.clear();
+
 	}
+	timeRainningParticuleAdd += delta;
+
+	if (timeRainningParticuleAdd >= RAIN_TIME_BEFORE_NEW_PARTICULE)
+	{
+		timeRainningParticuleAdd -= RAIN_TIME_BEFORE_NEW_PARTICULE;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		if (isRainning)
+			updateRain(simulation);
+	}
+	timeFillingParticuleAdd += delta;
+
+	if (timeFillingParticuleAdd >= FILLING_TIME_BEFORE_NEW_PARTICULE)
+	{
+		timeFillingParticuleAdd -= FILLING_TIME_BEFORE_NEW_PARTICULE;
+		double avg = 0.0;
+		for (double dtime : deltas)
+		{
+			avg += dtime;
+		}
+		avg /= deltas.size();
+		if (isFilling)
+			fillingPool(simulation);
+	}
+	for (Pannel & pannel : *pannelVector)
+	{
+		pannel.tick(delta);
+	}
+	
 
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)
@@ -239,6 +326,7 @@ static void	draw(
 				Terrain *terrain,
 				ShaderManager *shaderManager,
 				std::vector<Button>	*buttonVector,
+				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation)
 {
 	// Clear window
@@ -255,6 +343,11 @@ static void	draw(
 	{
 		button.renderMesh(shaderManager);
 	}
+	for (Pannel & pannel : *pannelVector)
+	{
+		pannel.renderMesh(shaderManager);
+	}
+
 
 	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);

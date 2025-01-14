@@ -18,6 +18,7 @@ static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				WaterSimulation	*simulation,
+				Terrain *terrain,
 				ShaderManager *shaderManager);
 static void	draw(
 				GLFWwindow* window,
@@ -74,7 +75,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	simulation.addWater(glm::vec3(70, 50, 70));
-	// int	nbWater[] = {32, 32, 32};
+	// int	nbWater[] = {32, 16, 32};
 	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
 	// for (int i = 0; i < nbWater[0]; i++)
 	// {
@@ -97,7 +98,7 @@ int	main(int argc, char **argv)
 			break;
 
 		// Compute part
-		computation(&inputManager, &camera, &simulation, &shaderManager);
+		computation(&inputManager, &camera, &simulation, &terrain, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -125,6 +126,7 @@ static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				WaterSimulation	*simulation,
+				Terrain *terrain,
 				ShaderManager *shaderManager)
 {
 	static int		nbCall = 0;
@@ -186,7 +188,7 @@ static void	computation(
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
-	simulation->tick(shaderManager, delta);
+	simulation->tick(shaderManager, terrain, delta);
 }
 
 
@@ -204,7 +206,7 @@ static void	draw(
 	// Draw mesh
 	// waterManager->draw(camera, shaderManager);
 	terrain->renderMesh(camera, shaderManager);
-	simulation->draw(camera, shaderManager);
+	simulation->draw(camera, shaderManager, terrain);
 
 	// Display the new image
 	glfwSwapBuffers(window);

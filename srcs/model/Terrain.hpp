@@ -22,10 +22,15 @@ public:
 	Terrain(const Terrain &obj);
 	~Terrain();
 
+	GLuint	getTextureBufferTerrainGridData(void);
+	GLuint	getTextureTerrainGridData(void);
 	GLuint	getTextureBufferTerrainGridFlat(void);
 	GLuint	getTextureTerrainGridFlat(void);
+	int		getSizeTerrainGridFlat(void);
 	GLuint	getTextureBufferTerrainGridOffsets(void);
 	GLuint	getTextureTerrainGridOffsets(void);
+	int		getSizeTerrainGridOffsets(void);
+	void	getGridSize(int sizes[3]);
 
 	Terrain	&operator=(const Terrain &obj);
 
@@ -39,8 +44,9 @@ private:
 	std::vector<t_rectangle>			rectangles;
 	Mesh								mesh;
 	int									terrainGridW, terrainGridH, terrainGridD,
-										terrainIdHsize;
-	GLuint								textureBufferTerrainGridFlat, textureTerrainGridFlat,
+										terrainIdHsize, flatTerrainGridSize, offsetsTerrainGridSize;
+	GLuint								textureBufferTerrainGridData, textureTerrainGridData,
+										textureBufferTerrainGridFlat, textureTerrainGridFlat,
 										textureBufferTerrainGridOffsets, textureTerrainGridOffsets;
 
 	void	initEmptyMap(void);

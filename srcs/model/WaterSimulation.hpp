@@ -8,6 +8,7 @@
 # include <engine/render/Camera.hpp>
 # include <engine/render/shader/ShaderManager.hpp>
 # include <engine/maths/Vec3.hpp>
+# include <model/Terrain.hpp>
 
 class WaterSimulation
 {
@@ -21,8 +22,8 @@ public:
 	WaterSimulation	&operator=(const WaterSimulation &obj);
 
 	void	addWater(glm::vec3 position);
-	void	tick(ShaderManager *shaderManager, float delta);
-	void	draw(Camera *camera, ShaderManager *shaderManager);
+	void	tick(ShaderManager *shaderManager, Terrain *terrain, float delta);
+	void	draw(Camera *camera, ShaderManager *shaderManager, Terrain *terrain);
 
 private:
 	std::vector<glm::vec4>	positions;
@@ -68,7 +69,7 @@ private:
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
-	void		updatePositions(ShaderManager *shaderManager, float delta);
+	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };
 
 #endif

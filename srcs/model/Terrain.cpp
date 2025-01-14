@@ -1,10 +1,28 @@
 #include <model/Terrain.hpp>
 
+//**** STATIC FUNCTIONS ********************************************************
+
+static float	min(float a, float b)
+{
+	if (a < b)
+		return (a);
+	return (b);
+}
+
+static float	max(float a, float b)
+{
+	if (a > b)
+		return (a);
+	return (b);
+}
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
 Terrain::Terrain(void)
 {
+	glGenBuffers(1, &this->textureBufferTerrainGridData);
+	glGenTextures(1, &this->textureTerrainGridData);
 	glGenBuffers(1, &this->textureBufferTerrainGridFlat);
 	glGenTextures(1, &this->textureTerrainGridFlat);
 	glGenBuffers(1, &this->textureBufferTerrainGridOffsets);
@@ -21,6 +39,8 @@ Terrain::Terrain(void)
 
 Terrain::Terrain(const Terrain &obj)
 {
+	glGenBuffers(1, &this->textureBufferTerrainGridData);
+	glGenTextures(1, &this->textureTerrainGridData);
 	glGenBuffers(1, &this->textureBufferTerrainGridFlat);
 	glGenTextures(1, &this->textureTerrainGridFlat);
 	glGenBuffers(1, &this->textureBufferTerrainGridOffsets);
@@ -38,6 +58,8 @@ Terrain::Terrain(const Terrain &obj)
 
 Terrain::~Terrain()
 {
+	glDeleteBuffers(1, &this->textureBufferTerrainGridData);
+	glDeleteTextures(1, &this->textureTerrainGridData);
 	glDeleteBuffers(1, &this->textureBufferTerrainGridFlat);
 	glDeleteTextures(1, &this->textureTerrainGridFlat);
 	glDeleteBuffers(1, &this->textureBufferTerrainGridOffsets);
@@ -46,6 +68,18 @@ Terrain::~Terrain()
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
+
+GLuint	Terrain::getTextureBufferTerrainGridData(void)
+{
+	return (this->textureBufferTerrainGridData);
+}
+
+
+GLuint	Terrain::getTextureTerrainGridData(void)
+{
+	return (this->textureTerrainGridData);
+}
+
 
 GLuint	Terrain::getTextureBufferTerrainGridFlat(void)
 {
@@ -59,6 +93,12 @@ GLuint	Terrain::getTextureTerrainGridFlat(void)
 }
 
 
+int	Terrain::getSizeTerrainGridFlat(void)
+{
+	return (this->flatTerrainGridSize);
+}
+
+
 GLuint	Terrain::getTextureBufferTerrainGridOffsets(void)
 {
 	return (this->textureBufferTerrainGridOffsets);
@@ -68,6 +108,20 @@ GLuint	Terrain::getTextureBufferTerrainGridOffsets(void)
 GLuint	Terrain::getTextureTerrainGridOffsets(void)
 {
 	return (this->textureTerrainGridOffsets);
+}
+
+
+int	Terrain::getSizeTerrainGridOffsets(void)
+{
+	return (this->offsetsTerrainGridSize);
+}
+
+
+void	Terrain::getGridSize(int sizes[3])
+{
+	sizes[0] = this->terrainGridW;
+	sizes[1] = this->terrainGridH;
+	sizes[2] = this->terrainGridD;
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -314,61 +368,48 @@ void	Terrain::generateGridTextures(void)
 		terrainGrid.push_back(terrainGridContent);
 	}
 
-	float gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ;
-	int	vid, gx, gy, gz, gid;
+	// Fill terrain grid
+	float	gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ;
+	int		vid, gx, gy, gz, gid;
+	int		rectangleId = 0;
 	std::unordered_map<int, bool>	idsIn;
-	// 3 vec3 per rectangle (pos, size, normal)
+	// 4 vec3 per rectangle (pos, vecX, vecZ, normal)
 	std::vector<glm::vec3>	terrainData;
 
-	for (uint i = 0; i < this->rectangles.size(); i++)
+	for (t_rectangle &rectangle : rectangles)
 	{
-		t_rectangle &rectangle = this->rectangles[i];
-
 		vid = rectangle.y * MAP_SIZE + rectangle.x;
-		Vec3	pos = this->vertices[vid].pos;
+		Vec3	topLeft = this->vertices[vid].pos;
 		Vec3	normal = this->vertices[vid].normal;
+
+		vid = rectangle.y * MAP_SIZE + (rectangle.x + rectangle.width);
+		Vec3	topRight = this->vertices[vid].pos;
+		Vec3	vecX = topRight - topLeft;
+
+		vid = (rectangle.y + rectangle.height) * MAP_SIZE + rectangle.x;
+		Vec3	botLeft = this->vertices[vid].pos;
+		Vec3	vecZ = botLeft - topLeft;
+
 		vid = (rectangle.y + rectangle.height) * MAP_SIZE
 				+ (rectangle.x + rectangle.width);
-		Vec3	endPos = this->vertices[vid].pos;
-		Vec3	size = endPos - pos;
+		Vec3	botRight = this->vertices[vid].pos;
+
+		// If the rectangle is on the ground, ignore it
+		if	(topLeft.y == 0.0 && topRight.y == 0.0 && botLeft.y == 0.0 && botRight.y == 0.0)
+			continue;
 
 		// Put data in terrainData vector
-		terrainData.push_back(glm::vec3(pos.x, pos.y, pos.z));
-		terrainData.push_back(glm::vec3(size.x, size.y, size.z));
+		terrainData.push_back(glm::vec3(topLeft.x, topLeft.y, topLeft.z));
+		terrainData.push_back(glm::vec3(vecX.x, vecX.y, vecX.z));
+		terrainData.push_back(glm::vec3(vecZ.x, vecZ.y, vecZ.z));
 		terrainData.push_back(glm::vec3(normal.x, normal.y, normal.z));
 
-		if (pos.x <= endPos.x)
-		{
-			gStartX = pos.x;
-			gEndX = endPos.x;
-		}
-		else
-		{
-			gStartX = endPos.x;
-			gEndX = pos.x;
-		}
-
-		if (pos.y <= endPos.y)
-		{
-			gStartY = pos.y;
-			gEndY = endPos.y;
-		}
-		else
-		{
-			gStartY = endPos.y;
-			gEndY = pos.y;
-		}
-
-		if (pos.z <= endPos.z)
-		{
-			gStartZ = pos.z;
-			gEndZ = endPos.z;
-		}
-		else
-		{
-			gStartZ = endPos.z;
-			gEndZ = pos.z;
-		}
+		gStartX = min(topLeft.x, botRight.x);
+		gEndX = max(topLeft.x, botRight.x);
+		gStartY = min(topLeft.y, botRight.y);
+		gEndY = max(topLeft.y, botRight.y);
+		gStartZ = min(topLeft.z, botRight.z);
+		gEndZ = max(topLeft.z, botRight.z);
 
 		idsIn.clear();
 		float gridStep = 1.0f;
@@ -386,11 +427,40 @@ void	Terrain::generateGridTextures(void)
 					if (idsIn.find(gid) != idsIn.end())
 						continue;
 
-					terrainGrid[gid].push_back(i);
+					terrainGrid[gid].push_back(rectangleId);
 					idsIn[gid] = true;
 				}
 			}
 		}
+		rectangleId++;
 	}
-	// TODO : Put texture for terrain vertices
+
+	// Create flat version of the grid
+	std::vector<float>	flatTerrainGrid;
+	std::vector<float>	offsetsTerrainGrid;
+	this->flatTerrainGridSize = 0;
+	this->offsetsTerrainGridSize = 0;
+	int	terrainCellSize;
+
+	for (std::vector<int> &terrainCell : terrainGrid)
+	{
+		terrainCellSize = terrainCell.size();
+
+		for (int i = 0; i < terrainCellSize; i++)
+			flatTerrainGrid.push_back(terrainCell[i]);
+		offsetsTerrainGrid.push_back(this->flatTerrainGridSize);
+		this->flatTerrainGridSize += terrainCellSize;
+		this->offsetsTerrainGridSize++;
+	}
+
+	// Fill textures from flat grids
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridData);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * terrainData.size(),
+					terrainData.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridFlat);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->flatTerrainGridSize,
+					flatTerrainGrid.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridOffsets);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->offsetsTerrainGridSize,
+					offsetsTerrainGrid.data(), GL_DYNAMIC_DRAW);
 }

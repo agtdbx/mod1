@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:50:55 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/13 14:17:06 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 13:11:38 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <engine/render/TextureManager.hpp>
 # include <model/Point2D.hpp>
 # include <model/Button.hpp>
+# include <model/Slider.hpp>
 
 class Pannel
 {
@@ -35,12 +36,14 @@ public:
 
 	Pannel	&operator=(const Pannel &obj);
 	Button& operator[](int);
+	Slider& operator[](float);
 	void	setPos(float x, float y);
 	void	setPosToGo(float x, float y);
 	void	addPosToGo(float x, float y);
 
 	void	renderMesh( ShaderManager *shaderManager);
 	void	addButton(Button  b);
+	void	addSlider(Slider  s);
 	void	tick(double delta);
 	
 
@@ -49,6 +52,7 @@ private:
 	glm::vec3		baseColor;
 	unsigned int	texture;
 	std::vector<Button>	buttonList;
+	std::vector<Slider>	sliderList;
 
 	void	moveButton(float mvx, float mvy);
 

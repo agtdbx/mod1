@@ -11,6 +11,7 @@
 #include <model/Terrain.hpp>
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
+#include <model/Slider.hpp>
 #include <model/WaterSimulation.hpp>
 
 static void	events(
@@ -95,6 +96,7 @@ int	main(int argc, char **argv)
 	bool				isPannelHide = false;
 
 	Button::mouse = &inputManager.mouse;
+	Slider::mouse = &inputManager.mouse;
 
 	try
 	{
@@ -104,6 +106,7 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("filling", "data/textures/fillingButton.png");
 		textureManager.addTexture("wave", "data/textures/waveButton.png");
 		textureManager.addTexture("noTexture", "data/textures/noTexture.png");
+		Slider::texture = textureManager.getTexture("noTexture");
 		textureManager.addTexture("North", "data/textures/North.png");
 		textureManager.addTexture("South", "data/textures/South.png");
 		textureManager.addTexture("West", "data/textures/West.png");
@@ -133,6 +136,8 @@ int	main(int argc, char **argv)
 	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
 	pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &pannelVector[1], textureManager.getTexture("wave")));
 	pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
+	pannelVector[0].addSlider(Slider(-500, 500, 200, 10, COLOR_29266F, COLOR_2C26E4));
+	pannelVector[0][0.0f].setValue(0.5);
 	pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, &simulation, textureManager.getTexture("North")));
 	pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &simulation, textureManager.getTexture("West")));
 	pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &simulation, textureManager.getTexture("Est")));
@@ -189,8 +194,6 @@ int	main(int argc, char **argv)
 		}
 
 
-		// if (inputManager.mouse.)
-		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
 		computation(&inputManager, &camera, &context, isRainning, isFilling, isPannelHide, &pannelVector, &simulation, &shaderManager);
 
@@ -320,7 +323,7 @@ static void	computation(
 	if (!isPannelHide)
 	{
 		const glm::vec2		cursorMidPos(WIN_W / 2, WIN_H / 2);
-		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * delta * CAMERA_ROTATION_SPEED_MOUSE);
+		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * delta * CAMERA_ROTATION_SPEED_MOUSE * -1);
 		camera->rotateX((cursorMidPos.y - inputManager->mouse.getPos().y) * delta * CAMERA_ROTATION_SPEED_MOUSE);
 		inputManager->mouse.goTo((*context).window, cursorMidPos.x, cursorMidPos.y);
 	}

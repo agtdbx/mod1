@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/13 14:17:26 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 14:03:09 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ Pannel::Pannel(const Pannel &obj)
 	this->padding = obj.padding;
 	this->texture = obj.texture;
 	this->baseColor = obj.baseColor;
-	buttonList = obj.buttonList;
+	this->buttonList = obj.buttonList;
+	this->sliderList = obj.sliderList;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -102,6 +103,15 @@ Button& Pannel::operator[](int index)
     return this->buttonList[index];
 }
 
+Slider& Pannel::operator[](float index)
+{
+    if (index >= (float)this->sliderList.size() || index < 0.0f)
+	{
+		throw std::range_error("Pannel error : can't get slider of gived index");
+    }
+    return this->sliderList[(int)index];
+}
+
 //**** PUBLIC METHODS **********************************************************
 
 
@@ -120,7 +130,11 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	{
 		button.renderMesh(shaderManager);
 	}
-
+	for (Slider & slider : this->sliderList)
+	{
+		slider.renderMesh(shaderManager);
+	}
+	
 	menuShader = shaderManager->getMenuShader();
 
 	points.push_back(Point2D(Vec2(this->x_screen, this->y_screen), (*color)[0], (*color)[1], (*color)[2]));
@@ -165,6 +179,15 @@ void	Pannel::addButton(Button  b)
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
 
+void	Pannel::addSlider(Slider  s)
+{
+	unsigned int indButton = this->sliderList.size();
+	this->sliderList.push_back(s);
+	Slider & newButton = this->sliderList[indButton];
+	glm::vec2 posButton= newButton.getPos();
+	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
+}
+
 void	Pannel::tick(double delta)
 {
 	if (this->x_toGo == this->x_screen && this->y_toGo == this->y_screen)
@@ -200,6 +223,10 @@ void	Pannel::moveButton(float mvx, float mvy)
 	for (Button & button : this->buttonList)
 	{
 		button.setPos(button.getPos().x + mvx, button.getPos().y + mvy);
+	}
+	for (Slider & slider : this->sliderList)
+	{
+		slider.setPos(slider.getPos().x + mvx, slider.getPos().y + mvy);
 	}
 }
 

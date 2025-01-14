@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/14 12:17:14 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 13:43:56 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@
 # define WAVE_HEIGHT 10
 
 # define COLOR_000000 glm::vec3(0.0f, 0.0f, 0.0f)
+# define COLOR_29266F glm::vec3(0.160784314f, 0.149019608f, 0.435294118f)
+# define COLOR_2C26E4 glm::vec3(0.17254902f, 0.149019608f, 0.894117647f)
 # define COLOR_666666 glm::vec3(0.4f, 0.4f, 0.4f)
 # define COLOR_6C3737 glm::vec3(0.423529412f, 0.215686275f, 0.215686275f)
 # define COLOR_7F7F7F glm::vec3(0.5f, 0.5f, 0.5f)

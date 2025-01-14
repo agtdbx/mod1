@@ -24,7 +24,8 @@ static void	computation(
 				OpenGLContext *context,
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
-				ShaderManager *shaderManager);
+				ShaderManager *shaderManager,
+				double	deltaConst);
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
@@ -88,6 +89,8 @@ int	main(int argc, char **argv)
 	sVar.waveHeight = WAVE_HEIGHT;
 	sVar.waveThickess = WAVE_THICKNESS;
 	sVar.waveVelocity = WAVE_VELOCITY;
+	sVar.isStopped = false;
+	sVar.needStep = false;
 
 	// std::vector<Pannel> pannelVector;
 	// bool				isRainning = false;
@@ -146,6 +149,7 @@ int	main(int argc, char **argv)
 	sVar.pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//wave pannel
 	sVar.pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//rain pannel
 	sVar.pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//filling pannel
+	sVar.pannelVector.push_back(Pannel(WIN_W / 2 - 56, -58.0f, 112, 58, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//stop & next step
 
 	sVar.pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar.pannelVector[2], textureManager.getTexture("rain")));
 	sVar.pannelVector[0][0].setSwitchMode(true);
@@ -202,6 +206,8 @@ int	main(int argc, char **argv)
 	sVar.pannelVector[3].addSlider(Slider(10, 270, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar.pannelVector[3][1.0f].setValue(0.5);
 
+	sVar.pannelVector[4].addButton(Button(4, 4, 50, 50,changeBoolStatus, &sVar.isStopped, textureManager.getTexture("noTexture")));
+	sVar.pannelVector[4].addButton(Button(58, 4, 50, 50,changeBoolStatus, &sVar.needStep, textureManager.getTexture("noTexture")));
 
 	// simulation.addWater(glm::vec3(5, 5, 5));
 	// int	nbWater[] = {32, 32, 32};
@@ -238,6 +244,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(120, 0);
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
+				sVar.pannelVector[4].addPosToGo(0, -58);
 			}
 			else
 			{
@@ -246,6 +253,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(-120, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
+				sVar.pannelVector[4].addPosToGo(0, 58);
 			}
 			sVar.isPannelHide = !sVar.isPannelHide;
 		}
@@ -265,8 +273,13 @@ int	main(int argc, char **argv)
 
 
 		// Compute part
-		computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager);
-
+		if (sVar.needStep)
+		{
+			computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager, 1.0f/100.0f);
+		}
+		else
+			computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager, 0.0);
+		sVar.needStep = false;
 		// Drawing part
 		draw(context.window, &camera, &terrain,
 			&shaderManager, &sVar, &simulation);
@@ -295,7 +308,8 @@ static void	computation(
 				OpenGLContext *context,
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
-				ShaderManager *shaderManager)
+				ShaderManager *shaderManager,
+				double	deltaConst)
 {
 	static std::vector<double> deltas;
 	static double	timePrintFps = 0.0;
@@ -324,32 +338,25 @@ static void	computation(
 		deltas.clear();
 
 	}
-	timeRainningParticuleAdd += delta;
-
+	if (deltaConst)
+		timeRainningParticuleAdd += deltaConst;
+	else
+		timeRainningParticuleAdd += delta;
 	if (timeRainningParticuleAdd >= sVar->rainDelay)
 	{
 		timeRainningParticuleAdd -= sVar->rainDelay;
-		double avg = 0.0;
-		for (double dtime : deltas)
-		{
-			avg += dtime;
-		}
-		avg /= deltas.size();
-		if (sVar->isRainning)
+		if (sVar->isRainning && (!sVar->isStopped || deltaConst))
 			updateRain(simulation, sVar);
 	}
-	timeFillingParticuleAdd += delta;
-
+	
+	if (deltaConst)
+		timeFillingParticuleAdd += deltaConst;
+	else
+		timeFillingParticuleAdd += delta;
 	if (timeFillingParticuleAdd >= sVar->fillingDelay)
 	{
 		timeFillingParticuleAdd -= sVar->fillingDelay;
-		double avg = 0.0;
-		for (double dtime : deltas)
-		{
-			avg += dtime;
-		}
-		avg /= deltas.size();
-		if (sVar->isFilling)
+		if (sVar->isFilling && (!sVar->isStopped || deltaConst))
 			fillingPool(simulation, sVar);
 	}
 	for (Pannel & pannel : sVar->pannelVector)
@@ -403,8 +410,10 @@ static void	computation(
 		camera->rotateY(-CAMERA_ROTATION_SPEED * delta);
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
-
-	simulation->tick(shaderManager, delta);
+	if (!sVar->isStopped)
+		simulation->tick(shaderManager, delta);
+	if (deltaConst)
+		simulation->tick(shaderManager, deltaConst);
 }
 
 

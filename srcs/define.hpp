@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/14 17:26:26 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 18:49:31 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 # define CAMERA_SPEED 20.0
 # define CAMERA_SPRINT_FACTOR 4.2
 # define CAMERA_ROTATION_SPEED 42.0
-# define CAMERA_ROTATION_SPEED_MOUSE 42.0
+# define CAMERA_ROTATION_SPEED_MOUSE 10.0
 
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f

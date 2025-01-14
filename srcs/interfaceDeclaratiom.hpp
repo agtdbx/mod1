@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 16:31:57 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 19:03:23 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ typedef struct s_simulationVariable
 	float				waveVelocity;
 	bool				isPannelHide;
 	void				*simulation;
+	bool				isStopped;
+	bool				needStep;
 }	t_simulationVariable;
 
 void	addWater(void * arg);

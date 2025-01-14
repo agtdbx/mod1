@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 19:03:23 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:22:54 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,9 @@ typedef struct s_simulationVariable
 	void				*simulation;
 	bool				isStopped;
 	bool				needStep;
+	float				sprintSpeed;
+	float				cameraSensibility;
+	glm::vec3			watercolor;
 }	t_simulationVariable;
 
 void	addWater(void * arg);
@@ -46,6 +49,7 @@ void	generateWaveAll(void *arg);
 void	moveWavePannel(void *arg);
 void	moveRainPannel(void *arg);
 void	moveFillingPannel(void *arg);
+void	moveSettingsPannel(void *arg);
 void	resetPool(void *arg);
 
 #endif

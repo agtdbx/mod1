@@ -109,6 +109,8 @@ void	Mouse::update(GLFWwindow *window)
 
 void	Mouse::goTo(GLFWwindow *window, float x, float y)
 {
+	this->pos.x = x;
+	this->pos.y = y;
 	glfwSetCursorPos(window, x, y);
 }
 

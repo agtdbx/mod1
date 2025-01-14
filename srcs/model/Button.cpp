@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/10 23:09:28 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:19:34 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,21 @@ void	Button::setPos(float x, float y)
 	this->y_screen = y;
 }
 
+void	Button::setColor(glm::vec3 color, int type)
+{
+	switch (type)
+	{
+		case BUTTON_BASE_COLOR_TYPE :
+			this->baseColor = color;
+			break;
+
+		case BUTTON_UNDERLINE_COLOR_TYPE :
+			this->baseColor = color;
+			break;
+	}
+}
+
+
 
 //---- Operators ---------------------------------------------------------------
 
@@ -198,7 +213,7 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 
 void	Button::press()
 {
-	if (this->active_B)
+	if (this->active_B && this->functionToExecute)
 		this->functionToExecute(this->arg);
 }
 

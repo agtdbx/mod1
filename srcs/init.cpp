@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 20:06:51 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:24:37 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,21 @@
 
 void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 {
+		//terrain texture
 		textureManager->addTexture("dirt", "data/textures/dirt.png");
 
+		//multi texture
+		textureManager->addTexture("active", "data/textures/active.png");
+		textureManager->addTexture("noTexture", "data/textures/noTexture.png");
+
+		//main pannel texture
 		textureManager->addTexture("rain", "data/textures/rainButton.png");
 		textureManager->addTexture("reset", "data/textures/resetButton.png");
 		textureManager->addTexture("filling", "data/textures/fillingButton.png");
 		textureManager->addTexture("wave", "data/textures/waveButton.png");
+		textureManager->addTexture("settings", "data/textures/settings.png");
 
-		textureManager->addTexture("active", "data/textures/active.png");
-		textureManager->addTexture("noTexture", "data/textures/noTexture.png");
-
+		//wave pannel texture
 		textureManager->addTexture("North", "data/textures/North.png");
 		textureManager->addTexture("South", "data/textures/South.png");
 		textureManager->addTexture("West", "data/textures/West.png");
@@ -38,20 +43,36 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("waveHeight", "data/textures/waveHeight.png");
 		textureManager->addTexture("waveVelocity", "data/textures/waveVelocity.png");
 
+		//rain pannel texture
 		textureManager->addTexture("rainIntensity", "data/textures/rainIntensity.png");
 		textureManager->addTexture("rainDelay", "data/textures/rainDelay.png");
 
+		//filling pannel texture
 		textureManager->addTexture("fillingIntensity", "data/textures/fillingIntensity.png");
 		textureManager->addTexture("fillingDelay", "data/textures/fillingDelay.png");
 
+		//pause & step pannel texture
 		textureManager->addTexture("pause", "data/textures/pause.png");
 		textureManager->addTexture("step", "data/textures/step.png");
 
+		//stettings pannel texture
+		textureManager->addTexture("sensibility", "data/textures/sensibility.png");
+		textureManager->addTexture("waterColor", "data/textures/waterColor.png");
+		textureManager->addTexture("red", "data/textures/red.png");
+		textureManager->addTexture("green", "data/textures/green.png");
+		textureManager->addTexture("blue", "data/textures/blue.png");
+		textureManager->addTexture("sprintSpeed", "data/textures/sprintSpeed.png");
 
+		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
+
+		//watershader
 		shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
+
+		//menu shader
 		shaderManager->loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
 		
+		//compute shader
 		shaderManager->addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager->addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager->addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
@@ -74,22 +95,28 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->isStopped = false;
 	sVar->needStep = false;
 	sVar->simulation = simulation;
+	sVar->sprintSpeed = CAMERA_SPRINT_FACTOR;
+	sVar->cameraSensibility = CAMERA_ROTATION_SPEED_MOUSE;
+	sVar->watercolor = DEFAULT_WATER_COLOR;
 
 	//pannel 
-	sVar->pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//main pannel
-	sVar->pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//wave pannel
-	sVar->pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//rain pannel
-	sVar->pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//filling pannel
-	sVar->pannelVector.push_back(Pannel(WIN_W / 2 - 56, -58.0f, 112, 58, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//stop & next step
+	sVar->pannelVector.push_back(Pannel(WIN_W, 0.0f, 230, 250, textureManager->getTexture("noTexture"), PANNEL_COLOR));				//main pannel
+	sVar->pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager->getTexture("noTexture"), PANNEL_COLOR));		//wave pannel
+	sVar->pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));			//rain pannel
+	sVar->pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));			//filling pannel
+	sVar->pannelVector.push_back(Pannel(WIN_W / 2 - 58, -58.0f, 112, 58, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//stop & next step pannel
+	sVar->pannelVector.push_back(Pannel(WIN_W / 2 - 150, WIN_H + 300, 300, 300, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//settings pannel
 
 	//main pannel content
 	sVar->pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar->pannelVector[2], textureManager->getTexture("rain")));
 	sVar->pannelVector[0][0].setSwitchMode(true);
-	sVar->pannelVector[0].addButton(Button(10, 70, 100, 50,moveFillingPannel, &sVar->pannelVector[3], textureManager->getTexture("filling")));
+	sVar->pannelVector[0].addButton(Button(120, 10, 100, 50,moveFillingPannel, &sVar->pannelVector[3], textureManager->getTexture("filling")));
 	sVar->pannelVector[0][1].setSwitchMode(true);
-	sVar->pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &sVar->pannelVector[1], textureManager->getTexture("wave")));
+	sVar->pannelVector[0].addButton(Button(10, 70, 100, 50,moveWavePannel, &sVar->pannelVector[1], textureManager->getTexture("wave")));
 	sVar->pannelVector[0][2].setSwitchMode(true);
-	sVar->pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
+	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveSettingsPannel, &sVar->pannelVector[5], textureManager->getTexture("settings")));
+	sVar->pannelVector[0][3].setSwitchMode(true);
+	sVar->pannelVector[0].addButton(Button(70, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
 
 	//wave pannel content
 	sVar->pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, sVar, textureManager->getTexture("North")));
@@ -111,7 +138,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[1][2.0f].setValue(0.5);
 
 	//rain pannel content
-	sVar->pannelVector[2].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar->isRainning, textureManager->getTexture("rain"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[2].addButton(Button(10, 10, 100, 50,NULL, NULL, textureManager->getTexture("rain"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[2][0].desactive();
 	sVar->pannelVector[2].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar->isRainning, textureManager->getTexture("active")));
 	sVar->pannelVector[2][1].setSwitchMode(true);
@@ -125,7 +152,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[2][1.0f].setValue(0.5);
 
 	//filling pannel content
-	sVar->pannelVector[3].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar->isRainning, textureManager->getTexture("filling"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[3].addButton(Button(10, 10, 100, 50,NULL, NULL, textureManager->getTexture("filling"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[3][0].desactive();
 	sVar->pannelVector[3].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar->isFilling, textureManager->getTexture("active")));
 	sVar->pannelVector[3][1].setSwitchMode(true);
@@ -142,4 +169,32 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[4].addButton(Button(4, 4, 50, 50,changeBoolStatus, &sVar->isStopped, textureManager->getTexture("pause")));
 	sVar->pannelVector[4][0].setSwitchMode(true);
 	sVar->pannelVector[4].addButton(Button(58, 4, 50, 50,changeBoolStatus, &sVar->needStep, textureManager->getTexture("step")));
+
+	// settings pannel content
+	sVar->pannelVector[5].addButton(Button(100, 10, 100, 50,NULL, NULL, textureManager->getTexture("settings"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][0].desactive();
+	sVar->pannelVector[5].addButton(Button(10, 60, 100, 50,NULL, NULL, textureManager->getTexture("sensibility"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][1].desactive();
+	sVar->pannelVector[5].addSlider(Slider(10, 120, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[5][0.0f].setValue(0.5);
+	sVar->pannelVector[5].addButton(Button(190, 60, 100, 50,NULL, NULL, textureManager->getTexture("sprintSpeed"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][2].desactive();
+	sVar->pannelVector[5].addSlider(Slider(190, 120, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[5][1.0f].setValue(0.5);
+	sVar->pannelVector[5].addButton(Button(75, 140, 150, 50,NULL, NULL, textureManager->getTexture("waterColor"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][3].desactive();
+	sVar->pannelVector[5].addButton(Button(0, 180, 80, 50,NULL, NULL, textureManager->getTexture("red"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][4].desactive();
+	sVar->pannelVector[5].addSlider(Slider(100, 200, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[5][2.0f].setValue(DEFAULT_WATER_COLOR[0]);
+	sVar->pannelVector[5].addButton(Button(0, 220, 80, 50,NULL, NULL, textureManager->getTexture("green"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][5].desactive();
+	sVar->pannelVector[5].addSlider(Slider(100, 240, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[5][3.0f].setValue(DEFAULT_WATER_COLOR[1]);
+	sVar->pannelVector[5].addButton(Button(0, 260, 80, 50,NULL, NULL, textureManager->getTexture("blue"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[5][6].desactive();
+	sVar->pannelVector[5].addSlider(Slider(100, 280, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[5][4.0f].setValue(DEFAULT_WATER_COLOR[2]);
+	sVar->pannelVector[5].addButton(Button(210, 205, 80, 80,NULL, NULL, textureManager->getTexture("noTexture"), DEFAULT_WATER_COLOR, DEFAULT_WATER_COLOR));
+	sVar->pannelVector[5][7].desactive();
 }

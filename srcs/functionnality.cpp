@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 17:28:52 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 21:16:33 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,18 @@ void	moveFillingPannel(void *arg)
 		pannel->addPosToGo(-120, 0);
 	else
 		pannel->addPosToGo(120, 0);
+}
+
+void	moveSettingsPannel(void *arg)
+{
+	static bool isHide = true;
+	Pannel *pannel = (Pannel *)arg;
+
+	isHide = !isHide;
+	if (isHide)
+		pannel->addPosToGo(0, 300);
+	else
+		pannel->addPosToGo(0, -300);
 }
 
 void	resetPool(void *arg)

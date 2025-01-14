@@ -138,15 +138,17 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
+				sVar.pannelVector[5].addPosToGo(0, 300);
 			}
 			else
 			{
 				inputManager.mouse.setVisible(context.window, true);
-				sVar.pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
+				sVar.pannelVector[0].setPosToGo(WIN_W - 230, 0.0f);
 				sVar.pannelVector[1].addPosToGo(-120, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
+				sVar.pannelVector[5].addPosToGo(0, -300);
 			}
 			sVar.isPannelHide = !sVar.isPannelHide;
 		}
@@ -162,6 +164,17 @@ int	main(int argc, char **argv)
 			//filling parameter
 			sVar.fillingIntensity =  sVar.pannelVector[3][0.0f].getValue() * 2 * FILLING_INTENSITY;
 			sVar.fillingDelay =  sVar.pannelVector[3][1.0f].getValue() * 2 * FILLING_TIME_BEFORE_NEW_PARTICULE;
+			//settings parameter
+			//TODO : demander preference a auguste
+			// if (sVar.pannelVector[5][0.0f].getValue() == 0)
+			// 	sVar.pannelVector[5][0.0f].setValue(0.01f);
+			sVar.cameraSensibility = sVar.pannelVector[5][0.0f].getValue() * 2 *  CAMERA_ROTATION_SPEED_MOUSE;
+			sVar.sprintSpeed = sVar.pannelVector[5][1.0f].getValue() * 2 *  CAMERA_SPRINT_FACTOR;
+			sVar.watercolor = glm::vec3(sVar.pannelVector[5][2.0f].getValue(),
+										sVar.pannelVector[5][3.0f].getValue(),
+										sVar.pannelVector[5][4.0f].getValue());
+			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
+	
 		}
 
 
@@ -264,7 +277,7 @@ static void	computation(
 
 	cameraSpeed = CAMERA_SPEED * delta;
 	if (inputManager->lcontrol.isDown())
-		cameraSpeed *= CAMERA_SPRINT_FACTOR;
+		cameraSpeed *= sVar->sprintSpeed;
 
 	// Camera info
 	if (inputManager->t.isPressed())
@@ -290,8 +303,8 @@ static void	computation(
 	if (sVar->isPannelHide)
 	{
 		const glm::vec2		cursorMidPos(WIN_W / 2, WIN_H / 2);
-		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * delta * CAMERA_ROTATION_SPEED_MOUSE * -1);
-		camera->rotateX((cursorMidPos.y - inputManager->mouse.getPos().y) * delta * CAMERA_ROTATION_SPEED_MOUSE);
+		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * sVar->cameraSensibility * -1);
+		camera->rotateX((cursorMidPos.y - inputManager->mouse.getPos().y) * sVar->cameraSensibility);
 		inputManager->mouse.goTo((*context).window, cursorMidPos.x, cursorMidPos.y);
 	}
 	if (inputManager->up.isDown())

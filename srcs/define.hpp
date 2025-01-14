@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/14 19:58:39 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:14:29 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 # define CAMERA_SPEED 20.0
 # define CAMERA_SPRINT_FACTOR 4.2
 # define CAMERA_ROTATION_SPEED 42.0
-# define CAMERA_ROTATION_SPEED_MOUSE 10.0
+# define CAMERA_ROTATION_SPEED_MOUSE 0.1
 
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
@@ -72,14 +72,17 @@
 # define COLOR_000000 glm::vec3(0.0f, 0.0f, 0.0f)
 # define COLOR_29266F glm::vec3(0.160784314f, 0.149019608f, 0.435294118f)
 # define COLOR_2C26E4 glm::vec3(0.17254902f, 0.149019608f, 0.894117647f)
+# define COLOR_3EAFDF glm::vec3(0.243137255f, 0.68627451f, 0.874509804f)
 # define COLOR_666666 glm::vec3(0.4f, 0.4f, 0.4f)
 # define COLOR_6C3737 glm::vec3(0.423529412f, 0.215686275f, 0.215686275f)
 # define COLOR_7F7F7F glm::vec3(0.5f, 0.5f, 0.5f)
 # define COLOR_FFFFFF glm::vec3(1.0f, 1.0f, 1.0f)
 
+# define DEFAULT_WATER_COLOR COLOR_3EAFDF
 # define DEFAULT_PANNEL_COLOR COLOR_7F7F7F
 # define DEFAULT_BUTTON_UNDERLINE_COLOR COLOR_666666
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
+# define DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR COLOR_FFFFFF
 
 # define PANNEL_COLOR COLOR_6C3737
 # define PANNEL_MOVE_SPEED 200

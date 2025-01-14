@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 14:21:56 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 22:15:19 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,8 @@ void	Slider::renderMesh( ShaderManager *shaderManager)
 	}
 
 	points.push_back(Point2D(Vec2(x_screen - WidthCursorDiv + this->width * this->value, y_screen + this->height / 2), this->baseColor[0], this->baseColor[1], this->baseColor[2]));
-	points.push_back(Point2D(Vec2(x_screen + this->width * this->value, y_screen), COLOR_FFFFFF[0], COLOR_FFFFFF[1], COLOR_FFFFFF[2]));
-	points.push_back(Point2D(Vec2(x_screen + this->width * this->value, y_screen + this->height),  COLOR_FFFFFF[0], COLOR_FFFFFF[1], COLOR_FFFFFF[2]));
+	points.push_back(Point2D(Vec2(x_screen + this->width * this->value, y_screen), DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[0], DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[1], DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[2]));
+	points.push_back(Point2D(Vec2(x_screen + this->width * this->value, y_screen + this->height),  DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[0], DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[1], DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR[2]));
 	points.push_back(Point2D(Vec2(x_screen + WidthCursorDiv + this->width * this->value, y_screen + this->height / 2), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));
 
 	points.push_back(Point2D(Vec2(x_screen, y_screen), this->underlineColor[0], this->underlineColor[1], this->underlineColor[2]));

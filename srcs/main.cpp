@@ -74,19 +74,19 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	simulation.addWater(glm::vec3(70, 50, 70));
-	// int	nbWater[] = {32, 16, 32};
-	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	// for (int i = 0; i < nbWater[0]; i++)
-	// {
-	// 	for (int j = 0; j < nbWater[2]; j++)
-	// 	{
-	// 		for (int k = 0; k < nbWater[1]; k++)
-	// 		{
-	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
-	// 		}
-	// 	}
-	// }
+	// simulation.addWater(glm::vec3(70, 50, 80));
+	int	nbWater[] = {8, 8, 8};
+	glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 50, MAP_SIZE / 2 - nbWater[2] / 2);
+	for (int i = 0; i < nbWater[0]; i++)
+	{
+		for (int j = 0; j < nbWater[2]; j++)
+		{
+			for (int k = 0; k < nbWater[1]; k++)
+			{
+				simulation.addWater(glm::vec3(i, k, j) + offset);
+			}
+		}
+	}
 
 	// Main loop
 	while (!glfwWindowShouldClose(context.window))

@@ -81,6 +81,12 @@ GLuint	Terrain::getTextureTerrainGridData(void)
 }
 
 
+int	Terrain::getDataNbRectangles(void)
+{
+	return (this->dataNbRectangles);
+}
+
+
 GLuint	Terrain::getTextureBufferTerrainGridFlat(void)
 {
 	return (this->textureBufferTerrainGridFlat);
@@ -117,11 +123,12 @@ int	Terrain::getSizeTerrainGridOffsets(void)
 }
 
 
-void	Terrain::getGridSize(int sizes[3])
+void	Terrain::getGridSize(int sizes[4])
 {
 	sizes[0] = this->terrainGridW;
 	sizes[1] = this->terrainGridH;
 	sizes[2] = this->terrainGridD;
+	sizes[3] = this->terrainIdHsize;
 }
 
 //---- Setters -----------------------------------------------------------------
@@ -434,6 +441,7 @@ void	Terrain::generateGridTextures(void)
 		}
 		rectangleId++;
 	}
+	this->dataNbRectangles = rectangleId;
 
 	// Create flat version of the grid
 	std::vector<float>	flatTerrainGrid;

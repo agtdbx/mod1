@@ -744,7 +744,7 @@ void	WaterSimulation::updatePositions(
 {
 	ComputeShader	*computeShader;
 	unsigned int	shaderId;
-	int				sizes[3], terrainFlatGridSize, terrainOffsetsGridSize;
+	int				sizes[4], terrainFlatGridSize, terrainOffsetsGridSize;
 	GLuint			terrainBufferTextureDataGrid, terrainTextureDataGrid,
 					terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
 					terrainBufferTextureOffsetsGrid, terrainTextureOffsetsGrid;
@@ -784,6 +784,9 @@ void	WaterSimulation::updatePositions(
 	int collisionEnergyKeepLoc = glGetUniformLocation(shaderId, "collisionEnergyKeep");
 	glUniform1f(collisionEnergyKeepLoc, COLLISION_ENERGY_KEEP);
 
+	int terrainCellSizeLoc = glGetUniformLocation(shaderId, "terrainCellSize");
+	glUniform1f(terrainCellSizeLoc, TERRAIN_CELL_SIZE);
+
 	int terrainGridWLoc = glGetUniformLocation(shaderId, "terrainGridW");
 	glUniform1i(terrainGridWLoc, sizes[0]);
 
@@ -792,6 +795,9 @@ void	WaterSimulation::updatePositions(
 
 	int terrainGridDLoc = glGetUniformLocation(shaderId, "terrainGridD");
 	glUniform1i(terrainGridDLoc, sizes[2]);
+
+	int terrainIdHsizeLoc = glGetUniformLocation(shaderId, "terrainIdHsize");
+	glUniform1i(terrainIdHsizeLoc, sizes[3]);
 
 	int terrainGridSizeLoc = glGetUniformLocation(shaderId, "terrainGridSize");
 	glUniform1i(terrainGridSizeLoc, terrainFlatGridSize);
@@ -802,7 +808,7 @@ void	WaterSimulation::updatePositions(
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_BUFFER, terrainTextureDataGrid);
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, terrainBufferTextureDataGrid);
-	glUniform1i(glGetUniformLocation(shaderId, "terrainPositionsBuffer"), 2);
+	glUniform1i(glGetUniformLocation(shaderId, "terrainDataBuffer"), 2);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_BUFFER, terrainTextureFlatGrid);

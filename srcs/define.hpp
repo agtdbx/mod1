@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/14 13:43:56 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 17:26:26 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,12 @@
 # define PI 3.1415926535f
 
 # define RAIN_INTENSITY 10
+# define RAIN_VELOCITY 10.0f
 # define RAIN_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_INTENSITY 10
 # define FILLING_VELOCITY 20
-# define WAVE_VELOCITY 10,0,0,10
+# define WAVE_VELOCITY 42
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
 
@@ -95,6 +96,7 @@ const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIUS, 9));
 
 std::vector<Vec3>	parse(char *name);
+
 
 
 

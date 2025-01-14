@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include <define.hpp>
+#include <interfaceDeclaratiom.hpp>
 #include <engine/inputs/InputManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
@@ -21,10 +22,7 @@ static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				OpenGLContext *context,
-				bool isRainning,
-				bool isFilling,
-				bool isPannelHide,
-				std::vector<Pannel> *pannelVector,
+				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager);
 static void	draw(
@@ -32,20 +30,8 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
-				std::vector<Button>	*buttonVector,
-				std::vector<Pannel> *pannelVector,
+				t_simulationVariable *sVar,
 				WaterSimulation	*simulation);
-void	addWater(void * arg);
-void	changeBoolStatus(void *arg);
-void	updateRain(WaterSimulation *simulation);
-void	fillingPool(WaterSimulation *simulation);
-void	generateWaveWest(void *arg);
-void	generateWaveEst(void *arg);
-void	moveWavePannel(void *arg);
-void	generateWaveNorth(void *arg);
-void	generateWaveSouth(void *arg);
-void	generateWaveAll(void *arg);
-void	resetPool(void *arg);
 
 
 
@@ -89,11 +75,24 @@ int	main(int argc, char **argv)
 	WaterSimulation	simulation;
 	Camera			camera;
 
-	std::vector<Button>	buttonVector;
-	std::vector<Pannel> pannelVector;
-	bool				isRainning = false;
-	bool				isFilling = false;
-	bool				isPannelHide = false;
+	t_simulationVariable	sVar;
+
+	sVar.fillingIntensity = FILLING_INTENSITY;
+	sVar.fillingDelay = FILLING_TIME_BEFORE_NEW_PARTICULE;
+	sVar.isFilling = false;
+	sVar.isPannelHide = true;
+	sVar.isRainning = false;
+	sVar.rainIntensity = RAIN_INTENSITY;
+	sVar.rainDelay = RAIN_TIME_BEFORE_NEW_PARTICULE;
+	sVar.simulation = &simulation;
+	sVar.waveHeight = WAVE_HEIGHT;
+	sVar.waveThickess = WAVE_THICKNESS;
+	sVar.waveVelocity = WAVE_VELOCITY;
+
+	// std::vector<Pannel> pannelVector;
+	// bool				isRainning = false;
+	// bool				isFilling = false;
+	// bool				isPannelHide = false;
 
 	Button::mouse = &inputManager.mouse;
 	Slider::mouse = &inputManager.mouse;
@@ -101,18 +100,31 @@ int	main(int argc, char **argv)
 	try
 	{
 		textureManager.addTexture("dirt", "data/textures/dirt.png");
+
 		textureManager.addTexture("rain", "data/textures/rainButton.png");
 		textureManager.addTexture("reset", "data/textures/resetButton.png");
 		textureManager.addTexture("filling", "data/textures/fillingButton.png");
 		textureManager.addTexture("wave", "data/textures/waveButton.png");
+
+		textureManager.addTexture("active", "data/textures/active.png");
 		textureManager.addTexture("noTexture", "data/textures/noTexture.png");
 		Slider::texture = textureManager.getTexture("noTexture");
+
 		textureManager.addTexture("North", "data/textures/North.png");
 		textureManager.addTexture("South", "data/textures/South.png");
 		textureManager.addTexture("West", "data/textures/West.png");
 		textureManager.addTexture("Est", "data/textures/Est.png");
 		textureManager.addTexture("all", "data/textures/all.png");
-		
+		textureManager.addTexture("waveThickness", "data/textures/waveThickness.png");
+		textureManager.addTexture("waveHeight", "data/textures/waveHeight.png");
+		textureManager.addTexture("waveVelocity", "data/textures/waveVelocity.png");
+
+		textureManager.addTexture("rainIntensity", "data/textures/rainIntensity.png");
+		textureManager.addTexture("rainDelay", "data/textures/rainDelay.png");
+
+		textureManager.addTexture("fillingIntensity", "data/textures/fillingIntensity.png");
+		textureManager.addTexture("fillingDelay", "data/textures/fillingDelay.png");
+
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
@@ -130,24 +142,65 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
-	pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));
-	pannelVector[0].addButton(Button(10, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
-	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
-	pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &pannelVector[1], textureManager.getTexture("wave")));
-	pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
-	pannelVector[0].addSlider(Slider(-500, 500, 200, 10, COLOR_29266F, COLOR_2C26E4));
-	pannelVector[0][0.0f].setValue(0.5);
-	pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, &simulation, textureManager.getTexture("North")));
-	pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &simulation, textureManager.getTexture("West")));
-	pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &simulation, textureManager.getTexture("Est")));
-	pannelVector[1].addButton(Button(10, 190, 100, 50,generateWaveSouth, &simulation, textureManager.getTexture("South")));
-	pannelVector[1].addButton(Button(10, 250, 100, 50,generateWaveAll, &simulation, textureManager.getTexture("all")));
-	pannelVector[0][0].setSwitchMode(true);
-	pannelVector[0][1].setSwitchMode(true);
-	pannelVector[0][2].setSwitchMode(true);
+	sVar.pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//main pannel
+	sVar.pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//wave pannel
+	sVar.pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//rain pannel
+	sVar.pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//filling pannel
+
+	sVar.pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar.pannelVector[2], textureManager.getTexture("rain")));
+	sVar.pannelVector[0][0].setSwitchMode(true);
+	sVar.pannelVector[0].addButton(Button(10, 70, 100, 50,moveFillingPannel, &sVar.pannelVector[3], textureManager.getTexture("filling")));
+	sVar.pannelVector[0][1].setSwitchMode(true);
+	sVar.pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &sVar.pannelVector[1], textureManager.getTexture("wave")));
+	sVar.pannelVector[0][2].setSwitchMode(true);
+	sVar.pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
+	// sVar.pannelVector[0].addSlider(Slider(-500, 500, 200, 10, COLOR_29266F, COLOR_2C26E4));
+	// sVar.pannelVector[0][0.0f].setValue(0.5);
+
+	sVar.pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, &sVar, textureManager.getTexture("North")));
+	sVar.pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &sVar, textureManager.getTexture("West")));
+	sVar.pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &sVar, textureManager.getTexture("Est")));
+	sVar.pannelVector[1].addButton(Button(10, 190, 100, 50,generateWaveSouth, &sVar, textureManager.getTexture("South")));
+	sVar.pannelVector[1].addButton(Button(10, 250, 100, 50,generateWaveAll, &sVar, textureManager.getTexture("all")));
+	sVar.pannelVector[1].addButton(Button(10, 310, 100, 50,NULL, NULL, textureManager.getTexture("waveHeight"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[1][5].desactive();
+	sVar.pannelVector[1].addSlider(Slider(10, 370, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[1][0.0f].setValue(0.5);
+	sVar.pannelVector[1].addButton(Button(10, 400, 100, 50,NULL, NULL, textureManager.getTexture("waveVelocity"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[1][6].desactive();
+	sVar.pannelVector[1].addSlider(Slider(10, 460, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[1][1.0f].setValue(0.5);
+	sVar.pannelVector[1].addButton(Button(10, 490, 100, 50,NULL, NULL, textureManager.getTexture("waveThickness"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[1][7].desactive();
+	sVar.pannelVector[1].addSlider(Slider(10, 560, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[1][2.0f].setValue(0.5);
 
 
+	sVar.pannelVector[2].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("rain"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[2][0].desactive();
+	sVar.pannelVector[2].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("active")));
+	sVar.pannelVector[2][1].setSwitchMode(true);
+	sVar.pannelVector[2].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager.getTexture("rainIntensity"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[2][2].desactive();
+	sVar.pannelVector[2].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[2][0.0f].setValue(0.5);
+	sVar.pannelVector[2].addButton(Button(10, 210, 100, 50,NULL, NULL, textureManager.getTexture("rainDelay"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[2][3].desactive();
+	sVar.pannelVector[2].addSlider(Slider(10, 270, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[2][1.0f].setValue(0.5);
+
+	sVar.pannelVector[3].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("filling"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[3][0].desactive();
+	sVar.pannelVector[3].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar.isFilling, textureManager.getTexture("active")));
+	sVar.pannelVector[3][1].setSwitchMode(true);
+	sVar.pannelVector[3].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager.getTexture("fillingIntensity"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[3][2].desactive();
+	sVar.pannelVector[3].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[3][0.0f].setValue(0.5);
+	sVar.pannelVector[3].addButton(Button(10, 210, 100, 50,NULL, NULL, textureManager.getTexture("fillingDelay"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar.pannelVector[3][3].desactive();
+	sVar.pannelVector[3].addSlider(Slider(10, 270, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar.pannelVector[3][1.0f].setValue(0.5);
 
 
 	// simulation.addWater(glm::vec3(5, 5, 5));
@@ -177,29 +230,46 @@ int	main(int argc, char **argv)
 			break;
 		if (inputManager.tab.isPressed())
 		{
-			if (isPannelHide)
+			if (!sVar.isPannelHide)
 			{
 				inputManager.mouse.setVisible(context.window, false);
 				inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
-				pannelVector[0].setPosToGo(WIN_W, 0.0f);
-				pannelVector[1].addPosToGo(120, 0);
+				sVar.pannelVector[0].setPosToGo(WIN_W, 0.0f);
+				sVar.pannelVector[1].addPosToGo(120, 0);
+				sVar.pannelVector[2].addPosToGo(-120, 0);
+				sVar.pannelVector[3].addPosToGo(-120, 0);
 			}
 			else
 			{
 				inputManager.mouse.setVisible(context.window, true);
-				pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
-				pannelVector[1].addPosToGo(-120, 0);
+				sVar.pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
+				sVar.pannelVector[1].addPosToGo(-120, 0);
+				sVar.pannelVector[2].addPosToGo(120, 0);
+				sVar.pannelVector[3].addPosToGo(120, 0);
 			}
-			isPannelHide = !isPannelHide;
+			sVar.isPannelHide = !sVar.isPannelHide;
+		}
+		if (!sVar.isPannelHide)
+		{
+			//wave parameter
+			sVar.waveHeight =  sVar.pannelVector[1][0.0f].getValue() * 2 * WAVE_HEIGHT;
+			sVar.waveVelocity =  sVar.pannelVector[1][1.0f].getValue() * 2 * WAVE_VELOCITY;
+			sVar.waveThickess =  sVar.pannelVector[1][2.0f].getValue() * 2 * WAVE_THICKNESS;
+			//rain parameter
+			sVar.rainIntensity =  sVar.pannelVector[2][0.0f].getValue() * 2 * RAIN_INTENSITY;
+			sVar.rainDelay =  sVar.pannelVector[2][1.0f].getValue() * 2 * RAIN_TIME_BEFORE_NEW_PARTICULE;
+			//filling parameter
+			sVar.fillingIntensity =  sVar.pannelVector[3][0.0f].getValue() * 2 * FILLING_INTENSITY;
+			sVar.fillingDelay =  sVar.pannelVector[3][1.0f].getValue() * 2 * FILLING_TIME_BEFORE_NEW_PARTICULE;
 		}
 
 
 		// Compute part
-		computation(&inputManager, &camera, &context, isRainning, isFilling, isPannelHide, &pannelVector, &simulation, &shaderManager);
+		computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
-			&shaderManager, &buttonVector, &pannelVector, &simulation);
+			&shaderManager, &sVar, &simulation);
 	}
 
 	context.close();
@@ -223,10 +293,7 @@ static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				OpenGLContext *context,
-				bool isRainning,
-				bool isFilling,
-				bool isPannelHide,
-				std::vector<Pannel> *pannelVector,
+				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
 {
@@ -259,33 +326,33 @@ static void	computation(
 	}
 	timeRainningParticuleAdd += delta;
 
-	if (timeRainningParticuleAdd >= RAIN_TIME_BEFORE_NEW_PARTICULE)
+	if (timeRainningParticuleAdd >= sVar->rainDelay)
 	{
-		timeRainningParticuleAdd -= RAIN_TIME_BEFORE_NEW_PARTICULE;
+		timeRainningParticuleAdd -= sVar->rainDelay;
 		double avg = 0.0;
 		for (double dtime : deltas)
 		{
 			avg += dtime;
 		}
 		avg /= deltas.size();
-		if (isRainning)
-			updateRain(simulation);
+		if (sVar->isRainning)
+			updateRain(simulation, sVar);
 	}
 	timeFillingParticuleAdd += delta;
 
-	if (timeFillingParticuleAdd >= FILLING_TIME_BEFORE_NEW_PARTICULE)
+	if (timeFillingParticuleAdd >= sVar->fillingDelay)
 	{
-		timeFillingParticuleAdd -= FILLING_TIME_BEFORE_NEW_PARTICULE;
+		timeFillingParticuleAdd -= sVar->fillingDelay;
 		double avg = 0.0;
 		for (double dtime : deltas)
 		{
 			avg += dtime;
 		}
 		avg /= deltas.size();
-		if (isFilling)
-			fillingPool(simulation);
+		if (sVar->isFilling)
+			fillingPool(simulation, sVar);
 	}
-	for (Pannel & pannel : *pannelVector)
+	for (Pannel & pannel : sVar->pannelVector)
 	{
 		pannel.tick(delta);
 	}
@@ -320,7 +387,7 @@ static void	computation(
 		camera->moveUp(-cameraSpeed);
 
 	// Camera rotation
-	if (!isPannelHide)
+	if (sVar->isPannelHide)
 	{
 		const glm::vec2		cursorMidPos(WIN_W / 2, WIN_H / 2);
 		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * delta * CAMERA_ROTATION_SPEED_MOUSE * -1);
@@ -346,8 +413,7 @@ static void	draw(
 				Camera *camera,
 				Terrain *terrain,
 				ShaderManager *shaderManager,
-				std::vector<Button>	*buttonVector,
-				std::vector<Pannel> *pannelVector,
+				t_simulationVariable *sVar,
 				WaterSimulation	*simulation)
 {
 	// Clear window
@@ -360,11 +426,7 @@ static void	draw(
 
 
 	// Button	test(10, 10, 100, 50,addWater, simulation, textureManager->getTexture("rain"));
-	for (Button & button : *buttonVector)
-	{
-		button.renderMesh(shaderManager);
-	}
-	for (Pannel & pannel : *pannelVector)
+	for (Pannel & pannel : sVar->pannelVector)
 	{
 		pannel.renderMesh(shaderManager);
 	}

@@ -6,11 +6,12 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 11:01:23 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 17:28:52 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
+#include <interfaceDeclaratiom.hpp>
 #include <model/WaterSimulation.hpp>
 #include <model/Pannel.hpp>
 #include <engine/maths/Random.hpp>
@@ -22,21 +23,22 @@ void	changeBoolStatus(void *arg)
 	*boolean = !(*boolean);
 }
 
-void	updateRain(WaterSimulation *simulation)
+void	updateRain(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
 
 	static Random	random;
-	for (size_t i = 0; i < RAIN_INTENSITY; i++)
+	for (size_t i = 0; i < sVar->rainIntensity; i++)
 	{
-		simulation->addWater(glm::vec3(random.random() * MAP_SIZE, WATER_MAX_HEIGHT,random.random() * MAP_SIZE));
+		simulation->addWater(glm::vec3(random.random() * (MAP_SIZE - 1), WATER_MAX_HEIGHT,random.random() * (MAP_SIZE - 1)),
+								glm::vec3(0.0f, 1.0f, 0.0f) * RAIN_VELOCITY);
 	}
 }
 
-void	fillingPool(WaterSimulation *simulation)
+void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
 
 	static Random	random;
-	for (size_t i = 0; i < FILLING_INTENSITY; i++)
+	for (size_t i = 0; i < sVar->fillingIntensity; i++)
 	{
 		float deviationFactor = (random.random() - 0.5) * (FILLING_VELOCITY/2) * 5;
 		// std::cout << "deviationFactor : " << deviationFactor << std::endl;
@@ -59,15 +61,16 @@ void	fillingPool(WaterSimulation *simulation)
 
 void	generateWaveWest(void *arg)
 {
-	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
+	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 	
 	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
 	{
-		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
 		{
-			for (float z = 0; z < WAVE_THICKNESS; z += WATER_RADIUS * 2)
+			for (float z = 0; z < sVar->waveThickess; z += WATER_RADIUS * 2)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 42.0f));
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 1.0f) * sVar->waveVelocity);
 			
 			}
 		}
@@ -77,15 +80,16 @@ void	generateWaveWest(void *arg)
 
 void	generateWaveEst(void *arg)
 {
-	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
+	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
 	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
 	{
-		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
 		{
-			for (float z = MAP_SIZE - WAVE_THICKNESS - 1 ; z < MAP_SIZE; z += WATER_RADIUS * 2)
+			for (float z = MAP_SIZE - sVar->waveThickess - 1 ; z < MAP_SIZE; z += WATER_RADIUS * 2)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, -42.0f));
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, -1.0f) * sVar->waveVelocity);
 			}
 		}
 	}
@@ -94,15 +98,16 @@ void	generateWaveEst(void *arg)
 
 void	generateWaveNorth(void *arg)
 {
-	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
+	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 	
 	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
 	{
-		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
 		{
-			for (float x = 0; x < WAVE_THICKNESS; x += WATER_RADIUS * 2)
+			for (float x = 0; x < sVar->waveThickess; x += WATER_RADIUS * 2)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(42.0f, 0.0f, 0.0f));
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
 			
 			}
 		}
@@ -112,15 +117,16 @@ void	generateWaveNorth(void *arg)
 
 void	generateWaveSouth(void *arg)
 {
-	WaterSimulation *simulation = ((WaterSimulation *)(arg));
+	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
+	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
 	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
 	{
-		for (float y = 0; y < WAVE_HEIGHT; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
 		{
-			for (float x = MAP_SIZE - WAVE_THICKNESS - 1 ; x < MAP_SIZE; x += WATER_RADIUS * 2)
+			for (float x = MAP_SIZE - sVar->waveThickess - 1 ; x < MAP_SIZE; x += WATER_RADIUS * 2)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(-42.0f, 0.0f, 0.0f));
+				simulation->addWater(glm::vec3(x, y, z), glm::vec3(-1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
 			}
 		}
 	}
@@ -145,6 +151,30 @@ void	moveWavePannel(void *arg)
 		pannel->addPosToGo(120, 0);
 	else
 		pannel->addPosToGo(-120, 0);
+}
+
+void	moveRainPannel(void *arg)
+{
+	static bool isHide = true;
+	Pannel *pannel = (Pannel *)arg;
+
+	isHide = !isHide;
+	if (isHide)
+		pannel->addPosToGo(-120, 0);
+	else
+		pannel->addPosToGo(120, 0);
+}
+
+void	moveFillingPannel(void *arg)
+{
+	static bool isHide = true;
+	Pannel *pannel = (Pannel *)arg;
+
+	isHide = !isHide;
+	if (isHide)
+		pannel->addPosToGo(-120, 0);
+	else
+		pannel->addPosToGo(120, 0);
 }
 
 void	resetPool(void *arg)

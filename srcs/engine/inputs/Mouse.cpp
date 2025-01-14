@@ -107,4 +107,9 @@ void	Mouse::update(GLFWwindow *window)
 	mouseScroll = 0.0;
 }
 
+void	Mouse::goTo(GLFWwindow *window, float x, float y)
+{
+	glfwSetCursorPos(window, x, y);
+}
+
 //**** PRIVATE METHODS *********************************************************

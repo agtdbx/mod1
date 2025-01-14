@@ -19,8 +19,10 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				OpenGLContext *context,
 				bool isRainning,
 				bool isFilling,
+				bool isPannelHide,
 				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager);
@@ -158,6 +160,9 @@ int	main(int argc, char **argv)
 	// }
 
 	// Main loop
+	inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
+	inputManager.mouse.setVisible(context.window, false);
+
 	while (!glfwWindowShouldClose(context.window))
 	{
 		events(context.window, &inputManager);
@@ -169,21 +174,25 @@ int	main(int argc, char **argv)
 		{
 			if (isPannelHide)
 			{
+				inputManager.mouse.setVisible(context.window, false);
+				inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
 				pannelVector[0].setPosToGo(WIN_W, 0.0f);
 				pannelVector[1].addPosToGo(120, 0);
 			}
 			else
 			{
+				inputManager.mouse.setVisible(context.window, true);
 				pannelVector[0].setPosToGo(WIN_W - 120, 0.0f);
 				pannelVector[1].addPosToGo(-120, 0);
 			}
 			isPannelHide = !isPannelHide;
 		}
 
+
 		// if (inputManager.mouse.)
 		// std::cout << inputManager.mouse.getPos() << std::endl;
 		// Compute part
-		computation(&inputManager, &camera, isRainning, isFilling, &pannelVector, &simulation, &shaderManager);
+		computation(&inputManager, &camera, &context, isRainning, isFilling, isPannelHide, &pannelVector, &simulation, &shaderManager);
 
 		// Drawing part
 		draw(context.window, &camera, &terrain,
@@ -210,8 +219,10 @@ static void	events(
 static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
+				OpenGLContext *context,
 				bool isRainning,
 				bool isFilling,
+				bool isPannelHide,
 				std::vector<Pannel> *pannelVector,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager)
@@ -306,6 +317,13 @@ static void	computation(
 		camera->moveUp(-cameraSpeed);
 
 	// Camera rotation
+	if (!isPannelHide)
+	{
+		const glm::vec2		cursorMidPos(WIN_W / 2, WIN_H / 2);
+		camera->rotateY((cursorMidPos.x - inputManager->mouse.getPos().x) * delta * CAMERA_ROTATION_SPEED_MOUSE);
+		camera->rotateX((cursorMidPos.y - inputManager->mouse.getPos().y) * delta * CAMERA_ROTATION_SPEED_MOUSE);
+		inputManager->mouse.goTo((*context).window, cursorMidPos.x, cursorMidPos.y);
+	}
 	if (inputManager->up.isDown())
 		camera->rotateX(CAMERA_ROTATION_SPEED * delta);
 	else if (inputManager->down.isDown())

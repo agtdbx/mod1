@@ -23,6 +23,8 @@ public:
 	Mouse	&operator=(const Mouse &obj);
 
 	void	update(GLFWwindow *window);
+	void	goTo(GLFWwindow *window, float x, float y);
+
 
 private:
 	Vec2	pos;

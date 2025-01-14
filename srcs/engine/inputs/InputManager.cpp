@@ -72,6 +72,7 @@ void	InputManager::update(GLFWwindow *window)
 	this->lcontrol.update(window);
 	this->t.update(window);
 	this->tab.update(window);
+	this->alt.update(window);
 }
 
 //**** PRIVATE METHODS *********************************************************
@@ -94,6 +95,7 @@ void	InputManager::initKeys(void)
 	this->lcontrol = Key(GLFW_KEY_LEFT_CONTROL);
 	this->t = Key(GLFW_KEY_T);
 	this->tab = Key(GLFW_KEY_TAB);
+	this->alt = Key(GLFW_KEY_LEFT_ALT);
 }
 
 
@@ -115,4 +117,5 @@ void	InputManager::copyKeys(const InputManager &obj)
 	this->lcontrol = obj.lcontrol;
 	this->t = obj.t;
 	this->tab = obj.tab;
+	this->alt = obj.alt;
 }

@@ -31,6 +31,7 @@ executable('mod1',
           'srcs/model/Slider.cpp',
           'srcs/model/WaterSimulation.cpp',
           'srcs/parsing.cpp',
+          'srcs/init.cpp',
           build_rpath: '.',
           dependencies : [
             dependency('glfw3'),

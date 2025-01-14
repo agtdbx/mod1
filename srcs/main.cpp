@@ -33,7 +33,8 @@ static void	draw(
 				ShaderManager *shaderManager,
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation);
-
+void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager);
+void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSimulation *simulation);
 
 
 int	main(int argc, char **argv)
@@ -78,20 +79,6 @@ int	main(int argc, char **argv)
 
 	t_simulationVariable	sVar;
 
-	sVar.fillingIntensity = FILLING_INTENSITY;
-	sVar.fillingDelay = FILLING_TIME_BEFORE_NEW_PARTICULE;
-	sVar.isFilling = false;
-	sVar.isPannelHide = true;
-	sVar.isRainning = false;
-	sVar.rainIntensity = RAIN_INTENSITY;
-	sVar.rainDelay = RAIN_TIME_BEFORE_NEW_PARTICULE;
-	sVar.simulation = &simulation;
-	sVar.waveHeight = WAVE_HEIGHT;
-	sVar.waveThickess = WAVE_THICKNESS;
-	sVar.waveVelocity = WAVE_VELOCITY;
-	sVar.isStopped = false;
-	sVar.needStep = false;
-
 	// std::vector<Pannel> pannelVector;
 	// bool				isRainning = false;
 	// bool				isFilling = false;
@@ -102,40 +89,9 @@ int	main(int argc, char **argv)
 
 	try
 	{
-		textureManager.addTexture("dirt", "data/textures/dirt.png");
-
-		textureManager.addTexture("rain", "data/textures/rainButton.png");
-		textureManager.addTexture("reset", "data/textures/resetButton.png");
-		textureManager.addTexture("filling", "data/textures/fillingButton.png");
-		textureManager.addTexture("wave", "data/textures/waveButton.png");
-
-		textureManager.addTexture("active", "data/textures/active.png");
-		textureManager.addTexture("noTexture", "data/textures/noTexture.png");
+		loadTexture(&textureManager, &shaderManager);
 		Slider::texture = textureManager.getTexture("noTexture");
 
-		textureManager.addTexture("North", "data/textures/North.png");
-		textureManager.addTexture("South", "data/textures/South.png");
-		textureManager.addTexture("West", "data/textures/West.png");
-		textureManager.addTexture("Est", "data/textures/Est.png");
-		textureManager.addTexture("all", "data/textures/all.png");
-		textureManager.addTexture("waveThickness", "data/textures/waveThickness.png");
-		textureManager.addTexture("waveHeight", "data/textures/waveHeight.png");
-		textureManager.addTexture("waveVelocity", "data/textures/waveVelocity.png");
-
-		textureManager.addTexture("rainIntensity", "data/textures/rainIntensity.png");
-		textureManager.addTexture("rainDelay", "data/textures/rainDelay.png");
-
-		textureManager.addTexture("fillingIntensity", "data/textures/fillingIntensity.png");
-		textureManager.addTexture("fillingDelay", "data/textures/fillingDelay.png");
-
-		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
-		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
-		shaderManager.loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
-
-		shaderManager.addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
-		shaderManager.addComputeShader("densities", "data/shaders/simulation/densities.glslc");
-		shaderManager.addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
-		shaderManager.addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 	}
 	catch (std::exception &e)
 	{
@@ -144,70 +100,7 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-
-	sVar.pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//main pannel
-	sVar.pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//wave pannel
-	sVar.pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//rain pannel
-	sVar.pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//filling pannel
-	sVar.pannelVector.push_back(Pannel(WIN_W / 2 - 56, -58.0f, 112, 58, textureManager.getTexture("noTexture"), PANNEL_COLOR));	//stop & next step
-
-	sVar.pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar.pannelVector[2], textureManager.getTexture("rain")));
-	sVar.pannelVector[0][0].setSwitchMode(true);
-	sVar.pannelVector[0].addButton(Button(10, 70, 100, 50,moveFillingPannel, &sVar.pannelVector[3], textureManager.getTexture("filling")));
-	sVar.pannelVector[0][1].setSwitchMode(true);
-	sVar.pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &sVar.pannelVector[1], textureManager.getTexture("wave")));
-	sVar.pannelVector[0][2].setSwitchMode(true);
-	sVar.pannelVector[0].addButton(Button(10, 190, 100, 50,resetPool, &simulation, textureManager.getTexture("reset")));
-	// sVar.pannelVector[0].addSlider(Slider(-500, 500, 200, 10, COLOR_29266F, COLOR_2C26E4));
-	// sVar.pannelVector[0][0.0f].setValue(0.5);
-
-	sVar.pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, &sVar, textureManager.getTexture("North")));
-	sVar.pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &sVar, textureManager.getTexture("West")));
-	sVar.pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &sVar, textureManager.getTexture("Est")));
-	sVar.pannelVector[1].addButton(Button(10, 190, 100, 50,generateWaveSouth, &sVar, textureManager.getTexture("South")));
-	sVar.pannelVector[1].addButton(Button(10, 250, 100, 50,generateWaveAll, &sVar, textureManager.getTexture("all")));
-	sVar.pannelVector[1].addButton(Button(10, 310, 100, 50,NULL, NULL, textureManager.getTexture("waveHeight"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[1][5].desactive();
-	sVar.pannelVector[1].addSlider(Slider(10, 370, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[1][0.0f].setValue(0.5);
-	sVar.pannelVector[1].addButton(Button(10, 400, 100, 50,NULL, NULL, textureManager.getTexture("waveVelocity"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[1][6].desactive();
-	sVar.pannelVector[1].addSlider(Slider(10, 460, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[1][1.0f].setValue(0.5);
-	sVar.pannelVector[1].addButton(Button(10, 490, 100, 50,NULL, NULL, textureManager.getTexture("waveThickness"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[1][7].desactive();
-	sVar.pannelVector[1].addSlider(Slider(10, 560, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[1][2.0f].setValue(0.5);
-
-
-	sVar.pannelVector[2].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("rain"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[2][0].desactive();
-	sVar.pannelVector[2].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("active")));
-	sVar.pannelVector[2][1].setSwitchMode(true);
-	sVar.pannelVector[2].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager.getTexture("rainIntensity"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[2][2].desactive();
-	sVar.pannelVector[2].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[2][0.0f].setValue(0.5);
-	sVar.pannelVector[2].addButton(Button(10, 210, 100, 50,NULL, NULL, textureManager.getTexture("rainDelay"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[2][3].desactive();
-	sVar.pannelVector[2].addSlider(Slider(10, 270, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[2][1.0f].setValue(0.5);
-
-	sVar.pannelVector[3].addButton(Button(10, 10, 100, 50,changeBoolStatus, &sVar.isRainning, textureManager.getTexture("filling"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[3][0].desactive();
-	sVar.pannelVector[3].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar.isFilling, textureManager.getTexture("active")));
-	sVar.pannelVector[3][1].setSwitchMode(true);
-	sVar.pannelVector[3].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager.getTexture("fillingIntensity"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[3][2].desactive();
-	sVar.pannelVector[3].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[3][0.0f].setValue(0.5);
-	sVar.pannelVector[3].addButton(Button(10, 210, 100, 50,NULL, NULL, textureManager.getTexture("fillingDelay"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar.pannelVector[3][3].desactive();
-	sVar.pannelVector[3].addSlider(Slider(10, 270, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar.pannelVector[3][1.0f].setValue(0.5);
-
-	sVar.pannelVector[4].addButton(Button(4, 4, 50, 50,changeBoolStatus, &sVar.isStopped, textureManager.getTexture("noTexture")));
-	sVar.pannelVector[4].addButton(Button(58, 4, 50, 50,changeBoolStatus, &sVar.needStep, textureManager.getTexture("noTexture")));
+	initUi(&sVar, &textureManager, &simulation);
 
 	// simulation.addWater(glm::vec3(5, 5, 5));
 	// int	nbWater[] = {32, 32, 32};

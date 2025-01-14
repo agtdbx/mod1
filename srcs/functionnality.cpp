@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <liam.flandrinck.58@gmail.com>    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/13 14:53:22 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/14 11:01:23 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,14 @@ void	generateWaveSouth(void *arg)
 		}
 	}
 	
+}
+
+void	generateWaveAll(void *arg)
+{
+	generateWaveEst(arg);
+	generateWaveWest(arg);
+	generateWaveNorth(arg);
+	generateWaveSouth(arg);
 }
 
 void	moveWavePannel(void *arg)

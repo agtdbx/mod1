@@ -41,6 +41,7 @@ void	generateWaveEst(void *arg);
 void	moveWavePannel(void *arg);
 void	generateWaveNorth(void *arg);
 void	generateWaveSouth(void *arg);
+void	generateWaveAll(void *arg);
 void	resetPool(void *arg);
 
 
@@ -97,6 +98,7 @@ int	main(int argc, char **argv)
 		textureManager.addTexture("South", "data/textures/South.png");
 		textureManager.addTexture("West", "data/textures/West.png");
 		textureManager.addTexture("Est", "data/textures/Est.png");
+		textureManager.addTexture("all", "data/textures/all.png");
 		
 		shaderManager.addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 		shaderManager.loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
@@ -116,7 +118,7 @@ int	main(int argc, char **argv)
 	}
 
 	pannelVector.push_back(Pannel(WIN_W, 0.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
-	pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 250, textureManager.getTexture("noTexture"), PANNEL_COLOR));
+	pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 310, textureManager.getTexture("noTexture"), PANNEL_COLOR));
 	pannelVector[0].addButton(Button(10, 10, 100, 50,changeBoolStatus, &isRainning, textureManager.getTexture("rain")));
 	pannelVector[0].addButton(Button(10, 70, 100, 50,changeBoolStatus, &isFilling, textureManager.getTexture("filling")));
 	pannelVector[0].addButton(Button(10, 130, 100, 50,moveWavePannel, &pannelVector[1], textureManager.getTexture("wave")));
@@ -125,6 +127,7 @@ int	main(int argc, char **argv)
 	pannelVector[1].addButton(Button(10, 70, 100, 50,generateWaveWest, &simulation, textureManager.getTexture("West")));
 	pannelVector[1].addButton(Button(10, 130, 100, 50,generateWaveEst, &simulation, textureManager.getTexture("Est")));
 	pannelVector[1].addButton(Button(10, 190, 100, 50,generateWaveSouth, &simulation, textureManager.getTexture("South")));
+	pannelVector[1].addButton(Button(10, 250, 100, 50,generateWaveAll, &simulation, textureManager.getTexture("all")));
 	pannelVector[0][0].setSwitchMode(true);
 	pannelVector[0][1].setSwitchMode(true);
 	pannelVector[0][2].setSwitchMode(true);

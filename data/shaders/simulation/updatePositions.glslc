@@ -5,11 +5,108 @@ layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform imageBuffer positionsBuffer;
 layout(rgba32f, binding = 1) uniform imageBuffer velocitiesBuffer;
 
-uniform	float	delta;
-uniform float	waterRadius;
-uniform float	waterMaxXZ;
-uniform float	waterMaxY;
-uniform float	collisionEnergyKeep;
+uniform	float			delta;
+uniform float			waterRadius;
+uniform float			waterMaxXZ;
+uniform float			waterMaxY;
+uniform float			collisionEnergyKeep;
+uniform float			terrainCellSize;
+uniform int				terrainGridW;
+uniform int				terrainGridH;
+uniform int				terrainGridD;
+uniform int				terrainIdHsize;
+uniform int				terrainGridSize;
+uniform int				terrainOffsetsSize;
+uniform samplerBuffer	terrainDataBuffer;
+uniform samplerBuffer	terrainGridBuffer;
+uniform samplerBuffer	terrainOffsetsBuffer;
+
+
+float	vecLength(vec3 vec)
+{
+	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+}
+
+
+int	checkCollisionWithTerrain(vec3 position)
+{
+	int	px, py, pz, gx, gy, gz, gid, startId, endId, rectangleId;
+	vec3	rectPos, vecX, vecZ, posFromRect, posOnRect;
+	float	minY, maxY, a, b;
+
+	px = int(position.x / terrainCellSize);
+	py = int(position.y / terrainCellSize);
+	pz = int(position.z / terrainCellSize);
+
+	for (int cx = -1; cx < 2; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= terrainGridW)
+			continue;
+
+		for (int cy = -1; cy < 2; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= terrainGridH)
+				continue;
+
+			for (int cz = -1; cz < 2; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= terrainGridD)
+					continue;
+
+				gid = gx + gz * terrainGridW + gy * terrainIdHsize;
+					startId = int(texelFetch(terrainOffsetsBuffer, gid).r);
+				if (gid + 1 < terrainOffsetsSize)
+					endId = int(texelFetch(terrainOffsetsBuffer, gid + 1).r);
+				else
+					endId = terrainGridSize;
+
+				for (int i = startId; i < endId; i++)
+				{
+					rectangleId = int(texelFetch(terrainGridBuffer, i).r);
+					rectPos = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
+					vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
+					vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
+
+					posFromRect = position - rectPos;
+					minY = min(vecX.y, vecZ.y);
+					maxY = max(vecX.y, vecZ.y);
+
+					if (posFromRect.x < -waterRadius || posFromRect.x > vecX.x
+						|| posFromRect.y < minY - waterRadius || posFromRect.y > maxY + waterRadius
+						|| posFromRect.z < -waterRadius || posFromRect.z > vecZ.z)
+						continue;
+
+					if (vecX.x != 0.0)
+						a = posFromRect.x / vecX.x;
+					else if (vecX.y != 0.0)
+						a = posFromRect.y / vecX.y;
+					else
+						continue;
+
+					if (vecZ.z != 0.0)
+						b = posFromRect.z / vecZ.z;
+					else if (vecZ.y != 0.0)
+						b = posFromRect.y / vecZ.y;
+					else
+						continue;
+
+					posOnRect = rectPos + a * vecX + b * vecZ;
+
+					if (posFromRect.y - waterRadius > posOnRect.y)
+						continue;
+
+					return (rectangleId);
+				}
+			}
+		}
+	}
+
+	return (-1);
+}
+
 
 void main()
 {
@@ -18,50 +115,70 @@ void main()
 	vec3	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
 	bool	needUpdateVelocity = false;
 
-	position += velocity * delta;
+	vec3	newPosition = position + velocity * delta;
+
+	// Check terrain collision
+	int	terrainCollisionId = checkCollisionWithTerrain(newPosition);
+
+	// Make particule bounce
+	if (terrainCollisionId != -1)
+	{
+		float	velocityLength = vecLength(velocity);
+		vec3	velocityDir = vec3(0.0, -1.0, 0.0);
+		if (velocityLength != 0.0)
+			velocityDir = velocity / velocityLength;
+
+		vec3	normal = texelFetch(terrainDataBuffer, terrainCollisionId * 4 + 3).rgb;
+		velocityDir -= normal * 2 * dot(velocityDir, normal);
+		velocityDir = normalize(velocityDir);
+		velocity = velocityDir * velocityLength * collisionEnergyKeep;
+
+		needUpdateVelocity = true;
+		newPosition = position + velocity * delta;
+	}
 
 	// Check if particule is out of the map on x axis
-	if (position.x < waterRadius)
+	if (newPosition.x < waterRadius)
 	{
-		position.x = waterRadius;
+		newPosition.x = waterRadius;
 		velocity.x *= -1.0;
 		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
-	else if (position.x >= waterMaxXZ)
+	else if (newPosition.x >= waterMaxXZ)
 	{
-		position.x = waterMaxXZ;
+		newPosition.x = waterMaxXZ;
 		velocity.x *= -1.0;
 		needUpdateVelocity = true;
 	}
 
 	// Check if particule is out of the map on y axis
-	if (position.y < waterRadius)
+	if (newPosition.y < waterRadius)
 	{
-		position.y = waterRadius;
+		newPosition.y = waterRadius;
 		velocity.y *= -1.0;
 		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
-	else if (position.y >= waterMaxY)
+	else if (newPosition.y >= waterMaxY)
 	{
-		position.y = waterMaxY;
+		newPosition.y = waterMaxY;
 		velocity.y *= -1.0;
 		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 
 	// Check if particule is out of the map on z axis
-	if (position.z < waterRadius)
+	if (newPosition.z < waterRadius)
 	{
-		position.z = waterRadius;
+		newPosition.z = waterRadius;
 		velocity.z *= -1.0;
 		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
-	else if (position.z >= waterMaxXZ)
+	else if (newPosition.z >= waterMaxXZ)
 	{
-		position.z = waterMaxXZ;
+		newPosition.z = waterMaxXZ;
 		velocity.z *= -1.0;
 		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
@@ -72,5 +189,5 @@ void main()
 		imageStore(velocitiesBuffer, particleIndex, vec4(velocity, 1.0));
 
 	// Write the value to the buffer
-	imageStore(positionsBuffer, particleIndex, vec4(position, 1.0));
+	imageStore(positionsBuffer, particleIndex, vec4(newPosition, 1.0));
 }

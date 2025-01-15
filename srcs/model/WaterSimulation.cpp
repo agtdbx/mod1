@@ -191,7 +191,7 @@ void	WaterSimulation::addWater(glm::vec3 position, glm::vec3 velocity)
 }
 
 
-void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
+void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float delta)
 {
 	if (this->needToUpdateBuffers == true)
 	{
@@ -207,11 +207,11 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, float delta)
 	this->putParticlesInGrid(shaderManager); // cpu
 	this->computeDensity(shaderManager); // gpu
 	this->calculatesAndApplyPressure(shaderManager, delta); // gpu
-	this->updatePositions(shaderManager, delta); // gpu
+	this->updatePositions(shaderManager, terrain, delta); // gpu
 }
 
 
-void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
+void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager, Terrain *terrain)
 {
 	WaterShader *shader;
 	int			shaderId;
@@ -305,7 +305,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager)
 	glDrawArrays(GL_TRIANGLES, 0, 12);
 }
 
-void	WaterSimulation::clear()
+void	WaterSimulation::clear(void)
 {
 	this->nbParticules = 0;
 	this->positions.clear();
@@ -374,7 +374,7 @@ void	WaterSimulation::generateTriangleOverScreen(void)
 
 void	WaterSimulation::generateFlatGrid(void)
 {
-	int	cellSize, currentOffset;
+	int	cellSize;
 
 	// grid
 	this->gridFlat.clear();
@@ -383,14 +383,12 @@ void	WaterSimulation::generateFlatGrid(void)
 	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
 
-	currentOffset = 0;
 	for (std::vector<int> &cell : this->grid)
 	{
 		cellSize = cell.size();
 		for (int i = 0; i < cellSize; i++)
 			this->gridFlat.push_back(cell[i]);
-		this->gridOffsets.push_back(currentOffset);
-		currentOffset += cellSize;
+		this->gridOffsets.push_back(this->gridFlatSize);
 		this->gridFlatSize += cellSize;
 		this->gridOffsetsSize++;
 	}
@@ -402,14 +400,12 @@ void	WaterSimulation::generateFlatGrid(void)
 	this->renderGridFlatSize = 0;
 	this->renderGridOffsetsSize = 0;
 
-	currentOffset = 0;
 	for (std::vector<int> &cell : this->renderGrid)
 	{
 		cellSize = cell.size();
 		for (int i = 0; i < cellSize; i++)
 			this->renderGridFlat.push_back(cell[i]);
-		this->renderGridOffsets.push_back(currentOffset);
-		currentOffset += cellSize;
+		this->renderGridOffsets.push_back(this->renderGridFlatSize);
 		this->renderGridFlatSize += cellSize;
 		this->renderGridOffsetsSize++;
 	}
@@ -771,10 +767,17 @@ void	WaterSimulation::calculatesAndApplyPressure(ShaderManager *shaderManager, f
 }
 
 
-void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
+void	WaterSimulation::updatePositions(
+							ShaderManager *shaderManager,
+							Terrain *terrain,
+							float delta)
 {
 	ComputeShader	*computeShader;
 	unsigned int	shaderId;
+	int				sizes[4], terrainFlatGridSize, terrainOffsetsGridSize;
+	GLuint			terrainBufferTextureDataGrid, terrainTextureDataGrid,
+					terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
+					terrainBufferTextureOffsetsGrid, terrainTextureOffsetsGrid;
 
 	// Get the compute shader
 	computeShader = shaderManager->getComputeShader("updatePositions");
@@ -783,6 +786,17 @@ void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 	shaderId = computeShader->getShaderId();
 
 	computeShader->use();
+
+	// Get terrain data
+	terrainBufferTextureDataGrid = terrain->getTextureBufferTerrainGridData();
+	terrainTextureDataGrid = terrain->getTextureTerrainGridData();
+	terrainBufferTextureFlatGrid = terrain->getTextureBufferTerrainGridFlat();
+	terrainTextureFlatGrid = terrain->getTextureTerrainGridFlat();
+	terrainFlatGridSize = terrain->getSizeTerrainGridFlat();
+	terrainBufferTextureOffsetsGrid = terrain->getTextureBufferTerrainGridOffsets();
+	terrainTextureOffsetsGrid = terrain->getTextureTerrainGridOffsets();
+	terrainOffsetsGridSize = terrain->getSizeTerrainGridOffsets();
+	terrain->getGridSize(sizes);
 
 	// Compute shader inputs setup
 	int deltaLoc = glGetUniformLocation(shaderId, "delta");
@@ -800,12 +814,49 @@ void	WaterSimulation::updatePositions(ShaderManager *shaderManager, float delta)
 	int collisionEnergyKeepLoc = glGetUniformLocation(shaderId, "collisionEnergyKeep");
 	glUniform1f(collisionEnergyKeepLoc, COLLISION_ENERGY_KEEP);
 
+	int terrainCellSizeLoc = glGetUniformLocation(shaderId, "terrainCellSize");
+	glUniform1f(terrainCellSizeLoc, TERRAIN_CELL_SIZE);
+
+	int terrainGridWLoc = glGetUniformLocation(shaderId, "terrainGridW");
+	glUniform1i(terrainGridWLoc, sizes[0]);
+
+	int terrainGridHLoc = glGetUniformLocation(shaderId, "terrainGridH");
+	glUniform1i(terrainGridHLoc, sizes[1]);
+
+	int terrainGridDLoc = glGetUniformLocation(shaderId, "terrainGridD");
+	glUniform1i(terrainGridDLoc, sizes[2]);
+
+	int terrainIdHsizeLoc = glGetUniformLocation(shaderId, "terrainIdHsize");
+	glUniform1i(terrainIdHsizeLoc, sizes[3]);
+
+	int terrainGridSizeLoc = glGetUniformLocation(shaderId, "terrainGridSize");
+	glUniform1i(terrainGridSizeLoc, terrainFlatGridSize);
+
+	int terrainOffsetsSizeLoc = glGetUniformLocation(shaderId, "terrainOffsetsSize");
+	glUniform1i(terrainOffsetsSizeLoc, terrainOffsetsGridSize);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_BUFFER, terrainTextureDataGrid);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, terrainBufferTextureDataGrid);
+	glUniform1i(glGetUniformLocation(shaderId, "terrainDataBuffer"), 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_BUFFER, terrainTextureFlatGrid);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, terrainBufferTextureFlatGrid);
+	glUniform1i(glGetUniformLocation(shaderId, "terrainGridBuffer"), 3);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_BUFFER, terrainTextureOffsetsGrid);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, terrainBufferTextureOffsetsGrid);
+	glUniform1i(glGetUniformLocation(shaderId, "terrainOffsetsBuffer"), 4);
+
 	// Compute shader output setup
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
 	glBindImageTexture(0, this->texturePositions, 0, GL_FALSE, 0,
 							GL_WRITE_ONLY, GL_RGBA32F);
+
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);

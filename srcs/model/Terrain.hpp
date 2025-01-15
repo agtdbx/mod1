@@ -7,12 +7,31 @@
 # include <engine/render/shader/ShaderManager.hpp>
 # include <engine/render/TextureManager.hpp>
 
+typedef struct s_rectangle
+{
+	int	x;
+	int	y;
+	int	width;
+	int	height;
+}	t_rectangle;
+
 class Terrain
 {
 public:
 	Terrain(void);
 	Terrain(const Terrain &obj);
 	~Terrain();
+
+	GLuint	getTextureBufferTerrainGridData(void);
+	GLuint	getTextureTerrainGridData(void);
+	int		getDataNbRectangles(void);
+	GLuint	getTextureBufferTerrainGridFlat(void);
+	GLuint	getTextureTerrainGridFlat(void);
+	int		getSizeTerrainGridFlat(void);
+	GLuint	getTextureBufferTerrainGridOffsets(void);
+	GLuint	getTextureTerrainGridOffsets(void);
+	int		getSizeTerrainGridOffsets(void);
+	void	getGridSize(int sizes[4]);
 
 	Terrain	&operator=(const Terrain &obj);
 
@@ -22,12 +41,19 @@ public:
 private:
 	std::vector<Vec3>					parameterPoints;
 	std::vector<std::vector<double>>	heightmap;
-	std::vector<glm::vec3>				squaresPoints;
+	std::vector<Point>					vertices;
+	std::vector<t_rectangle>			rectangles;
 	Mesh								mesh;
+	int									terrainGridW, terrainGridH, terrainGridD,
+										terrainIdHsize, dataNbRectangles, flatTerrainGridSize, offsetsTerrainGridSize;
+	GLuint								textureBufferTerrainGridData, textureTerrainGridData,
+										textureBufferTerrainGridFlat, textureTerrainGridFlat,
+										textureBufferTerrainGridOffsets, textureTerrainGridOffsets;
 
 	void	initEmptyMap(void);
 	void	interpolate(void);
 	void	createMesh(void);
+	void	generateGridTextures(void);
 };
 
 #endif

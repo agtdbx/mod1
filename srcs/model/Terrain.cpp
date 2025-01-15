@@ -1,32 +1,135 @@
 #include <model/Terrain.hpp>
 
+//**** STATIC FUNCTIONS ********************************************************
+
+static float	min(float a, float b)
+{
+	if (a < b)
+		return (a);
+	return (b);
+}
+
+static float	max(float a, float b)
+{
+	if (a > b)
+		return (a);
+	return (b);
+}
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
 Terrain::Terrain(void)
 {
+	glGenBuffers(1, &this->textureBufferTerrainGridData);
+	glGenTextures(1, &this->textureTerrainGridData);
+	glGenBuffers(1, &this->textureBufferTerrainGridFlat);
+	glGenTextures(1, &this->textureTerrainGridFlat);
+	glGenBuffers(1, &this->textureBufferTerrainGridOffsets);
+	glGenTextures(1, &this->textureTerrainGridOffsets);
+
+	this->terrainGridW = 0;
+	this->terrainGridH = 0;
+	this->terrainGridD = 0;
+	this->terrainIdHsize = 0;
+
 	this->initEmptyMap();
 }
 
 
 Terrain::Terrain(const Terrain &obj)
 {
+	glGenBuffers(1, &this->textureBufferTerrainGridData);
+	glGenTextures(1, &this->textureTerrainGridData);
+	glGenBuffers(1, &this->textureBufferTerrainGridFlat);
+	glGenTextures(1, &this->textureTerrainGridFlat);
+	glGenBuffers(1, &this->textureBufferTerrainGridOffsets);
+	glGenTextures(1, &this->textureTerrainGridOffsets);
+
 	this->parameterPoints = obj.parameterPoints;
 	this->heightmap = obj.heightmap;
 	this->mesh = obj.mesh;
-	this->squaresPoints = obj.squaresPoints;
+	this->rectangles = obj.rectangles;
 
+	this->generateGridTextures();
 }
 
 //---- Destructor --------------------------------------------------------------
 
 Terrain::~Terrain()
 {
-
+	glDeleteBuffers(1, &this->textureBufferTerrainGridData);
+	glDeleteTextures(1, &this->textureTerrainGridData);
+	glDeleteBuffers(1, &this->textureBufferTerrainGridFlat);
+	glDeleteTextures(1, &this->textureTerrainGridFlat);
+	glDeleteBuffers(1, &this->textureBufferTerrainGridOffsets);
+	glDeleteTextures(1, &this->textureTerrainGridOffsets);
 }
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
+
+GLuint	Terrain::getTextureBufferTerrainGridData(void)
+{
+	return (this->textureBufferTerrainGridData);
+}
+
+
+GLuint	Terrain::getTextureTerrainGridData(void)
+{
+	return (this->textureTerrainGridData);
+}
+
+
+int	Terrain::getDataNbRectangles(void)
+{
+	return (this->dataNbRectangles);
+}
+
+
+GLuint	Terrain::getTextureBufferTerrainGridFlat(void)
+{
+	return (this->textureBufferTerrainGridFlat);
+}
+
+
+GLuint	Terrain::getTextureTerrainGridFlat(void)
+{
+	return (this->textureTerrainGridFlat);
+}
+
+
+int	Terrain::getSizeTerrainGridFlat(void)
+{
+	return (this->flatTerrainGridSize);
+}
+
+
+GLuint	Terrain::getTextureBufferTerrainGridOffsets(void)
+{
+	return (this->textureBufferTerrainGridOffsets);
+}
+
+
+GLuint	Terrain::getTextureTerrainGridOffsets(void)
+{
+	return (this->textureTerrainGridOffsets);
+}
+
+
+int	Terrain::getSizeTerrainGridOffsets(void)
+{
+	return (this->offsetsTerrainGridSize);
+}
+
+
+void	Terrain::getGridSize(int sizes[4])
+{
+	sizes[0] = this->terrainGridW;
+	sizes[1] = this->terrainGridH;
+	sizes[2] = this->terrainGridD;
+	sizes[3] = this->terrainIdHsize;
+}
 
 //---- Setters -----------------------------------------------------------------
 
@@ -40,7 +143,9 @@ Terrain	&Terrain::operator=(const Terrain &obj)
 	this->parameterPoints = obj.parameterPoints;
 	this->heightmap = obj.heightmap;
 	this->mesh = obj.mesh;
-	this->squaresPoints = obj.squaresPoints;
+	this->rectangles = obj.rectangles;
+
+	this->generateGridTextures();
 
 	return (*this);
 }
@@ -128,38 +233,19 @@ void Terrain::interpolate(void)
 	}
 }
 
-bool checkIsInDequekSave(std::deque<std::pair<Point &, Point &>> & save, Point & point)
-{
-	for (std::pair<Point &, Point &>  pair : save)
-	{
-		if (point.pos.x >= pair.first.pos.x and point.pos.x < pair.second.pos.x and
-			point.pos.z >= pair.first.pos.z and point.pos.z < pair.second.pos.z)
-			return true;
-	}
-	return false;
-}
-
-bool needToDestroyTriangle(Point & p1,Point & p2,Point & p3,Point & p4)
-{
-	if (p1.normal == Vec3(0, -1, 0) and
-		p2.normal == Vec3(0, -1, 0) and
-		p3.normal == Vec3(0, -1, 0) and
-		p4.normal == Vec3(0, -1, 0))
-		return true;
-	return false;
-}
-
 
 void	Terrain::createMesh(void)
 {
-	std::vector<Point>		vertices;
 	std::vector<t_tri_id>	indices;
+	std::vector<bool>		isInRectangle;
+	double					r, g, b, height;
+	Vec3					p1, p2, p3, A, B, normal;
+	int						yId, nyId, nx, area, maxArea,
+							maxAreaX, maxAreaY, minLineX;
+	unsigned int			vIds[4];
 
-	unsigned int	id_tl, id_tr, id_dl, id_dr;
-	double			r, g, b, height;
-	Vec3			p1, p2, p3, A, B, normal;
-	std::deque<std::pair<Point &, Point &>>		triangleSave;
-
+	this->vertices.clear();
+	// Vertices creation
 	for (double y = 0; y < MAP_SIZE; y++)
 	{
 		for (double x = 0; x < MAP_SIZE; x++)
@@ -189,150 +275,200 @@ void	Terrain::createMesh(void)
 				normal.normalize();
 			}
 
-			vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
+			this->vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
 		}
 	}
+
+
+	for (int y = 0; y < MAP_SIZE; y++)
+		for (int x = 0; x < MAP_SIZE; x++)
+			isInRectangle.push_back(false);
+
 
 	for (int y = 0; y < MAP_SIZE - 1; y++)
 	{
+		yId = y * MAP_SIZE;
 		for (int x = 0; x < MAP_SIZE - 1; x++)
 		{
-			id_tl = y * MAP_SIZE + x;
-			id_tr = y * MAP_SIZE + (x + 1);
-			id_dl = (y + 1) * MAP_SIZE + x;
-			id_dr = (y + 1) * MAP_SIZE + (x + 1);
-			if (checkIsInDequekSave(triangleSave, vertices[y * MAP_SIZE + x]))
+
+			if (isInRectangle[yId + x])
 				continue;
-			int len1 = MAP_SIZE + 42;
-			int len2 = MAP_SIZE + 42;
-			std::pair<Point *, Point *> pair1= std::pair<Point *, Point *>(NULL,NULL);
-			std::pair<Point *, Point *> pair2= std::pair<Point *, Point *>(NULL,NULL);
-			Vec3	testVect = vertices[y * MAP_SIZE + x].normal;
-			
-			for (int y_n = y; y_n < MAP_SIZE - 1; y_n++)
+
+			Vec3	&testNormal = this->vertices[yId + x].normal;
+
+			maxArea = 1;
+			maxAreaX = x + 1;
+			maxAreaY = y + 1;
+			minLineX = MAP_SIZE - 1;
+			for (int ny = y; ny < MAP_SIZE; ny++)
 			{
-				for (int x_n = x; x_n < MAP_SIZE - 1; x_n++)
+				nyId = ny * MAP_SIZE;
+				nx = x;
+				while (nx < MAP_SIZE)
 				{
-					bool test = checkIsInDequekSave(triangleSave, vertices[y_n * MAP_SIZE + x_n]);
-					if (vertices[y_n * MAP_SIZE + x_n].normal != testVect or vertices[y_n * MAP_SIZE + (x_n + 1)].normal != testVect or
-						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect
-						or test)
-					{
-						if (len1 == MAP_SIZE + 42)
-						{
-							len1 = x_n - x;
-						}
-						else
-						{
-							if (x_n - x <= len1)
-							{
-								if (len1 == 0)
-									len1 = 1;
-								pair1.first = &vertices[y * MAP_SIZE + x];
-								pair1.second = &vertices[y_n * MAP_SIZE + x + len1];
-							}
-						}
+					if (this->vertices[nyId + nx].normal != testNormal)
 						break;
-					}
-					else if (y_n == x_n && x_n == MAP_SIZE - 2)
-					{
-						// if (len1 == 0)
-						// 	len1 = 1;
-						if (len1 == MAP_SIZE + 42)
-						{
-							len1 = x_n - x;
-						}
-						pair1.first = &vertices[y * MAP_SIZE + x];
-						std::cout << "test :" <<  (y_n +1 ) * MAP_SIZE + x + len1 + 1 << std::endl;
-						pair1.second = &vertices[(y_n + 1 ) * MAP_SIZE + x + len1 + 1 ];	
-					}
-				}
-				if (pair1.first)
-					break;
-				if (len1 == MAP_SIZE + 42)
-				{
-					len1 = MAP_SIZE - 2 - x;
-				}
-			}
-
-			// test Y axe
-			for (int x_n = x; x_n < MAP_SIZE - 1; x_n++) //
-			{
-				for (int y_n = y; y_n < MAP_SIZE - 1; y_n++)
-				{
-					bool test = checkIsInDequekSave(triangleSave, vertices[y_n * MAP_SIZE + x_n]);
-
-					if (vertices[y_n * MAP_SIZE + x_n].normal != testVect or vertices[y_n * MAP_SIZE + (x_n + 1)].normal != testVect or
-						vertices[(y_n + 1) * MAP_SIZE + x_n].normal != testVect or vertices[(y_n + 1) * MAP_SIZE + (x_n + 1)].normal != testVect
-						or test)
-					{
-						if (len2 == MAP_SIZE + 42)
-						{
-							len2 = y_n - y;
-						}
-						else
-						{
-							if (y_n - y <= len2)
-							{
-								if (len2 == 0)
-									len2 = 1;
-								pair2.first = &vertices[y * MAP_SIZE + x];
-								pair2.second = &vertices[(y + len2) * MAP_SIZE + x_n];
-							}
-						}
+					if (isInRectangle[nyId + nx])
 						break;
-					}
-					else if (y_n == x_n && x_n == MAP_SIZE - 2)
-					{
-						// if (len2 == 0)
-						// 	len2 = 1;
-						if (len2 == MAP_SIZE + 42)
-						{
-							len2 = y_n - y;
-						}
-						pair2.first = &vertices[y * MAP_SIZE + x];
-						pair2.second = &vertices[(y + len2 + 1) * MAP_SIZE + x_n + 1];		
-					}
+					nx++;
 				}
-				if (pair2.first)
-					break;
-				if (len2 == MAP_SIZE + 42)
-					len2 = MAP_SIZE - 2 - y;
-			}
-			// std::cout << "test : " << pair1.first << std::endl;
-			int T1 = 0;
-			int T2 = 0;
-			if (pair1.first)
-				T1 = (pair1.first->pos.x + pair1.second->pos.x) * (pair1.first->pos.z + pair1.second->pos.z);
-			if (pair2.first)
-				T2 = (pair2.first->pos.x + pair2.second->pos.x) * (pair2.first->pos.z + pair2.second->pos.z);
-			if (T1  > T2)
-			{
-				id_tl = pair1.first->pos.z * MAP_SIZE + pair1.first->pos.x;
-				id_tr = pair1.first->pos.z * MAP_SIZE + pair1.second->pos.x;
-				id_dl = pair1.second->pos.z * MAP_SIZE + pair1.first->pos.x;
-				id_dr = pair1.second->pos.z * MAP_SIZE + pair1.second->pos.x;
-				triangleSave.push_back(std::pair<Point &, Point&>(*pair1.first, *pair1.second));
-			}
-			else
-			{
-				id_tl = pair2.first->pos.z * MAP_SIZE + pair2.first->pos.x;
-				id_tr = pair2.first->pos.z * MAP_SIZE + pair2.second->pos.x;
-				id_dl = pair2.second->pos.z * MAP_SIZE + pair2.first->pos.x;
-				id_dr = pair2.second->pos.z * MAP_SIZE + pair2.second->pos.x;
-				triangleSave.push_back(std::pair<Point &, Point&>(*pair2.first, *pair2.second));
-			}
-			indices.push_back((t_tri_id){id_tl, id_tr, id_dr});
-			indices.push_back((t_tri_id){id_tl, id_dr, id_dl});
 
+				if (minLineX > nx)
+					minLineX = nx;
+
+				area = (ny - y) * (minLineX - x);
+				if (area > maxArea)
+				{
+					maxArea = area;
+					maxAreaX = minLineX;
+					maxAreaY = ny;
+				}
+			}
+
+			nyId = maxAreaY * MAP_SIZE;
+
+			vIds[0] = yId + x;
+			vIds[1] = yId + maxAreaX;
+			vIds[2] = nyId + maxAreaX;
+			vIds[3] = nyId + x;
+
+			indices.push_back((t_tri_id){vIds[0], vIds[1], vIds[2]});
+			indices.push_back((t_tri_id){vIds[0], vIds[2], vIds[3]});
+
+			for (int ty = y; ty < maxAreaY; ty++)
+				for (int tx = x; tx < maxAreaX; tx++)
+					isInRectangle[ty * MAP_SIZE + tx] = true;
+
+			this->rectangles.push_back((t_rectangle){x, y, maxAreaX - x, maxAreaY - y});
 		}
 	}
-	std::cout << "nb triangle : " << indices.size() << std::endl;
-	this->mesh = Mesh(vertices, indices);
-	for (std::pair<Point &, Point &>  pair : triangleSave)
+
+	// Create mesh
+	this->mesh = Mesh(this->vertices, indices);
+	this->generateGridTextures();
+}
+
+
+void	Terrain::generateGridTextures(void)
+{
+	// Init terrain grid size
+	int	terrain_cell_size = TERRAIN_CELL_SIZE;
+	this->terrainGridW = MAP_SIZE / terrain_cell_size;
+	if (MAP_SIZE > terrain_cell_size && MAP_SIZE % terrain_cell_size != 0)
+		this->terrainGridW++;
+
+	this->terrainGridH = MAP_MAX_HEIGHT / terrain_cell_size;
+	if (MAP_MAX_HEIGHT > terrain_cell_size
+		&& (int)MAP_MAX_HEIGHT % terrain_cell_size != 0)
+		this->terrainGridH++;
+
+	this->terrainGridD = this->terrainGridW;
+	this->terrainIdHsize = this->terrainGridW * this->terrainGridD;
+
+	// Init terrain grid
+	int terrainGridSize = this->terrainGridW * this->terrainGridH * this->terrainGridD;
+	std::vector<std::vector<int>>	terrainGrid;
+
+	for (int i = 0; i < terrainGridSize; i++)
 	{
-		std::cout << "square : " << pair.first.pos << " to " << pair.second.pos << "" <<std::endl;
-		this->squaresPoints.push_back(glm::vec3(pair.first.pos.x, pair.first.pos.y, pair.first.pos.z));
-		this->squaresPoints.push_back(glm::vec3(pair.second.pos.x, pair.second.pos.y, pair.second.pos.z));
+		std::vector<int>	terrainGridContent;
+		terrainGrid.push_back(terrainGridContent);
 	}
+
+	// Fill terrain grid
+	float	gStartX, gEndX, gStartY, gEndY, gStartZ, gEndZ;
+	int		vid, gx, gy, gz, gid;
+	int		rectangleId = 0;
+	std::unordered_map<int, bool>	idsIn;
+	// 4 vec3 per rectangle (pos, vecX, vecZ, normal)
+	std::vector<glm::vec3>	terrainData;
+
+	for (t_rectangle &rectangle : rectangles)
+	{
+		vid = rectangle.y * MAP_SIZE + rectangle.x;
+		Vec3	topLeft = this->vertices[vid].pos;
+		Vec3	normal = this->vertices[vid].normal;
+
+		vid = rectangle.y * MAP_SIZE + (rectangle.x + rectangle.width);
+		Vec3	topRight = this->vertices[vid].pos;
+		Vec3	vecX = topRight - topLeft;
+
+		vid = (rectangle.y + rectangle.height) * MAP_SIZE + rectangle.x;
+		Vec3	botLeft = this->vertices[vid].pos;
+		Vec3	vecZ = botLeft - topLeft;
+
+		vid = (rectangle.y + rectangle.height) * MAP_SIZE
+				+ (rectangle.x + rectangle.width);
+		Vec3	botRight = this->vertices[vid].pos;
+
+		// If the rectangle is on the ground, ignore it
+		if	(topLeft.y == 0.0 && topRight.y == 0.0 && botLeft.y == 0.0 && botRight.y == 0.0)
+			continue;
+
+		// Put data in terrainData vector
+		terrainData.push_back(glm::vec3(topLeft.x, topLeft.y, topLeft.z));
+		terrainData.push_back(glm::vec3(vecX.x, vecX.y, vecX.z));
+		terrainData.push_back(glm::vec3(vecZ.x, vecZ.y, vecZ.z));
+		terrainData.push_back(glm::vec3(normal.x, normal.y, normal.z));
+
+		gStartX = min(topLeft.x, botRight.x);
+		gEndX = max(topLeft.x, botRight.x);
+		gStartY = min(topLeft.y, botRight.y);
+		gEndY = max(topLeft.y, botRight.y);
+		gStartZ = min(topLeft.z, botRight.z);
+		gEndZ = max(topLeft.z, botRight.z);
+
+		idsIn.clear();
+		float gridStep = 1.0f;
+		for (float x = gStartX; x < gEndX; x += gridStep)
+		{
+			gx = x / TERRAIN_CELL_SIZE;
+			for (float y = gStartY; y < gEndY; y += gridStep)
+			{
+				gy = y / TERRAIN_CELL_SIZE;
+				for (float z = gStartZ; z < gEndZ; z += gridStep)
+				{
+					gz = z / TERRAIN_CELL_SIZE;
+					gid = gx + gz * this->terrainGridW + gy * this->terrainIdHsize;
+					// If the id in already in grid, skip it
+					if (idsIn.find(gid) != idsIn.end())
+						continue;
+
+					terrainGrid[gid].push_back(rectangleId);
+					idsIn[gid] = true;
+				}
+			}
+		}
+		rectangleId++;
+	}
+	this->dataNbRectangles = rectangleId;
+
+	// Create flat version of the grid
+	std::vector<float>	flatTerrainGrid;
+	std::vector<float>	offsetsTerrainGrid;
+	this->flatTerrainGridSize = 0;
+	this->offsetsTerrainGridSize = 0;
+	int	terrainCellSize;
+
+	for (std::vector<int> &terrainCell : terrainGrid)
+	{
+		terrainCellSize = terrainCell.size();
+
+		for (int i = 0; i < terrainCellSize; i++)
+			flatTerrainGrid.push_back(terrainCell[i]);
+		offsetsTerrainGrid.push_back(this->flatTerrainGridSize);
+		this->flatTerrainGridSize += terrainCellSize;
+		this->offsetsTerrainGridSize++;
+	}
+
+	// Fill textures from flat grids
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridData);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec3) * terrainData.size(),
+					terrainData.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridFlat);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->flatTerrainGridSize,
+					flatTerrainGrid.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferTerrainGridOffsets);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->offsetsTerrainGridSize,
+					offsetsTerrainGrid.data(), GL_DYNAMIC_DRAW);
 }

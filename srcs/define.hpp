@@ -33,6 +33,7 @@
 # define MAX_HEIGHT 50
 # define MAP_SIZE 200
 # define TERRAIN_PRECISION 0.01
+# define TERRAIN_CELL_SIZE 5.0f
 
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
@@ -89,7 +90,7 @@
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;
-const float		WATER_RADIUS = 1.0f;
+const float		WATER_RADIUS = 2.0f;
 const float		WATER_RADIUS2 = WATER_RADIUS * WATER_RADIUS;
 const float		WATER_MAX_XZ = MAP_SIZE - WATER_RADIUS;
 const float		WATER_MAX_HEIGHT = MAP_MAX_HEIGHT - WATER_RADIUS;
@@ -99,10 +100,5 @@ const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIUS, 9));
 
 std::vector<Vec3>	parse(char *name);
-
-
-
-
-
 
 #endif

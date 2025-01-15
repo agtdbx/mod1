@@ -1,8 +1,8 @@
 project('mod1', 'cpp',
-  version : '0.1',
+  version : '1.0',
   default_options : ['warning_level=1', 'cpp_std=c++14'])
 
-add_global_arguments('-g', language : 'cpp')
+add_global_arguments('-g3', language : 'cpp')
 
 executable('mod1',
           'srcs/engine/inputs/InputManager.cpp',

@@ -15,6 +15,13 @@
 #include <model/Slider.hpp>
 #include <model/WaterSimulation.hpp>
 
+void		loadTexture(
+				TextureManager *textureManager,
+				ShaderManager *shaderManager);
+void		initUi(
+				t_simulationVariable *sVar,
+				TextureManager *textureManager,
+				WaterSimulation *simulation);
 static void	events(
 				GLFWwindow* window,
 				InputManager *inputManager);
@@ -25,16 +32,15 @@ static void	computation(
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager,
+				Terrain *terrain,
 				double	deltaConst);
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
-				Terrain *terrain,
 				ShaderManager *shaderManager,
+				Terrain *terrain,
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation);
-void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager);
-void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSimulation *simulation);
 
 
 int	main(int argc, char **argv)
@@ -51,18 +57,6 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	Terrain	terrain;
-
-	try
-	{
-		terrain.loadFromFile(argv[1]);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-		return (1);
-	}
-
 	OpenGLContext	context;
 
 	if (!context.isInitGood())
@@ -71,6 +65,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	Terrain			terrain;
 	InputManager	inputManager(context.window);
 	ShaderManager	shaderManager;
 	TextureManager	textureManager;
@@ -79,16 +74,12 @@ int	main(int argc, char **argv)
 
 	t_simulationVariable	sVar;
 
-	// std::vector<Pannel> pannelVector;
-	// bool				isRainning = false;
-	// bool				isFilling = false;
-	// bool				isPannelHide = false;
-
 	Button::mouse = &inputManager.mouse;
 	Slider::mouse = &inputManager.mouse;
 
 	try
 	{
+		terrain.loadFromFile(argv[1]);
 		loadTexture(&textureManager, &shaderManager);
 		Slider::texture = textureManager.getTexture("noTexture");
 
@@ -101,20 +92,6 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	initUi(&sVar, &textureManager, &simulation);
-
-	// simulation.addWater(glm::vec3(5, 5, 5));
-	// int	nbWater[] = {32, 32, 32};
-	// glm::vec3	offset(MAP_SIZE / 2 - nbWater[0] / 2, 5, MAP_SIZE / 2 - nbWater[2] / 2);
-	// for (int i = 0; i < nbWater[0]; i++)
-	// {
-	// 	for (int j = 0; j < nbWater[2]; j++)
-	// 	{
-	// 		for (int k = 0; k < nbWater[1]; k++)
-	// 		{
-	// 			simulation.addWater(glm::vec3(i, k, j) + offset);
-	// 		}
-	// 	}
-	// }
 
 	// Main loop
 	inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
@@ -165,6 +142,7 @@ int	main(int argc, char **argv)
 			sVar.fillingIntensity =  sVar.pannelVector[3][0.0f].getValue() * 2 * FILLING_INTENSITY;
 			sVar.fillingDelay =  sVar.pannelVector[3][1.0f].getValue() * 2 * FILLING_TIME_BEFORE_NEW_PARTICULE;
 			//settings parameter
+
 			//TODO : demander preference a auguste
 			// if (sVar.pannelVector[5][0.0f].getValue() == 0)
 			// 	sVar.pannelVector[5][0.0f].setValue(0.01f);
@@ -174,21 +152,22 @@ int	main(int argc, char **argv)
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
-	
-		}
 
+		}
 
 		// Compute part
 		if (sVar.needStep)
 		{
-			computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager, 1.0f/100.0f);
+			computation(&inputManager, &camera, &context, &sVar, &simulation,
+						&shaderManager, &terrain, 1.0f/100.0f);
 		}
 		else
-			computation(&inputManager, &camera, &context, &sVar, &simulation, &shaderManager, 0.0);
+			computation(&inputManager, &camera, &context, &sVar, &simulation,
+						&shaderManager, &terrain, 0.0);
 		sVar.needStep = false;
+
 		// Drawing part
-		draw(context.window, &camera, &terrain,
-			&shaderManager, &sVar, &simulation);
+		draw(context.window, &camera, &shaderManager, &terrain, &sVar, &simulation);
 	}
 
 	context.close();
@@ -215,9 +194,10 @@ static void	computation(
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager,
+				Terrain *terrain,
 				double	deltaConst)
 {
-	static std::vector<double> deltas;
+	static int		nbCall = 0;
 	static double	timePrintFps = 0.0;
 	static double	timeRainningParticuleAdd = 0.0;
 	static double	timeFillingParticuleAdd = 0.0;
@@ -229,20 +209,14 @@ static void	computation(
 	lastTime = currentTime;
 
 	timePrintFps += delta;
-	deltas.push_back(delta);
+	nbCall++;
 	if (timePrintFps >= PRINT_FPS_TIME)
 	{
-		timePrintFps -= PRINT_FPS_TIME;
-		double avg = 0.0;
-		for (double dtime : deltas)
-		{
-			avg += dtime;
-		}
-		avg /= deltas.size();
+		double	avg = timePrintFps / (double)nbCall;
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
-		deltas.clear();
-
+		timePrintFps -= PRINT_FPS_TIME;
+		nbCall = 0;
 	}
 	if (deltaConst)
 		timeRainningParticuleAdd += deltaConst;
@@ -254,7 +228,7 @@ static void	computation(
 		if (sVar->isRainning && (!sVar->isStopped || deltaConst))
 			updateRain(simulation, sVar);
 	}
-	
+
 	if (deltaConst)
 		timeFillingParticuleAdd += deltaConst;
 	else
@@ -269,7 +243,6 @@ static void	computation(
 	{
 		pannel.tick(delta);
 	}
-	
 
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)
@@ -316,18 +289,20 @@ static void	computation(
 		camera->rotateY(-CAMERA_ROTATION_SPEED * delta);
 	else if (inputManager->right.isDown())
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
+
+	// Water simulation
 	if (!sVar->isStopped)
-		simulation->tick(shaderManager, delta);
+		simulation->tick(shaderManager, terrain, delta);
 	if (deltaConst)
-		simulation->tick(shaderManager, deltaConst);
+		simulation->tick(shaderManager, terrain, deltaConst);
 }
 
 
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
-				Terrain *terrain,
 				ShaderManager *shaderManager,
+				Terrain *terrain,
 				t_simulationVariable *sVar,
 				WaterSimulation	*simulation)
 {
@@ -335,21 +310,14 @@ static void	draw(
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Draw mesh
-	// waterManager->draw(camera, shaderManager);
-	// glBindVertexArray(0);
-
-
-	// Button	test(10, 10, 100, 50,addWater, simulation, textureManager->getTexture("rain"));
 	for (Pannel & pannel : sVar->pannelVector)
 	{
 		pannel.renderMesh(shaderManager);
 	}
 
-
 	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);
-	simulation->draw(camera, shaderManager);
+	simulation->draw(camera, shaderManager, terrain);
 
 	// Display the new image
 	glfwSwapBuffers(window);

@@ -40,11 +40,12 @@ public:
 	void	print(void);
 
 private:
-	float			*vertices, degrees_x, degrees_y, degrees_z, scaleFactor;
-	unsigned int	*indices;
-	int				nbVertices, nbIndices;
-	glm::vec3		translation;
-	glm::mat4		model;
+	std::vector<float>			vertices;
+	std::vector<unsigned int>	indices;
+	float		degrees_x, degrees_y, degrees_z, scaleFactor;
+	int			nbVertices, nbIndices;
+	glm::vec3	translation;
+	glm::mat4	model;
 
 	void	computeModelMatrix(void);
 };

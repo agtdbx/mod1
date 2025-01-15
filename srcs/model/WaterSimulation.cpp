@@ -1,6 +1,7 @@
 #include <model/WaterSimulation.hpp>
 
 #include <engine/render/shader/WaterShader.hpp>
+#include <engine/render/shader/ShaderFunctions.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -171,6 +172,7 @@ void	WaterSimulation::addWater(glm::vec3 position)
 	this->needToUpdateBuffers = true;
 }
 
+
 void	WaterSimulation::addWater(glm::vec3 position, glm::vec3 velocity)
 {
 	if (this->needToUpdateBuffers == false)
@@ -230,80 +232,34 @@ void	WaterSimulation::drawTest(
 	shader->use();
 	shaderId = shader->getShaderId();
 
-	int lightPosLoc = glGetUniformLocation(shaderId, "lightPos");
-	glUniform3fv(lightPosLoc, 1, glm::value_ptr(camera->getLightPosition()));
-
-	int cameraPosLoc = glGetUniformLocation(shaderId, "cameraPos");
-	glUniform3fv(cameraPosLoc, 1, glm::value_ptr(camera->getPosition()));
-
-	int cameraFrontLoc = glGetUniformLocation(shaderId, "cameraFront");
-	glUniform3fv(cameraFrontLoc, 1, glm::value_ptr(camera->getFront()));
-
-	int cameraRightLoc = glGetUniformLocation(shaderId, "cameraRight");
-	glUniform3fv(cameraRightLoc, 1, glm::value_ptr(camera->getRight()));
-
-	int cameraUpLoc = glGetUniformLocation(shaderId, "cameraUp");
-	glUniform3fv(cameraUpLoc, 1, glm::value_ptr(camera->getUp()));
-
-	int cameraFOVLoc = glGetUniformLocation(shaderId, "cameraFOV");
-	glUniform1f(cameraFOVLoc, CAMERA_FOV);
-
-	int cameraFarLoc = glGetUniformLocation(shaderId, "cameraFar");
-	glUniform1f(cameraFarLoc, CAMERA_MAX_VIEW_DIST);
-
-	int planeWidthLoc = glGetUniformLocation(shaderId, "planeWidth");
-	glUniform1f(planeWidthLoc, camera->getPlaneWidth());
-
-	int planeHeightLoc = glGetUniformLocation(shaderId, "planeHeight");
-	glUniform1f(planeHeightLoc, camera->getPlaneHeight());
-
-	int waterRadius2Loc = glGetUniformLocation(shaderId, "waterRadius2");
-	glUniform1f(waterRadius2Loc, WATER_RADIUS2);
-
-	int waterColorLoc = glGetUniformLocation(shaderId, "waterColor");
-	glUniform3fv(waterColorLoc, 1, glm::value_ptr(*waterColor));
-
-	int renderCellSizeLoc = glGetUniformLocation(shaderId, "renderCellSize");
-	glUniform1f(renderCellSizeLoc, RENDER_CELL_SIZE);
-
-	int nbPositionsLoc = glGetUniformLocation(shaderId, "nbPositions");
-	glUniform1i(nbPositionsLoc, this->nbParticules);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 0);
-
-	int mapSizeLoc = glGetUniformLocation(shaderId, "mapSize");
-	glUniform1i(mapSizeLoc, MAP_SIZE);
-
-	int mapHeightLoc = glGetUniformLocation(shaderId, "mapHeight");
-	glUniform1i(mapHeightLoc, WATER_MAX_HEIGHT);
-
-	int renderGridWLoc = glGetUniformLocation(shaderId, "renderGridW");
-	glUniform1i(renderGridWLoc, this->renderGridW);
-
-	int renderGridHLoc = glGetUniformLocation(shaderId, "renderGridH");
-	glUniform1i(renderGridHLoc, this->renderGridH);
-
-	int renderGridDLoc = glGetUniformLocation(shaderId, "renderGridD");
-	glUniform1i(renderGridDLoc, this->renderGridD);
-
-	int renderGridSizeLoc = glGetUniformLocation(shaderId, "renderGridSize");
-	glUniform1i(renderGridSizeLoc, this->renderGridFlatSize);
-
-	int renderOffsetsSizeLoc = glGetUniformLocation(shaderId, "renderOffsetsSize");
-	glUniform1i(renderOffsetsSizeLoc, this->renderGridOffsetsSize);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureRenderGridFlat);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferRenderGridFlat);
-	glUniform1i(glGetUniformLocation(shaderId, "renderGridBuffer"), 1);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureRenderGridOffsets);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferRenderGridOffsets);
-	glUniform1i(glGetUniformLocation(shaderId, "renderOffsetsBuffer"), 2);
+	giveVec3ToShader(shaderId, "lightPos", camera->getLightPosition());
+	giveVec3ToShader(shaderId, "cameraPos", camera->getPosition());
+	giveVec3ToShader(shaderId, "cameraFront", camera->getFront());
+	giveVec3ToShader(shaderId, "cameraRight", camera->getRight());
+	giveVec3ToShader(shaderId, "cameraUp", camera->getUp());
+	giveVec3ToShader(shaderId, "waterColor", *waterColor);
+	giveFloatToShader(shaderId, "cameraFOV", CAMERA_FOV);
+	giveFloatToShader(shaderId, "cameraFar", CAMERA_MAX_VIEW_DIST);
+	giveFloatToShader(shaderId, "planeWidth", camera->getPlaneWidth());
+	giveFloatToShader(shaderId, "planeHeight", camera->getPlaneHeight());
+	giveFloatToShader(shaderId, "waterRadius2", WATER_RADIUS2);
+	giveFloatToShader(shaderId, "renderCellSize", RENDER_CELL_SIZE);
+	giveIntToShader(shaderId, "nbPositions", this->nbParticules);
+	giveIntToShader(shaderId, "mapSize", MAP_SIZE);
+	giveIntToShader(shaderId, "mapHeight", WATER_MAX_HEIGHT);
+	giveIntToShader(shaderId, "renderGridW", this->renderGridW);
+	giveIntToShader(shaderId, "renderGridH", this->renderGridH);
+	giveIntToShader(shaderId, "renderGridD", this->renderGridD);
+	giveIntToShader(shaderId, "renderGridSize", this->renderGridFlatSize);
+	giveIntToShader(shaderId, "renderOffsetsSize", this->renderGridOffsetsSize);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 0,
+							this->textureBufferPositions, this->texturePositions);
+	giveFloatTextureToShader(shaderId, "renderGridBuffer", 1,
+							this->textureBufferRenderGridFlat,
+							this->textureRenderGridFlat);
+	giveFloatTextureToShader(shaderId, "renderOffsetsBuffer", 2,
+							this->textureBufferRenderGridOffsets,
+							this->textureRenderGridOffsets);
 
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);

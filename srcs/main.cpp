@@ -142,10 +142,6 @@ int	main(int argc, char **argv)
 			sVar.fillingIntensity =  sVar.pannelVector[3][0.0f].getValue() * 2 * FILLING_INTENSITY;
 			sVar.fillingDelay =  sVar.pannelVector[3][1.0f].getValue() * 2 * FILLING_TIME_BEFORE_NEW_PARTICULE;
 			//settings parameter
-
-			//TODO : demander preference a auguste
-			// if (sVar.pannelVector[5][0.0f].getValue() == 0)
-			// 	sVar.pannelVector[5][0.0f].setValue(0.01f);
 			sVar.cameraSensibility = sVar.pannelVector[5][0.0f].getValue() * 2 *  CAMERA_ROTATION_SPEED_MOUSE;
 			sVar.sprintSpeed = sVar.pannelVector[5][1.0f].getValue() * 2 *  CAMERA_SPRINT_FACTOR;
 			sVar.watercolor = glm::vec3(sVar.pannelVector[5][2.0f].getValue(),
@@ -317,7 +313,7 @@ static void	draw(
 
 	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);
-	simulation->draw(camera, shaderManager, terrain);
+	simulation->drawTest(camera, shaderManager, terrain, &sVar->watercolor);
 
 	// Display the new image
 	glfwSwapBuffers(window);

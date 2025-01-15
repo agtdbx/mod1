@@ -211,7 +211,11 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 }
 
 
-void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager, Terrain *terrain)
+void	WaterSimulation::drawTest(
+			Camera *camera,
+			ShaderManager *shaderManager,
+			Terrain *terrain,
+			glm::vec3 *waterColor)
 {
 	WaterShader *shader;
 	int			shaderId;
@@ -257,7 +261,7 @@ void	WaterSimulation::draw(Camera *camera, ShaderManager *shaderManager, Terrain
 	glUniform1f(waterRadius2Loc, WATER_RADIUS2);
 
 	int waterColorLoc = glGetUniformLocation(shaderId, "waterColor");
-	glUniform3fv(waterColorLoc, 1, glm::value_ptr(WATER_COLOR));
+	glUniform3fv(waterColorLoc, 1, glm::value_ptr(*waterColor));
 
 	int renderCellSizeLoc = glGetUniformLocation(shaderId, "renderCellSize");
 	glUniform1f(renderCellSizeLoc, RENDER_CELL_SIZE);

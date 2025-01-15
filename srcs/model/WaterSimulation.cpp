@@ -814,6 +814,9 @@ void	WaterSimulation::updatePositions(
 	int collisionEnergyKeepLoc = glGetUniformLocation(shaderId, "collisionEnergyKeep");
 	glUniform1f(collisionEnergyKeepLoc, COLLISION_ENERGY_KEEP);
 
+	int collisionRepulsionForceLoc = glGetUniformLocation(shaderId, "collisionRepulsionForce");
+	glUniform1f(collisionRepulsionForceLoc, COLLISION_REPULSION_FORCE);
+
 	int terrainCellSizeLoc = glGetUniformLocation(shaderId, "terrainCellSize");
 	glUniform1f(terrainCellSizeLoc, TERRAIN_CELL_SIZE);
 

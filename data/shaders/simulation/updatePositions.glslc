@@ -10,6 +10,7 @@ uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform float			collisionEnergyKeep;
+uniform float			collisionRepulsionForce;
 uniform float			terrainCellSize;
 uniform int				terrainGridW;
 uniform int				terrainGridH;
@@ -131,23 +132,22 @@ void main()
 		vec3	normal = texelFetch(terrainDataBuffer, terrainCollisionId * 4 + 3).rgb;
 		velocityDir -= normal * 2 * dot(velocityDir, normal);
 		velocityDir = normalize(velocityDir);
-		velocity = velocityDir * velocityLength * collisionEnergyKeep;
+		velocity = velocityDir * velocityLength;
 
+		newPosition = position + velocity * delta - normal * collisionRepulsionForce;
 		needUpdateVelocity = true;
-		newPosition = position + velocity * delta;
 	}
 
 	// Check if particule is out of the map on x axis
 	if (newPosition.x < waterRadius)
 	{
-		newPosition.x = waterRadius;
+		newPosition.x = waterRadius + collisionRepulsionForce;
 		velocity.x *= -1.0;
-		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 	else if (newPosition.x >= waterMaxXZ)
 	{
-		newPosition.x = waterMaxXZ;
+		newPosition.x = waterMaxXZ - collisionRepulsionForce;
 		velocity.x *= -1.0;
 		needUpdateVelocity = true;
 	}
@@ -155,38 +155,37 @@ void main()
 	// Check if particule is out of the map on y axis
 	if (newPosition.y < waterRadius)
 	{
-		newPosition.y = waterRadius;
+		newPosition.y = waterRadius + collisionRepulsionForce;
 		velocity.y *= -1.0;
-		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 	else if (newPosition.y >= waterMaxY)
 	{
-		newPosition.y = waterMaxY;
+		newPosition.y = waterMaxY - collisionRepulsionForce;
 		velocity.y *= -1.0;
-		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 
 	// Check if particule is out of the map on z axis
 	if (newPosition.z < waterRadius)
 	{
-		newPosition.z = waterRadius;
+		newPosition.z = waterRadius + collisionRepulsionForce;
 		velocity.z *= -1.0;
-		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 	else if (newPosition.z >= waterMaxXZ)
 	{
-		newPosition.z = waterMaxXZ;
+		newPosition.z = waterMaxXZ - collisionRepulsionForce;
 		velocity.z *= -1.0;
-		velocity *= collisionEnergyKeep;
 		needUpdateVelocity = true;
 	}
 
 	// Update density if needed
 	if (needUpdateVelocity)
+	{
+		velocity *= collisionEnergyKeep;
 		imageStore(velocitiesBuffer, particleIndex, vec4(velocity, 1.0));
+	}
 
 	// Write the value to the buffer
 	imageStore(positionsBuffer, particleIndex, vec4(newPosition, 1.0));

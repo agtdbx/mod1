@@ -51,3 +51,33 @@ void	giveVec4TextureToShader(int shaderId, const char *variableName, int texture
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, textureBuffer);
 	glUniform1i(glGetUniformLocation(shaderId, variableName), textureId);
 }
+
+
+void	giveFloatTextureInputToShader(int textureId, bool readable,
+										GLuint textureBuffer, GLuint texture)
+{
+	glActiveTexture(GL_TEXTURE0 + textureId);
+	glBindTexture(GL_TEXTURE_BUFFER, texture);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, textureBuffer);
+	if (readable)
+		glBindImageTexture(textureId, texture, 0, GL_FALSE, 0,
+							GL_READ_WRITE, GL_R32F);
+	else
+		glBindImageTexture(textureId, texture, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_R32F);
+}
+
+
+void	giveVec4TextureInputToShader(int textureId, bool readable,
+										GLuint textureBuffer, GLuint texture)
+{
+	glActiveTexture(GL_TEXTURE0 + textureId);
+	glBindTexture(GL_TEXTURE_BUFFER, texture);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, textureBuffer);
+	if (readable)
+		glBindImageTexture(textureId, texture, 0, GL_FALSE, 0,
+							GL_READ_WRITE, GL_RGBA32F);
+	else
+		glBindImageTexture(textureId, texture, 0, GL_FALSE, 0,
+							GL_WRITE_ONLY, GL_RGBA32F);
+}

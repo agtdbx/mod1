@@ -482,38 +482,20 @@ void	WaterSimulation::computePredictedPositions(ShaderManager *shaderManager, fl
 	computeShader->use();
 
 	// Compute shader inputs setup
-	int deltaLoc = glGetUniformLocation(shaderId, "delta");
-	glUniform1f(deltaLoc, delta);
-
-	int waterRadiusLoc = glGetUniformLocation(shaderId, "waterRadius");
-	glUniform1f(waterRadiusLoc, WATER_RADIUS);
-
-	int waterMaxXZLoc = glGetUniformLocation(shaderId, "waterMaxXZ");
-	glUniform1f(waterMaxXZLoc, WATER_MAX_XZ);
-
-	int waterMaxYLoc = glGetUniformLocation(shaderId, "waterMaxY");
-	glUniform1f(waterMaxYLoc, WATER_MAX_HEIGHT);
-
-	int gravityForceLoc = glGetUniformLocation(shaderId, "gravityForce");
-	glUniform1f(gravityForceLoc, GRAVITY_FORCE);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 2);
+	giveFloatToShader(shaderId, "delta", delta);
+	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
+	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
+	giveFloatToShader(shaderId, "waterMaxY", WATER_MAX_HEIGHT);
+	giveFloatToShader(shaderId, "gravityForce", GRAVITY_FORCE);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
+							this->textureBufferPositions,
+							this->texturePositions);
 
 	// Compute shader output setup
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_BUFFER, this->texturePredictedPositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPredictedPositions);
-	glBindImageTexture(0, this->texturePredictedPositions, 0, GL_FALSE, 0,
-							GL_WRITE_ONLY, GL_RGBA32F);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureVelocities);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferVelocities);
-	glBindImageTexture(1, this->textureVelocities, 0, GL_FALSE, 0,
-							GL_READ_WRITE, GL_RGBA32F);
+	giveVec4TextureInputToShader(0, false, this->textureBufferPredictedPositions,
+									this->texturePredictedPositions);
+	giveVec4TextureInputToShader(1, true, this->textureBufferVelocities,
+									this->textureVelocities);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
@@ -580,54 +562,28 @@ void	WaterSimulation::computeDensity(ShaderManager *shaderManager)
 	computeShader->use();
 
 	// Compute shader inputs setup
-	int smoothingRadiusLoc = glGetUniformLocation(shaderId, "smoothingRadius");
-	glUniform1f(smoothingRadiusLoc, SMOOTHING_RADIUS);
-
-	int smoothingScaleLoc = glGetUniformLocation(shaderId, "smoothingScale");
-	glUniform1f(smoothingScaleLoc, SMOOTHING_SCALE);
-
-	int waterMassLoc = glGetUniformLocation(shaderId, "waterMass");
-	glUniform1f(waterMassLoc, WATER_MASS);
-
-	int gridWLoc = glGetUniformLocation(shaderId, "gridW");
-	glUniform1i(gridWLoc, this->gridW);
-
-	int gridHLoc = glGetUniformLocation(shaderId, "gridH");
-	glUniform1i(gridHLoc, this->gridH);
-
-	int gridDLoc = glGetUniformLocation(shaderId, "gridD");
-	glUniform1i(gridDLoc, this->gridD);
-
-	int idHsizeLoc = glGetUniformLocation(shaderId, "idHsize");
-	glUniform1i(idHsizeLoc, this->idHsize);
-
-	int gridSizeLoc = glGetUniformLocation(shaderId, "gridSize");
-	glUniform1i(gridSizeLoc, this->gridFlatSize);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridFlat);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridFlat);
-	glUniform1i(glGetUniformLocation(shaderId, "gridBuffer"), 1);
-
-	int offsetsSizeLoc = glGetUniformLocation(shaderId, "offsetsSize");
-	glUniform1i(offsetsSizeLoc, this->gridOffsetsSize);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureGridOffsets);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferGridOffsets);
-	glUniform1i(glGetUniformLocation(shaderId, "offsetsBuffer"), 2);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_BUFFER, this->texturePositions);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, this->textureBufferPositions);
-	glUniform1i(glGetUniformLocation(shaderId, "positionsBuffer"), 3);
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
+	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
+	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
+	giveFloatTextureToShader(shaderId, "gridBuffer", 1,
+								this->textureBufferGridFlat,
+								this->textureGridFlat);
+	giveFloatTextureToShader(shaderId, "offsetsBuffer", 2,
+								this->textureBufferGridOffsets,
+								this->textureGridOffsets);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
+								this->textureBufferPositions,
+								this->texturePositions);
 
 	// Compute shader output setup
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_BUFFER, this->textureDensities);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, this->textureBufferDensities);
-	glBindImageTexture(0, this->textureDensities, 0, GL_FALSE, 0,
-							GL_WRITE_ONLY, GL_R32F);
+	giveFloatTextureInputToShader(0, false, this->textureBufferDensities,
+									this->textureDensities);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);

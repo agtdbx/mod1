@@ -15,5 +15,9 @@ void	giveVec3TextureToShader(int shaderId, const char *variableName, int texture
 									GLuint textureBuffer, GLuint texture);
 void	giveVec4TextureToShader(int shaderId, const char *variableName, int textureId,
 									GLuint textureBuffer, GLuint texture);
+void	giveFloatTextureInputToShader(int textureId, bool readable,
+										GLuint textureBuffer, GLuint texture);
+void	giveVec4TextureInputToShader(int textureId, bool readable,
+										GLuint textureBuffer, GLuint texture);
 
 #endif

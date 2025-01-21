@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/21 12:12:42 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:03:55 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@
 # define VISCOSITY_FORCE 0.1f
 
 # define RENDER_CELL_SIZE 20.0f
-# define RAY_STEP 0.1f
+# define RAY_STEP 0.5f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.05f

@@ -40,25 +40,43 @@ uniform samplerBuffer	terrainOffsetsBuffer;
 
 
 // RAY INTERSION FUNCTIONS
+vec3	normalRight =	vec3( 1.0,  0.0,  0.0);
+vec3	normalLeft =	vec3(-1.0,  0.0,  0.0);
+vec3	normalUp =		vec3( 0.0,  1.0,  0.0);
+vec3	normalDown =	vec3( 0.0, -1.0,  0.0);
+vec3	normalFront =	vec3( 0.0,  0.0, -1.0);
+vec3	normalBack =	vec3( 0.0,  0.0,  1.0);
+
+struct s_inter_map_info
+{
+	bool	inter_map;
+	bool	inter_ground;
+	float	dst_map_min;
+	float	dst_map_max;
+	float	dst_to_ground;
+};
+
 bool	isSameSign(float a, float b)
 {
 	return ((a >= 0.0 && b >= 0.0) || (a < 0.0 && b < 0.0));
 }
 
-bool	intersectWithCubeFace(vec3 rayPos, vec3 rayDir, vec3 faceNormal,
-								vec3 facePoint_lu, vec3 facePoint_ru,
-								vec3 facePoint_ld, vec3 facePoint_rd)
+float	intersectWithCubeFace(
+			vec3 rayPos, vec3 rayDir, vec3 faceNormal,
+			vec3 facePoint_lu, vec3 facePoint_ru,
+			vec3 facePoint_ld, vec3 facePoint_rd)
 {
 	float	denom, dist, o1, o2, o3, o4;
 	vec3	q, p1_q, p2_q, p3_q, p4_q;
 
+
 	denom = dot(rayDir, faceNormal);
 	if (denom >= 0.000001)
-		return (false);
+		return (-1.0);
 
 	dist = dot(facePoint_lu - rayPos, faceNormal) / denom;
 	if (dist < 0.0)
-		return (false);
+		return (-1.0);
 
 	q = rayPos + rayDir * dist;
 
@@ -67,77 +85,165 @@ bool	intersectWithCubeFace(vec3 rayPos, vec3 rayDir, vec3 faceNormal,
 
 	o1 = dot(cross(p1_q, p2_q), faceNormal);
 	if (o1 == 0.0)
-		return (false);
+		return (-1.0);
 
 	p3_q = facePoint_rd - q;
 	o2 = dot(cross(p2_q, p3_q), faceNormal);
 	if (o2 == 0.0 || !isSameSign(o1, o2))
-		return (false);
+		return (-1.0);
 
 	p4_q = facePoint_ru - q;
 	o3 = dot(cross(p3_q, p4_q), faceNormal);
 	if (o3 == 0.0 || !isSameSign(o2, o3))
-		return (false);
+		return (-1.0);
 
 	o4 = dot(cross(p4_q, p1_q), faceNormal);
 	if (o4 == 0.0 || !isSameSign(o3, o4))
-		return (false);
+		return (-1.0);
 
-	return (true);
+	return (dist);
 }
 
 
-bool	intersectWithCube(vec3 rayPos, vec3 rayDir,
+s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 							vec3 facePoint_luf, vec3 facePoint_ruf,
 							vec3 facePoint_ldf, vec3 facePoint_rdf,
 							vec3 facePoint_lub, vec3 facePoint_rub,
 							vec3 facePoint_ldb, vec3 facePoint_rdb)
 {
-	// Check if ary is in the cube
+	s_inter_map_info	result;
+	float				dst;
+
+	result.inter_map = false;
+	result.inter_ground = false;
+	result.dst_map_min = cameraFar;
+	result.dst_map_max = 0.0;
+	result.dst_to_ground = 0.0;
+
+	// Check if ray is in the cube
 	if (facePoint_ldf.x <= rayPos.x && rayPos.x <= facePoint_rub.x
 		&& facePoint_ldf.y <= rayPos.y && rayPos.y <= facePoint_rub.y
 		&& facePoint_ldf.z <= rayPos.z && rayPos.z <= facePoint_rub.z)
-		return (true);
+	{
+		result.inter_map = true;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalRight,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalRight,
 								facePoint_ruf, facePoint_rub,
-								facePoint_rdf, facePoint_rdb))
-		return (true);
+								facePoint_rdf, facePoint_rdb);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalLeft,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalLeft,
 								facePoint_lub, facePoint_luf,
-								facePoint_ldb, facePoint_ldf))
-		return (true);
+								facePoint_ldb, facePoint_ldf);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalUp,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
 								facePoint_lub, facePoint_rub,
-								facePoint_luf, facePoint_ruf))
-		return (true);
+								facePoint_luf, facePoint_ruf);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalDown,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalDown,
 								facePoint_ldf, facePoint_rdf,
-								facePoint_ldb, facePoint_rdb))
-		return (true);
+								facePoint_ldb, facePoint_rdb);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		result.inter_ground = true;
+		result.dst_to_ground = dst;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalFront,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalFront,
 								facePoint_luf, facePoint_ruf,
-								facePoint_ldf, facePoint_rdf))
-		return (true);
+								facePoint_ldf, facePoint_rdf);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	if (intersectWithCubeFace(rayPos, rayDir, normalBack,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalBack,
 								facePoint_rub, facePoint_lub,
-								facePoint_rdb, facePoint_ldb))
-		return (true);
+								facePoint_rdb, facePoint_ldb);
+	if (dst != -1.0f)
+	{
+		result.inter_map = true;
+		if (result.dst_map_min > dst)
+			result.dst_map_min = dst;
+		if (result.dst_map_max < dst)
+			result.dst_map_max = dst;
+	}
 
-	return (false);
+	return (result);
 }
 
-// HIT TERRAIN
+
+s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
+{
+	s_inter_map_info	result;
+	vec3				p_luf, p_ruf, p_ldf, p_rdf,
+						p_lub, p_rub, p_ldb, p_rdb;
+
+	p_luf = vec3(0.0, waterMaxY, 0.0);
+	p_ruf = vec3(waterMaxXZ, waterMaxY, 0.0);
+	p_ldf = vec3(0.0, 0.0, 0.0);
+	p_rdf = vec3(waterMaxXZ, 0.0, 0.0);
+	p_lub = vec3(0.0, waterMaxY, waterMaxXZ);
+	p_rub = vec3(waterMaxXZ, waterMaxY, waterMaxXZ);
+	p_ldb = vec3(0.0, 0.0, waterMaxXZ);
+	p_rdb = vec3(waterMaxXZ, 0.0, waterMaxXZ);
+	return (intersectWithCube(
+				rayPos, rayDir,
+				p_luf, p_ruf, p_ldf, p_rdf,
+				p_lub, p_rub, p_ldb, p_rdb));
+}
+
+
+// Ray marching
 bool	hitTerrain(vec3 rayPos, vec3 rayDir)
 {
-	float	dist = 0.0;
+	s_inter_map_info	hitMapInfo;
+	float	dist, distGround, maxDist;
 
-	while (dist <= cameraFar)
+	hitMapInfo = hitMap(rayPos, rayDir);
+	if (!hitMapInfo.inter_map)
+		return (false);
+
+	dist = hitMapInfo.dst_map_min;
+	if (hitMapInfo.inter_ground)
+		return (true);
+
+	maxDist = hitMapInfo.dst_map_max;
+
+	while (dist <= maxDist)
 	{
 		// Check if ray collide with map bottom
 		if (rayPos.x >= 0.0 && rayPos.x < waterMaxXZ

@@ -95,7 +95,7 @@ bool	intersectWithCube(vec3 rayPos, vec3 rayDir,
 							vec3 facePoint_lub, vec3 facePoint_rub,
 							vec3 facePoint_ldb, vec3 facePoint_rdb)
 {
-	// Check if ary is in the cube
+	// Check if ray is in the cube
 	if (facePoint_ldf.x <= rayPos.x && rayPos.x <= facePoint_rub.x
 		&& facePoint_ldf.y <= rayPos.y && rayPos.y <= facePoint_rub.y
 		&& facePoint_ldf.z <= rayPos.z && rayPos.z <= facePoint_rub.z)

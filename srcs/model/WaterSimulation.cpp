@@ -260,6 +260,7 @@ void	WaterSimulation::draw(
 	giveFloatToShader(shaderId, "planeWidth", camera->getPlaneWidth());
 	giveFloatToShader(shaderId, "planeHeight", camera->getPlaneHeight());
 	giveFloatToShader(shaderId, "rayStep", RAY_STEP);
+	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
 	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
 	giveFloatToShader(shaderId, "waterMaxY", WATER_MAX_HEIGHT);
 	giveVec3ToShader(shaderId, "waterColor", *waterColor);

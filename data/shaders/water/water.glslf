@@ -12,6 +12,7 @@ uniform float			cameraFar;
 uniform float			planeWidth;
 uniform float			planeHeight;
 uniform float			rayStep;
+uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform vec3			waterColor;
@@ -55,6 +56,11 @@ struct s_inter_map_info
 	float	dst_map_max;
 	float	dst_to_ground;
 };
+
+float	vecLength(vec3 vec)
+{
+	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+}
 
 bool	isSameSign(float a, float b)
 {
@@ -118,7 +124,6 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	result.inter_ground = false;
 	result.dst_map_min = cameraFar;
 	result.dst_map_max = 0.0;
-	result.dst_to_ground = 0.0;
 
 	// Check if ray is in the cube
 	if (facePoint_ldf.x <= rayPos.x && rayPos.x <= facePoint_rub.x
@@ -134,10 +139,8 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalLeft,
@@ -146,10 +149,8 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
@@ -158,24 +159,32 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
 	}
 
-	dst = intersectWithCubeFace(rayPos, rayDir, normalDown,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
 								facePoint_ldf, facePoint_rdf,
 								facePoint_ldb, facePoint_rdb);
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
 		result.inter_ground = true;
-		result.dst_to_ground = dst;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
+	}
+	else
+	{
+		dst = intersectWithCubeFace(rayPos, rayDir, normalDown,
+								facePoint_ldf, facePoint_rdf,
+								facePoint_ldb, facePoint_rdb);
+		if (dst != -1.0f)
+		{
+			result.inter_map = true;
+			result.inter_ground = true;
+			if (result.dst_map_min > dst) result.dst_map_min = dst;
+			if (result.dst_map_max < dst) result.dst_map_max = dst;
+		}
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalFront,
@@ -184,10 +193,8 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalBack,
@@ -196,10 +203,8 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	if (dst != -1.0f)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst)
-			result.dst_map_min = dst;
-		if (result.dst_map_max < dst)
-			result.dst_map_max = dst;
+		if (result.dst_map_min > dst) result.dst_map_min = dst;
+		if (result.dst_map_max < dst) result.dst_map_max = dst;
 	}
 
 	return (result);
@@ -228,6 +233,86 @@ s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 
 
 // Ray marching
+bool	checkCollisionWithTerrain(vec3 position)
+{
+	int	px, py, pz, gx, gy, gz, gid, startId, endId, rectangleId;
+	vec3	rectPos, vecX, vecZ, posFromRect, posOnRect;
+	float	minY, maxY, a, b;
+
+	px = int(position.x / terrainCellSize);
+	py = int(position.y / terrainCellSize);
+	pz = int(position.z / terrainCellSize);
+
+	for (int cx = -1; cx < 2; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= terrainGridW)
+			continue;
+
+		for (int cy = -1; cy < 2; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= terrainGridH)
+				continue;
+
+			for (int cz = -1; cz < 2; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= terrainGridD)
+					continue;
+
+				gid = gx + gz * terrainGridW + gy * terrainIdHsize;
+					startId = int(texelFetch(terrainOffsetsBuffer, gid).r);
+				if (gid + 1 < terrainOffsetsSize)
+					endId = int(texelFetch(terrainOffsetsBuffer, gid + 1).r);
+				else
+					endId = terrainGridSize;
+
+				for (int i = startId; i < endId; i++)
+				{
+					rectangleId = int(texelFetch(terrainGridBuffer, i).r);
+					rectPos = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
+					vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
+					vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
+
+					posFromRect = position - rectPos;
+					minY = min(vecX.y, vecZ.y);
+					maxY = max(vecX.y, vecZ.y);
+
+					if (posFromRect.x < -waterRadius || posFromRect.x > vecX.x
+						|| posFromRect.y < minY - waterRadius || posFromRect.y > maxY + waterRadius
+						|| posFromRect.z < -waterRadius || posFromRect.z > vecZ.z)
+						continue;
+
+					if (vecX.x != 0.0)
+						a = posFromRect.x / vecX.x;
+					else if (vecX.y != 0.0)
+						a = posFromRect.y / vecX.y;
+					else
+						continue;
+
+					if (vecZ.z != 0.0)
+						b = posFromRect.z / vecZ.z;
+					else if (vecZ.y != 0.0)
+						b = posFromRect.y / vecZ.y;
+					else
+						continue;
+
+					posOnRect = rectPos + a * vecX + b * vecZ;
+
+					if (posFromRect.y - waterRadius > posOnRect.y)
+						continue;
+
+					return (true);
+				}
+			}
+		}
+	}
+
+	return (false);
+}
+
+
 bool	hitTerrain(vec3 rayPos, vec3 rayDir)
 {
 	s_inter_map_info	hitMapInfo;
@@ -246,10 +331,11 @@ bool	hitTerrain(vec3 rayPos, vec3 rayDir)
 	while (dist <= maxDist)
 	{
 		// Check if ray collide with map bottom
-		if (rayPos.x >= 0.0 && rayPos.x < waterMaxXZ
-				&& rayPos.z >= 0.0 && rayPos.z < waterMaxXZ
-				&& abs(rayPos.y) < 0.1)
+		if (abs(rayPos.y) < 0.1)
 			return (true);
+
+		// if (checkCollisionWithTerrain(rayPos))
+		// 	return (true);
 
 		rayPos += rayDir * rayStep;
 		dist += rayStep;

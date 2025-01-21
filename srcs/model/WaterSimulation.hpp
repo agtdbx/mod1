@@ -24,6 +24,8 @@ public:
 	void	addWater(glm::vec3 position);
 	void	addWater(glm::vec3 position, glm::vec3 velociy);
 	void	tick(ShaderManager *shaderManager, Terrain *terrain, float delta);
+	void	draw(Camera *camera, ShaderManager *shaderManager,
+					Terrain *terrain, glm::vec3 *waterColor);
 	void	drawTest(Camera *camera, ShaderManager *shaderManager,
 						Terrain *terrain, glm::vec3 *waterColor);
 	void	clear(void);

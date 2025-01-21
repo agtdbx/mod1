@@ -213,6 +213,99 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 }
 
 
+void	WaterSimulation::draw(
+			Camera *camera,
+			ShaderManager *shaderManager,
+			Terrain *terrain,
+			glm::vec3 *waterColor)
+{
+	WaterShader *shader;
+	int			shaderId;
+	int			sizes[4], terrainFlatGridSize, terrainOffsetsSize;
+	GLuint		terrainBufferTextureDataGrid, terrainTextureDataGrid,
+				terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
+				terrainBufferTextureOffsets, terrainTextureOffsets;
+
+	if (this->nbParticules == 0)
+		return ;
+
+	// Get terrain data
+	terrainBufferTextureDataGrid = terrain->getTextureBufferTerrainGridData();
+	terrainTextureDataGrid = terrain->getTextureTerrainGridData();
+	terrainBufferTextureFlatGrid = terrain->getTextureBufferTerrainGridFlat();
+	terrainTextureFlatGrid = terrain->getTextureTerrainGridFlat();
+	terrainFlatGridSize = terrain->getSizeTerrainGridFlat();
+	terrainBufferTextureOffsets = terrain->getTextureBufferTerrainGridOffsets();
+	terrainTextureOffsets = terrain->getTextureTerrainGridOffsets();
+	terrainOffsetsSize = terrain->getSizeTerrainGridOffsets();
+	terrain->getGridSize(sizes);
+
+	// Give triangles to water shader
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12,
+					this->triangleOverScreen, GL_STATIC_DRAW);
+
+	// Use water shader
+	shader = shaderManager->getWaterShader();
+	shader->use();
+	shaderId = shader->getShaderId();
+
+	// Give parameters to shaders
+	giveVec3ToShader(shaderId, "lightPos", camera->getLightPosition());
+	giveVec3ToShader(shaderId, "cameraPos", camera->getPosition());
+	giveVec3ToShader(shaderId, "cameraFront", camera->getFront());
+	giveVec3ToShader(shaderId, "cameraRight", camera->getRight());
+	giveVec3ToShader(shaderId, "cameraUp", camera->getUp());
+	giveFloatToShader(shaderId, "cameraFOV", CAMERA_FOV);
+	giveFloatToShader(shaderId, "cameraFar", CAMERA_MAX_VIEW_DIST);
+	giveFloatToShader(shaderId, "planeWidth", camera->getPlaneWidth());
+	giveFloatToShader(shaderId, "planeHeight", camera->getPlaneHeight());
+	giveFloatToShader(shaderId, "rayStep", RAY_STEP);
+	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
+	giveFloatToShader(shaderId, "waterMaxY", WATER_MAX_HEIGHT);
+	giveVec3ToShader(shaderId, "waterColor", *waterColor);
+
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
+	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
+	giveFloatTextureToShader(shaderId, "gridBuffer", 0,
+								this->textureBufferGridFlat,
+								this->textureGridFlat);
+	giveFloatTextureToShader(shaderId, "offsetsBuffer", 1,
+								this->textureBufferGridOffsets,
+								this->textureGridOffsets);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
+								this->textureBufferPositions,
+								this->texturePositions);
+	giveFloatTextureToShader(shaderId, "densitiesBuffer", 3,
+								this->textureBufferDensities,
+								this->textureDensities);
+
+	giveFloatToShader(shaderId, "terrainCellSize", TERRAIN_CELL_SIZE);
+	giveIntToShader(shaderId, "terrainGridW", sizes[0]);
+	giveIntToShader(shaderId, "terrainGridH", sizes[1]);
+	giveIntToShader(shaderId, "terrainGridD", sizes[2]);
+	giveIntToShader(shaderId, "terrainIdHsize", sizes[3]);
+	giveIntToShader(shaderId, "terrainGridSize", terrainFlatGridSize);
+	giveIntToShader(shaderId, "terrainOffsetsSize", terrainOffsetsSize);
+	giveVec3TextureToShader(shaderId, "terrainDataBuffer", 4,
+								terrainBufferTextureDataGrid,
+								terrainTextureDataGrid);
+	giveFloatTextureToShader(shaderId, "terrainGridBuffer", 5,
+								terrainBufferTextureFlatGrid,
+								terrainTextureFlatGrid);
+	giveFloatTextureToShader(shaderId, "terrainOffsetsBuffer", 6,
+								terrainBufferTextureOffsets,
+								terrainTextureOffsets);
+
+	// Draw triangles
+	glBindVertexArray(shaderManager->getVAOId());
+	glDrawArrays(GL_TRIANGLES, 0, 12);
+}
+
+
 void	WaterSimulation::drawTest(
 			Camera *camera,
 			ShaderManager *shaderManager,
@@ -264,6 +357,7 @@ void	WaterSimulation::drawTest(
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);
 }
+
 
 void	WaterSimulation::clear(void)
 {

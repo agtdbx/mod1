@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:24:37 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/21 12:04:58 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,12 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 
 		//watershader
-		shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
+		// shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
+		shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
 
 		//menu shader
 		shaderManager->loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
-		
+
 		//compute shader
 		shaderManager->addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager->addComputeShader("densities", "data/shaders/simulation/densities.glslc");
@@ -99,7 +100,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->cameraSensibility = CAMERA_ROTATION_SPEED_MOUSE;
 	sVar->watercolor = DEFAULT_WATER_COLOR;
 
-	//pannel 
+	//pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W, 0.0f, 230, 250, textureManager->getTexture("noTexture"), PANNEL_COLOR));				//main pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W + 120, 255.0f, 120, 590, textureManager->getTexture("noTexture"), PANNEL_COLOR));		//wave pannel
 	sVar->pannelVector.push_back(Pannel(0 - 240, 0.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));			//rain pannel

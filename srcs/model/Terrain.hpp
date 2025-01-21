@@ -35,7 +35,7 @@ public:
 
 	Terrain	&operator=(const Terrain &obj);
 
-	void	loadFromFile(char *filePath);
+	void	loadFromParse(std::vector<Vec3> & pointsList, std::vector<std::vector<double>> heightmap);
 	void	renderMesh(Camera *camera, ShaderManager *shaderManager);
 
 private:
@@ -51,7 +51,7 @@ private:
 										textureBufferTerrainGridOffsets, textureTerrainGridOffsets;
 
 	void	initEmptyMap(void);
-	void	interpolate(void);
+	// void	interpolate(void);
 	void	createMesh(void);
 	void	generateGridTextures(void);
 };

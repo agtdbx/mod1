@@ -51,11 +51,27 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	std::vector<Vec3> parseTab;
+	std::vector<std::vector<double>> heightmap;
+
+	try
+	{
+		parseTab = parse(argv[1]);
+		heightmap = interpolate(parseTab);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Error : " << e.what() << std::endl;
+		return (1);
+	}
+
 	if (!glfwInit())
 	{
 		std::cerr << "Error : Opengl init failed" << std::endl;
 		return (1);
 	}
+
+	
 
 	OpenGLContext	context;
 
@@ -79,7 +95,7 @@ int	main(int argc, char **argv)
 
 	try
 	{
-		terrain.loadFromFile(argv[1]);
+		terrain.loadFromParse(parseTab, heightmap);
 		loadTexture(&textureManager, &shaderManager);
 		Slider::texture = textureManager.getTexture("noTexture");
 
@@ -91,6 +107,10 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
+
+
+
+	
 	initUi(&sVar, &textureManager, &simulation);
 
 	// Main loop

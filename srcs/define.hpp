@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/21 12:12:42 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:13:05 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,5 +102,7 @@ const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIUS, 9));
 
 std::vector<Vec3>	parse(char *name);
+std::vector<std::vector<double>> interpolate(std::vector<Vec3> & parameterPoints);
+
 
 #endif

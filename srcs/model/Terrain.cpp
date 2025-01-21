@@ -152,10 +152,11 @@ Terrain	&Terrain::operator=(const Terrain &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-void	Terrain::loadFromFile(char *filePath)
+void	Terrain::loadFromParse(std::vector<Vec3> & pointsList, std::vector<std::vector<double>> heightmap)
 {
-	this->parameterPoints = parse(filePath);
-	this->interpolate();
+	this->parameterPoints = pointsList;
+	this->heightmap = heightmap;
+	// this->interpolate();
 	this->createMesh();
 }
 
@@ -179,59 +180,6 @@ void	Terrain::initEmptyMap(void)
 	}
 }
 
-
-void Terrain::interpolate(void)
-{
-	double	px, py, pz, dx, dy, dist, val;
-	std::vector<double> possible_heights;
-
-	for (int y = 0; y < MAP_SIZE; y++)
-	{
-		for (int x = 0; x < MAP_SIZE; x++)
-		{
-			possible_heights.clear();
-			for (Vec3 point: this->parameterPoints)
-			{
-				px = point.x;
-				py = point.y;
-				pz = point.z;
-
-				dx = px - x;
-				dy = py - y;
-				dist = (dx * dx) + (dy * dy);
-				if (dist == 0)
-				{
-					possible_heights.push_back(pz);
-					continue;
-				}
-
-				dist = std::sqrt(dist);
-				val = std::max(0.0, pz*pz - dist*dist);
-				if (val == 0)
-					continue;
-
-				val /= pz*pz;
-				val = val*val*val;
-				val = val * pz;
-				if (val <= TERRAIN_PRECISION)
-					continue;
-
-				possible_heights.push_back(val);
-
-			}
-			if (possible_heights.size() == 0)
-					continue;
-
-			val = 0.0;
-			for (double testVal : possible_heights)
-			{
-				if (testVal > val)
-					val = testVal;
-			}
-			this->heightmap[y][x] = val;
-		}
-	}
-}
 
 
 void	Terrain::createMesh(void)

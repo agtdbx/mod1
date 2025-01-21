@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/08 20:49:13 by lflandri          #+#    #+#             */
-/*   Updated: 2024/12/12 18:12:40 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:59:01 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
 #include <fstream>
+#include <unistd.h>
 
 static std::vector<std::string> split(std::string const s, char c)
 {
@@ -32,6 +33,78 @@ static std::vector<std::string> split(std::string const s, char c)
 		i += j;
 	}
 	return (res);
+}
+
+std::vector<std::vector<double>> interpolate(std::vector<Vec3> & parameterPoints)
+{
+	double	px, py, pz, dx, dy, dist, val;
+	std::vector<double> possible_heights;
+	std::vector<std::vector<double>> heightmap;
+	char spin[5] = "-\\|/";
+	int	ind = 0;
+
+	for (int y = 0; y < MAP_SIZE; y++)
+	{
+		std::vector<double> line;
+		for (int x = 0; x < MAP_SIZE; x++)
+			line.push_back(0.0);
+		heightmap.push_back(line);
+	}
+	std::cout << "Creating Map :" << std::endl;
+	std::cout << "/\t0%";
+	for (int y = 0; y < MAP_SIZE; y++)
+	{
+		for (int x = 0; x < MAP_SIZE; x++)
+		{
+			std::cout << "\r" << spin[ind] << "\t" << (y * MAP_SIZE + x) * 100  / (MAP_SIZE * MAP_SIZE) << "%" ;
+			ind++;
+			if (ind == 4)
+				ind = 0;
+			possible_heights.clear();
+			for (Vec3 & point: parameterPoints)
+			{
+				px = point.x;
+				py = point.y;
+				pz = point.z;
+
+				dx = px - x;
+				dy = py - y;
+				dist = (dx * dx) + (dy * dy);
+				if (dist == 0)
+				{
+					possible_heights.push_back(pz);
+					continue;
+				}
+
+				dist = std::sqrt(dist);
+				val = std::max(0.0, pz*pz - dist*dist);
+				if (val == 0)
+					continue;
+
+				val /= pz*pz;
+				val = val*val*val;
+				val = val * pz;
+				if (val <= TERRAIN_PRECISION)
+					continue;
+
+				possible_heights.push_back(val);
+
+			}
+			if (possible_heights.size() == 0)
+					continue;
+
+			val = 0.0;
+			for (double testVal : possible_heights)
+			{
+				if (testVal > val)
+					val = testVal;
+			}
+			heightmap[y][x] = val;
+		}
+	}
+	std::cout << "\r" << "                                   " ;
+	std::cout << "\r" << "100%" << std::endl;
+	return heightmap;
 }
 
 std::vector<Vec3> parse(char *name)

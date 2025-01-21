@@ -134,7 +134,7 @@ void main()
 		velocityDir = normalize(velocityDir);
 		velocity = velocityDir * velocityLength;
 
-		newPosition = position + velocity * delta - normal * collisionRepulsionForce;
+		// newPosition = position + velocity * delta - normal * collisionRepulsionForce;
 		needUpdateVelocity = true;
 	}
 

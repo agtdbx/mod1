@@ -226,8 +226,8 @@ void	WaterSimulation::draw(
 				terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
 				terrainBufferTextureOffsets, terrainTextureOffsets;
 
-	if (this->nbParticules == 0)
-		return ;
+	// if (this->nbParticules == 0)
+	// 	return ;
 
 	// Get terrain data
 	terrainBufferTextureDataGrid = terrain->getTextureBufferTerrainGridData();

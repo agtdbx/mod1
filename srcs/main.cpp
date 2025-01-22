@@ -312,7 +312,7 @@ static void	draw(
 	}
 
 	// test.renderMesh(shaderManager);
-	terrain->renderMesh(camera, shaderManager);
+	// terrain->renderMesh(camera, shaderManager);
 	simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
 	// simulation->drawTest(camera, shaderManager, terrain, &sVar->watercolor);
 

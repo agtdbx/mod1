@@ -51,7 +51,6 @@ vec3	normalBack =	vec3( 0.0,  0.0,  1.0);
 struct s_inter_map_info
 {
 	bool	inter_map;
-	bool	inter_ground;
 	float	dst_map_min;
 	float	dst_map_max;
 	float	dst_to_ground;
@@ -75,39 +74,76 @@ float	intersectWithCubeFace(
 	float	denom, dist, o1, o2, o3, o4;
 	vec3	q, p1_q, p2_q, p3_q, p4_q;
 
-
+	// Intersection with face normal
 	denom = dot(rayDir, faceNormal);
-	if (denom >= 0.000001)
-		return (-1.0);
+	if (denom < 0.000001)
+	{
+		dist = dot(facePoint_lu - rayPos, faceNormal) / denom;
+		if (dist < 0.0)
+			return (-1.0);
 
-	dist = dot(facePoint_lu - rayPos, faceNormal) / denom;
-	if (dist < 0.0)
-		return (-1.0);
+		q = rayPos + rayDir * dist;
 
-	q = rayPos + rayDir * dist;
+		p1_q = facePoint_lu - q;
+		p2_q = facePoint_ld - q;
 
-	p1_q = facePoint_lu - q;
-	p2_q = facePoint_ld - q;
+		o1 = dot(cross(p1_q, p2_q), faceNormal);
+		if (o1 == 0.0)
+			return (-1.0);
 
-	o1 = dot(cross(p1_q, p2_q), faceNormal);
-	if (o1 == 0.0)
-		return (-1.0);
+		p3_q = facePoint_rd - q;
+		o2 = dot(cross(p2_q, p3_q), faceNormal);
+		if (o2 == 0.0 || !isSameSign(o1, o2))
+			return (-1.0);
 
-	p3_q = facePoint_rd - q;
-	o2 = dot(cross(p2_q, p3_q), faceNormal);
-	if (o2 == 0.0 || !isSameSign(o1, o2))
-		return (-1.0);
+		p4_q = facePoint_ru - q;
+		o3 = dot(cross(p3_q, p4_q), faceNormal);
+		if (o3 == 0.0 || !isSameSign(o2, o3))
+			return (-1.0);
 
-	p4_q = facePoint_ru - q;
-	o3 = dot(cross(p3_q, p4_q), faceNormal);
-	if (o3 == 0.0 || !isSameSign(o2, o3))
-		return (-1.0);
+		o4 = dot(cross(p4_q, p1_q), faceNormal);
+		if (o4 == 0.0 || !isSameSign(o3, o4))
+			return (-1.0);
 
-	o4 = dot(cross(p4_q, p1_q), faceNormal);
-	if (o4 == 0.0 || !isSameSign(o3, o4))
-		return (-1.0);
+		return (dist);
+	}
 
-	return (dist);
+	// Intersection with inverse face normal
+	denom = -denom;
+	if (denom < 0.000001)
+	{
+		faceNormal *= -1.0;
+		dist = dot(facePoint_lu - rayPos, faceNormal) / denom;
+		if (dist < 0.0)
+			return (-1.0);
+
+		q = rayPos + rayDir * dist;
+
+		p1_q = facePoint_lu - q;
+		p2_q = facePoint_ld - q;
+
+		o1 = dot(cross(p1_q, p2_q), faceNormal);
+		if (o1 == 0.0)
+			return (-1.0);
+
+		p3_q = facePoint_rd - q;
+		o2 = dot(cross(p2_q, p3_q), faceNormal);
+		if (o2 == 0.0 || !isSameSign(o1, o2))
+			return (-1.0);
+
+		p4_q = facePoint_ru - q;
+		o3 = dot(cross(p3_q, p4_q), faceNormal);
+		if (o3 == 0.0 || !isSameSign(o2, o3))
+			return (-1.0);
+
+		o4 = dot(cross(p4_q, p1_q), faceNormal);
+		if (o4 == 0.0 || !isSameSign(o3, o4))
+			return (-1.0);
+
+		return (dist);
+	}
+
+	return (-1.0);
 }
 
 
@@ -121,9 +157,9 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	float				dst;
 
 	result.inter_map = false;
-	result.inter_ground = false;
 	result.dst_map_min = cameraFar;
 	result.dst_map_max = 0.0;
+	result.dst_to_ground = cameraFar + 1.0;
 
 	// Check if ray is in the cube
 	if (facePoint_ldf.x <= rayPos.x && rayPos.x <= facePoint_rub.x
@@ -131,80 +167,68 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 		&& facePoint_ldf.z <= rayPos.z && rayPos.z <= facePoint_rub.z)
 	{
 		result.inter_map = true;
+		result.dst_map_min = 0.0;
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalRight,
 								facePoint_ruf, facePoint_rub,
 								facePoint_rdf, facePoint_rdb);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalLeft,
 								facePoint_lub, facePoint_luf,
 								facePoint_ldb, facePoint_ldf);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
 								facePoint_lub, facePoint_rub,
 								facePoint_luf, facePoint_ruf);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
 	}
 
-	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
+	dst = intersectWithCubeFace(rayPos, rayDir, normalDown,
 								facePoint_ldf, facePoint_rdf,
 								facePoint_ldb, facePoint_rdb);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		result.inter_ground = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
-	}
-	else
-	{
-		dst = intersectWithCubeFace(rayPos, rayDir, normalDown,
-								facePoint_ldf, facePoint_rdf,
-								facePoint_ldb, facePoint_rdb);
-		if (dst != -1.0f)
-		{
-			result.inter_map = true;
-			result.inter_ground = true;
-			if (result.dst_map_min > dst) result.dst_map_min = dst;
-			if (result.dst_map_max < dst) result.dst_map_max = dst;
-		}
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
+		result.dst_to_ground = dst;
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalFront,
 								facePoint_luf, facePoint_ruf,
 								facePoint_ldf, facePoint_rdf);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
 	}
 
 	dst = intersectWithCubeFace(rayPos, rayDir, normalBack,
 								facePoint_rub, facePoint_lub,
 								facePoint_rdb, facePoint_ldb);
-	if (dst != -1.0f)
+	if (dst != -1.0)
 	{
 		result.inter_map = true;
-		if (result.dst_map_min > dst) result.dst_map_min = dst;
-		if (result.dst_map_max < dst) result.dst_map_max = dst;
+		result.dst_map_min = min(result.dst_map_min, dst);
+		result.dst_map_max = max(result.dst_map_max, dst + 1.0);
 	}
 
 	return (result);
@@ -232,116 +256,133 @@ s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 }
 
 
-// Ray marching
-bool	checkCollisionWithTerrain(vec3 position)
+bool	hitTriangle(
+			vec3 rayPos, vec3 rayDir, vec3 p1, vec3 p2, vec3 p3, vec3 normal)
 {
-	int	px, py, pz, gx, gy, gz, gid, startId, endId, rectangleId;
-	vec3	rectPos, vecX, vecZ, posFromRect, posOnRect;
-	float	minY, maxY, a, b;
+	vec3	edge_1, edge_2, ray_cross_e2, s, s_cross_e1;
+	float	det, inv_det, u, v;
 
-	px = int(position.x / terrainCellSize);
-	py = int(position.y / terrainCellSize);
-	pz = int(position.z / terrainCellSize);
+	edge_1 = p2 - p1;
+	edge_2 = p3 - p1;
 
-	for (int cx = -1; cx < 2; cx++)
+	// normal = vec3((edge_1.y * edge_2.z) - (edge_1.z * edge_2.y),
+	// 				(edge_1.z * edge_2.x) - (edge_1.x * edge_2.z),
+	// 				(edge_1.x * edge_2.y) - (edge_1.y * edge_2.x));
+
+	ray_cross_e2 = cross(rayDir, edge_2);
+	det = dot(edge_1, ray_cross_e2);
+	if (det > -0.000001)
+		return (false);
+
+	inv_det = 1.0 / det;
+	s = rayPos - p1;
+	u = inv_det * dot(s, ray_cross_e2);
+	if (u < 0.0 || u > 1.0)
+		return (false);
+
+	s_cross_e1 = cross(s, edge_1);
+	v = inv_det * dot(rayDir, s_cross_e1);
+	if (v < 0.0 || v + u > 1.0)
+		return (false);
+
+	return (true);
+}
+
+
+// Ray marching
+bool	checkIntersectionWithTerrain(
+			vec3 rayPos, vec3 rayDir, int gx, int gy, int gz)
+{
+	int	gid, startId, endId, rectangleId;
+	vec3	position, vecX, vecZ, normal, dirToRect,
+			interPos, interLocalPos;
+	vec3	pul, pur, pdl, pdr;
+	float	denom, dist, interLocalx, interLocalz;
+
+	if (gx < 0 || gx >= terrainGridW)
+		return (false);
+	if (gy < 0 || gy >= terrainGridH)
+		return (false);
+	if (gz < 0 || gz >= terrainGridD)
+		return (false);
+
+	gid = gx + gz * terrainGridW + gy * terrainIdHsize;
+		startId = int(texelFetch(terrainOffsetsBuffer, gid).r);
+	if (gid + 1 < terrainOffsetsSize)
+		endId = int(texelFetch(terrainOffsetsBuffer, gid + 1).r);
+	else
+		endId = terrainGridSize;
+
+	for (int i = startId; i < endId; i++)
 	{
-		gx = px + cx;
-		if (gx < 0 || gx >= terrainGridW)
+		rectangleId = int(texelFetch(terrainGridBuffer, i).r);
+
+		position = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
+		vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
+		vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
+		normal = texelFetch(terrainDataBuffer, rectangleId * 4 + 3).rgb;
+
+		pul = position;
+		pur = pul + vecX;
+		pdl = pul + vecZ;
+		pdr = pur + vecZ;
+
+		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl, normal))
+		if (!hitTriangle(rayPos, rayDir, pdl, pur, pdr, normal))
+		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl, normal)
+		// 	&& !hitTriangle(rayPos, rayDir, pdl, pur, pdr, normal))
 			continue;
 
-		for (int cy = -1; cy < 2; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= terrainGridH)
-				continue;
-
-			for (int cz = -1; cz < 2; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= terrainGridD)
-					continue;
-
-				gid = gx + gz * terrainGridW + gy * terrainIdHsize;
-					startId = int(texelFetch(terrainOffsetsBuffer, gid).r);
-				if (gid + 1 < terrainOffsetsSize)
-					endId = int(texelFetch(terrainOffsetsBuffer, gid + 1).r);
-				else
-					endId = terrainGridSize;
-
-				for (int i = startId; i < endId; i++)
-				{
-					rectangleId = int(texelFetch(terrainGridBuffer, i).r);
-					rectPos = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
-					vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
-					vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
-
-					posFromRect = position - rectPos;
-					minY = min(vecX.y, vecZ.y);
-					maxY = max(vecX.y, vecZ.y);
-
-					if (posFromRect.x < -waterRadius || posFromRect.x > vecX.x
-						|| posFromRect.y < minY - waterRadius || posFromRect.y > maxY + waterRadius
-						|| posFromRect.z < -waterRadius || posFromRect.z > vecZ.z)
-						continue;
-
-					if (vecX.x != 0.0)
-						a = posFromRect.x / vecX.x;
-					else if (vecX.y != 0.0)
-						a = posFromRect.y / vecX.y;
-					else
-						continue;
-
-					if (vecZ.z != 0.0)
-						b = posFromRect.z / vecZ.z;
-					else if (vecZ.y != 0.0)
-						b = posFromRect.y / vecZ.y;
-					else
-						continue;
-
-					posOnRect = rectPos + a * vecX + b * vecZ;
-
-					if (posFromRect.y - waterRadius > posOnRect.y)
-						continue;
-
-					return (true);
-				}
-			}
-		}
+		return (true);
 	}
+
 
 	return (false);
 }
 
 
-bool	hitTerrain(vec3 rayPos, vec3 rayDir)
+int	hitTerrain(vec3 rayPos, vec3 rayDir)
 {
 	s_inter_map_info	hitMapInfo;
+	int	gx, gy, gz, ngx, ngy, ngz;
 	float	dist, distGround, maxDist;
 
 	hitMapInfo = hitMap(rayPos, rayDir);
 	if (!hitMapInfo.inter_map)
-		return (false);
+		return (-1);
 
 	dist = hitMapInfo.dst_map_min;
-	if (hitMapInfo.inter_ground)
-		return (true);
-
+	rayPos += rayDir * dist;
+	distGround = hitMapInfo.dst_to_ground;
 	maxDist = hitMapInfo.dst_map_max;
+
+	gx = int(rayPos.x / terrainCellSize);
+	gy = int(rayPos.y / terrainCellSize);
+	gz = int(rayPos.z / terrainCellSize);
 
 	while (dist <= maxDist)
 	{
 		// Check if ray collide with map bottom
-		if (abs(rayPos.y) < 0.1)
-			return (true);
+		if (dist >= distGround)
+			return (1);
 
-		// if (checkCollisionWithTerrain(rayPos))
-		// 	return (true);
+		ngx = int(rayPos.x / terrainCellSize);
+		ngy = int(rayPos.y / terrainCellSize);
+		ngz = int(rayPos.z / terrainCellSize);
+		if (ngx != gx || ngy != gy || ngz != gz)
+		{
+			gx = ngx;
+			gy = ngy;
+			gz = ngz;
+			if (checkIntersectionWithTerrain(rayPos, rayDir, gx, gy, gz))
+				return (2);
+		}
 
 		rayPos += rayDir * rayStep;
 		dist += rayStep;
 	}
 
-	return (false);
+	return (-2);
 }
 
 
@@ -352,8 +393,20 @@ void main()
 	vec3	rayDir = normalize(rayPos - fakeCameraPos);
 
 	// The default color to transparent
-	if (hitTerrain(rayPos, rayDir))
-		FragColor = vec4(waterColor, 1.0);
+	int res = hitTerrain(rayPos, rayDir);
+	// Non hit case
+	if (res == -1)
+		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (res == -2)
+		FragColor = vec4(0.5, 0.0, 0.0, 1.0);
+
+	// Hit case
+	else if (res == 1)
+		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else if (res == 2)
+		FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+
+	// WTF case
 	else
-		FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+		FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }

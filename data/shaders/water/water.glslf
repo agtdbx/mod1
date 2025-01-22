@@ -35,6 +35,7 @@ uniform int				terrainGridD;
 uniform int				terrainIdHsize;
 uniform int				terrainGridSize;
 uniform int				terrainOffsetsSize;
+uniform int				terrainNbRectangles;
 uniform samplerBuffer	terrainDataBuffer;
 uniform samplerBuffer	terrainGridBuffer;
 uniform samplerBuffer	terrainOffsetsBuffer;
@@ -257,17 +258,17 @@ s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 
 
 bool	hitTriangle(
-			vec3 rayPos, vec3 rayDir, vec3 p1, vec3 p2, vec3 p3, vec3 normal)
+			vec3 rayPos, vec3 rayDir, vec3 p1, vec3 p2, vec3 p3)
 {
-	vec3	edge_1, edge_2, ray_cross_e2, s, s_cross_e1;
+	vec3	edge_1, edge_2, normal, ray_cross_e2, s, s_cross_e1;
 	float	det, inv_det, u, v;
 
 	edge_1 = p2 - p1;
 	edge_2 = p3 - p1;
 
-	// normal = vec3((edge_1.y * edge_2.z) - (edge_1.z * edge_2.y),
-	// 				(edge_1.z * edge_2.x) - (edge_1.x * edge_2.z),
-	// 				(edge_1.x * edge_2.y) - (edge_1.y * edge_2.x));
+	normal = vec3((edge_1.y * edge_2.z) - (edge_1.z * edge_2.y),
+					(edge_1.z * edge_2.x) - (edge_1.x * edge_2.z),
+					(edge_1.x * edge_2.y) - (edge_1.y * edge_2.x));
 
 	ray_cross_e2 = cross(rayDir, edge_2);
 	det = dot(edge_1, ray_cross_e2);
@@ -293,8 +294,8 @@ bool	hitTriangle(
 bool	checkIntersectionWithTerrain(
 			vec3 rayPos, vec3 rayDir, int gx, int gy, int gz)
 {
-	int	gid, startId, endId, rectangleId;
-	vec3	position, vecX, vecZ, normal, dirToRect,
+	int		gid, startId, endId, rectangleId;
+	vec3	position, vecX, vecZ, vecXZ, normal, dirToRect,
 			interPos, interLocalPos;
 	vec3	pul, pur, pdl, pdr;
 	float	denom, dist, interLocalx, interLocalz;
@@ -317,20 +318,21 @@ bool	checkIntersectionWithTerrain(
 	{
 		rectangleId = int(texelFetch(terrainGridBuffer, i).r);
 
-		position = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
-		vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
-		vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
-		normal = texelFetch(terrainDataBuffer, rectangleId * 4 + 3).rgb;
+		position = texelFetch(terrainDataBuffer, rectangleId * 5).rgb;
+		vecX = texelFetch(terrainDataBuffer, rectangleId * 5 + 1).rgb;
+		vecZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 2).rgb;
+		vecXZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 3).rgb;
+		normal = texelFetch(terrainDataBuffer, rectangleId * 5 + 4).rgb;
 
 		pul = position;
-		pur = pul + vecX;
-		pdl = pul + vecZ;
-		pdr = pur + vecZ;
+		pur = position + vecX;
+		pdl = position + vecZ;
+		pdr = position + vecXZ;
 
-		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl, normal))
-		if (!hitTriangle(rayPos, rayDir, pdl, pur, pdr, normal))
-		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl, normal)
-		// 	&& !hitTriangle(rayPos, rayDir, pdl, pur, pdr, normal))
+		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl))
+		// if (!hitTriangle(rayPos, rayDir, pdl, pur, pdr))
+		if (!hitTriangle(rayPos, rayDir, pul, pur, pdl)
+			&& !hitTriangle(rayPos, rayDir, pdl, pur, pdr))
 			continue;
 
 		return (true);
@@ -338,6 +340,37 @@ bool	checkIntersectionWithTerrain(
 
 
 	return (false);
+}
+
+
+float interWithAllTriangles(vec3 rayPos, vec3 rayDir)
+{
+	float	dst = cameraFar + 2;
+	vec3	position, vecX, vecZ, vecXZ;
+	vec3	pul, pur, pdl, pdr;
+
+	for (int i = 0; i < terrainGridSize; i++)
+	{
+		int rectangleId = int(texelFetch(terrainGridBuffer, i).r);
+
+		position = texelFetch(terrainDataBuffer, rectangleId * 5).rgb;
+		vecX = texelFetch(terrainDataBuffer, rectangleId * 5 + 1).rgb;
+		vecZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 2).rgb;
+		vecXZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 3).rgb;
+
+		pul = position;
+		pur = position + vecX;
+		pdl = position + vecZ;
+		pdr = position + vecXZ;
+
+		// if (hitTriangle(rayPos, rayDir, pul, pur, pdl))
+		// if (hitTriangle(rayPos, rayDir, pdl, pur, pdr))
+		if (hitTriangle(rayPos, rayDir, pul, pur, pdl)
+			|| hitTriangle(rayPos, rayDir, pdl, pur, pdr))
+			return (0.0);
+	}
+
+	return (dst);
 }
 
 
@@ -356,9 +389,13 @@ int	hitTerrain(vec3 rayPos, vec3 rayDir)
 	distGround = hitMapInfo.dst_to_ground;
 	maxDist = hitMapInfo.dst_map_max;
 
-	gx = int(rayPos.x / terrainCellSize);
-	gy = int(rayPos.y / terrainCellSize);
-	gz = int(rayPos.z / terrainCellSize);
+	// float triDst = interWithAllTriangles(rayPos, rayDir);
+	// if (triDst < maxDist)
+	// 	return (2);
+
+	gx = -1;
+	gy = -1;
+	gz = -1;
 
 	while (dist <= maxDist)
 	{

@@ -291,6 +291,7 @@ void	WaterSimulation::draw(
 	giveIntToShader(shaderId, "terrainIdHsize", sizes[3]);
 	giveIntToShader(shaderId, "terrainGridSize", terrainFlatGridSize);
 	giveIntToShader(shaderId, "terrainOffsetsSize", terrainOffsetsSize);
+	giveIntToShader(shaderId, "terrainNbRectangles", terrain->getDataNbRectangles());
 	giveVec3TextureToShader(shaderId, "terrainDataBuffer", 4,
 								terrainBufferTextureDataGrid,
 								terrainTextureDataGrid);

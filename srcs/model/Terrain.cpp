@@ -16,6 +16,26 @@ static float	max(float a, float b)
 	return (b);
 }
 
+static float	min4(float a, float b, float c, float d)
+{
+	float	mini = a;
+
+	mini = min(mini, b);
+	mini = min(mini, c);
+	mini = min(mini, d);
+	return (mini);
+}
+
+static float	max4(float a, float b, float c, float d)
+{
+	float	maxi = a;
+
+	maxi = max(maxi, b);
+	maxi = max(maxi, c);
+	maxi = max(maxi, d);
+	return (maxi);
+}
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
@@ -380,10 +400,10 @@ void	Terrain::generateGridTextures(void)
 	int		vid, gx, gy, gz, gid;
 	int		rectangleId = 0;
 	std::unordered_map<int, bool>	idsIn;
-	// 4 vec3 per rectangle (pos, vecX, vecZ, normal)
+	// 5 vec3 per rectangle (pos, vecX, vecZ, vecXZ, normal)
 	std::vector<glm::vec3>	terrainData;
 
-	for (t_rectangle &rectangle : rectangles)
+	for (t_rectangle &rectangle : this->rectangles)
 	{
 		vid = rectangle.y * MAP_SIZE + rectangle.x;
 		Vec3	topLeft = this->vertices[vid].pos;
@@ -400,6 +420,7 @@ void	Terrain::generateGridTextures(void)
 		vid = (rectangle.y + rectangle.height) * MAP_SIZE
 				+ (rectangle.x + rectangle.width);
 		Vec3	botRight = this->vertices[vid].pos;
+		Vec3	vecXZ = botRight - topLeft;
 
 		// If the rectangle is on the ground, ignore it
 		if	(topLeft.y == 0.0 && topRight.y == 0.0 && botLeft.y == 0.0 && botRight.y == 0.0)
@@ -409,24 +430,25 @@ void	Terrain::generateGridTextures(void)
 		terrainData.push_back(glm::vec3(topLeft.x, topLeft.y, topLeft.z));
 		terrainData.push_back(glm::vec3(vecX.x, vecX.y, vecX.z));
 		terrainData.push_back(glm::vec3(vecZ.x, vecZ.y, vecZ.z));
+		terrainData.push_back(glm::vec3(vecXZ.x, vecXZ.y, vecXZ.z));
 		terrainData.push_back(glm::vec3(normal.x, normal.y, normal.z));
 
-		gStartX = min(topLeft.x, botRight.x);
-		gEndX = max(topLeft.x, botRight.x);
-		gStartY = min(topLeft.y, botRight.y);
-		gEndY = max(topLeft.y, botRight.y);
-		gStartZ = min(topLeft.z, botRight.z);
-		gEndZ = max(topLeft.z, botRight.z);
+		gStartX = min4(topLeft.x, topRight.x, botLeft.x, botRight.x);
+		gEndX = max4(topLeft.x, topRight.x, botLeft.x, botRight.x);
+		gStartY = min4(topLeft.y, topRight.y, botLeft.y, botRight.y);
+		gEndY = max4(topLeft.y, topRight.y, botLeft.y, botRight.y);
+		gStartZ = min4(topLeft.z, topRight.z, botLeft.z, botRight.z);
+		gEndZ = max4(topLeft.z, topRight.z, botLeft.z, botRight.z);
 
 		idsIn.clear();
-		float gridStep = 1.0f;
-		for (float x = gStartX; x < gEndX; x += gridStep)
+		float gridStep = 0.2f;
+		for (float x = gStartX; x <= gEndX; x += gridStep)
 		{
 			gx = x / TERRAIN_CELL_SIZE;
-			for (float y = gStartY; y < gEndY; y += gridStep)
+			for (float y = gStartY; y <= gEndY; y += gridStep)
 			{
 				gy = y / TERRAIN_CELL_SIZE;
-				for (float z = gStartZ; z < gEndZ; z += gridStep)
+				for (float z = gStartZ; z <= gEndZ; z += gridStep)
 				{
 					gz = z / TERRAIN_CELL_SIZE;
 					gid = gx + gz * this->terrainGridW + gy * this->terrainIdHsize;

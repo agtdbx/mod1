@@ -67,9 +67,9 @@ int	checkCollisionWithTerrain(vec3 position)
 				for (int i = startId; i < endId; i++)
 				{
 					rectangleId = int(texelFetch(terrainGridBuffer, i).r);
-					rectPos = texelFetch(terrainDataBuffer, rectangleId * 4).rgb;
-					vecX = texelFetch(terrainDataBuffer, rectangleId * 4 + 1).rgb;
-					vecZ = texelFetch(terrainDataBuffer, rectangleId * 4 + 2).rgb;
+					rectPos = texelFetch(terrainDataBuffer, rectangleId * 5).rgb;
+					vecX = texelFetch(terrainDataBuffer, rectangleId * 5 + 1).rgb;
+					vecZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 2).rgb;
 
 					posFromRect = position - rectPos;
 					minY = min(vecX.y, vecZ.y);
@@ -129,7 +129,7 @@ void main()
 		if (velocityLength != 0.0)
 			velocityDir = velocity / velocityLength;
 
-		vec3	normal = texelFetch(terrainDataBuffer, terrainCollisionId * 4 + 3).rgb;
+		vec3	normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
 		velocityDir -= normal * 2 * dot(velocityDir, normal);
 		velocityDir = normalize(velocityDir);
 		velocity = velocityDir * velocityLength;

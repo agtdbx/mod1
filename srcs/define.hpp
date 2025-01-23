@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/23 16:49:52 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 18:00:54 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
 # define DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR COLOR_FFFFFF
 
-# define ENTRYTEXT_WITDH_CHAR 20
+# define ENTRYTEXT_WITDH_CHAR 10
 # define PANNEL_COLOR COLOR_6C3737
 # define PANNEL_MOVE_SPEED 200
 

@@ -111,7 +111,7 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	
@@ -174,6 +174,37 @@ int	main(int argc, char **argv)
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
+			if (sVar.pannelVector[6][(char) 0].getValue().size())
+			{
+				sVar.generatePos.x = std::stoi(sVar.pannelVector[6][(char) 0].getValue());
+				if (sVar.generatePos.x >= MAP_SIZE)
+					sVar.generatePos.x = MAP_SIZE - 1;
+			}
+			else
+			{
+				sVar.generatePos.x = 0;
+			}
+			if (sVar.pannelVector[6][(char) 1].getValue().size())
+			{
+				sVar.generatePos.y = std::stoi(sVar.pannelVector[6][(char)1].getValue());
+				if (sVar.generatePos.y > MAP_MAX_HEIGHT)
+					sVar.generatePos.y = MAP_MAX_HEIGHT;
+			}
+			else
+			{
+				sVar.generatePos.y = 0;
+			}
+				if (sVar.pannelVector[6][(char) 2].getValue().size())
+			{
+				sVar.generatePos.z = std::stoi(sVar.pannelVector[6][(char) 2].getValue());
+				if (sVar.generatePos.z >= MAP_SIZE)
+					sVar.generatePos.z = MAP_SIZE - 1;
+			}
+			else
+			{
+				sVar.generatePos.z = 0;
+			}
+
 
 			// std::cout << "value : " << sVar.pannelVector[6][(char) 0].getValue() << std::endl;
 
@@ -225,6 +256,7 @@ static void	computation(
 	static double	timePrintFps = 0.0;
 	static double	timeRainningParticuleAdd = 0.0;
 	static double	timeFillingParticuleAdd = 0.0;
+	static double	timeGenerateParticuleAdd = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
@@ -262,6 +294,16 @@ static void	computation(
 		timeFillingParticuleAdd -= sVar->fillingDelay;
 		if (sVar->isFilling && (!sVar->isStopped || deltaConst))
 			fillingPool(simulation, sVar);
+	}
+	if (deltaConst)
+		timeGenerateParticuleAdd += deltaConst;
+	else
+		timeGenerateParticuleAdd += delta;
+	if (timeGenerateParticuleAdd >= sVar->fillingDelay)
+	{
+		timeGenerateParticuleAdd -= sVar->generateDelay;
+		if (sVar->isGenerate && (!sVar->isStopped || deltaConst))
+			generateAt(simulation, sVar);
 	}
 	for (Pannel & pannel : sVar->pannelVector)
 	{

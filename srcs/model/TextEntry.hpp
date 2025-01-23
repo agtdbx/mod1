@@ -44,6 +44,7 @@ public:
 	glm::vec2	getPos();
 	std::string	getValue();
 	void	setPos(float x, float y);
+	void	setValue(std::string value);
 	void	setColor(glm::vec3, int type);
 
 

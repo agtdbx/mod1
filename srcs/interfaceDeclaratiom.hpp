@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 16:17:37 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 17:49:58 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	addWater(void * arg);
 void	changeBoolStatus(void *arg);
 void	updateRain(WaterSimulation *simulation, t_simulationVariable *sVar);
 void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar);
+void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar);
 void	generateWaveWest(void *arg);
 void	generateWaveEst(void *arg);
 void	generateWaveNorth(void *arg);

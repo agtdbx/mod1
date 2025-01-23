@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 17:07:19 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 18:10:17 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,20 @@
 
 void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 {
+
+		//number texture
+		textureManager->addTexture("0", "data/textures/0.png");
+		textureManager->addTexture("1", "data/textures/1.png");
+		textureManager->addTexture("2", "data/textures/2.png");
+		textureManager->addTexture("3", "data/textures/3.png");
+		textureManager->addTexture("4", "data/textures/4.png");
+		textureManager->addTexture("5", "data/textures/5.png");
+		textureManager->addTexture("6", "data/textures/6.png");
+		textureManager->addTexture("7", "data/textures/7.png");
+		textureManager->addTexture("8", "data/textures/8.png");
+		textureManager->addTexture("9", "data/textures/9.png");
+
+
 		//terrain texture
 		textureManager->addTexture("dirt", "data/textures/dirt.png");
 
@@ -64,17 +78,7 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("blue", "data/textures/blue.png");
 		textureManager->addTexture("sprintSpeed", "data/textures/sprintSpeed.png");
 
-		//number texture
-		textureManager->addTexture("0", "data/textures/0.png");
-		textureManager->addTexture("1", "data/textures/1.png");
-		textureManager->addTexture("2", "data/textures/2.png");
-		textureManager->addTexture("3", "data/textures/3.png");
-		textureManager->addTexture("4", "data/textures/4.png");
-		textureManager->addTexture("5", "data/textures/5.png");
-		textureManager->addTexture("6", "data/textures/6.png");
-		textureManager->addTexture("7", "data/textures/7.png");
-		textureManager->addTexture("8", "data/textures/8.png");
-		textureManager->addTexture("9", "data/textures/9.png");
+
 
 
 		//terrain shader
@@ -127,7 +131,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector.push_back(Pannel(0 - 240, 640, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//generate pannel
 
 	//main pannel content
-	sVar->pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar->pannelVector[2], textureManager->getTexture("5")));
+	sVar->pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar->pannelVector[2], textureManager->getTexture("rain")));
 	sVar->pannelVector[0][0].setSwitchMode(true);
 	sVar->pannelVector[0].addButton(Button(120, 10, 100, 50,moveFillingPannel, &sVar->pannelVector[3], textureManager->getTexture("filling")));
 	sVar->pannelVector[0][1].setSwitchMode(true);
@@ -224,7 +228,12 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[6][0].desactive();
 	sVar->pannelVector[6].addButton(Button(10, 70, 100, 50,changeBoolStatus, &sVar->isGenerate, textureManager->getTexture("active")));
 	sVar->pannelVector[6][1].setSwitchMode(true);
-	sVar->pannelVector[6].addTextEntry(TextEntry(10, 130, 100, 50));
+	sVar->pannelVector[6].addTextEntry(TextEntry(5, 130, 30, 30));
+	sVar->pannelVector[6][(char) 0].setValue(std::to_string((int) sVar->generatePos.x));
+	sVar->pannelVector[6].addTextEntry(TextEntry(42, 130, 30, 30));
+	sVar->pannelVector[6][(char) 1].setValue(std::to_string((int) sVar->generatePos.y));
+	sVar->pannelVector[6].addTextEntry(TextEntry(77, 130, 30, 30));
+	sVar->pannelVector[6][(char) 2].setValue(std::to_string((int) sVar->generatePos.z));
 	// sVar->pannelVector[3].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager->getTexture("fillingIntensity"), PANNEL_COLOR, PANNEL_COLOR));
 	// sVar->pannelVector[3][2].desactive();
 	// sVar->pannelVector[3].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));

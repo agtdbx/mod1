@@ -81,6 +81,11 @@ std::string	TextEntry::getValue()
 
 //---- Setters -----------------------------------------------------------------
 
+void	TextEntry::setValue(std::string value)
+{
+	this->value = value;
+}
+
 
 void	TextEntry::setPos(float x, float y)
 {

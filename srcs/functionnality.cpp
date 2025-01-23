@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 16:23:34 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 17:54:14 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,19 @@ void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar)
 							 glm::vec3(-FILLING_VELOCITY + deviationFactor, 0.0f, -FILLING_VELOCITY - deviationFactor));
 
 	}
-	
+}
 
+void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar)
+{
+	static Random	random;
+
+	for (size_t i = 0; i < sVar->fillingIntensity; i++)
+	{
+		// std::cout << "deviationFactor : " << deviationFactor << std::endl;
+		simulation->addWater(glm::vec3(sVar->generatePos.x + random.random(),
+										sVar->generatePos.y + random.random(),
+										sVar->generatePos.z + random.random()));
+	}
 }
 
 void	generateWaveWest(void *arg)

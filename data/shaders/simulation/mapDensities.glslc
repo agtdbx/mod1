@@ -93,7 +93,7 @@ void main()
 	z = int(idXZ / gridW);
 	x = idXZ - (z * gridW);
 
-	position = vec3(x, y, z);
+	position = vec3(x, y, z) * smoothingRadius;
 	density = calculateDensity(position);
 
 	// Write the value to the buffer

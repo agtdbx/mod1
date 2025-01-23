@@ -289,9 +289,9 @@ void	WaterSimulation::draw(
 	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
 								this->textureBufferPositions,
 								this->texturePositions);
-	giveFloatTextureToShader(shaderId, "densitiesBuffer", 3,
-								this->textureBufferDensities,
-								this->textureDensities);
+	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 3,
+								this->textureBufferMapDensities,
+								this->textureMapDensities);
 
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS); // TODO: CHECK IF THEY CAN BE REMOVE
 	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);

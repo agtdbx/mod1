@@ -26,7 +26,7 @@ uniform int				offsetsSize;
 uniform samplerBuffer	gridBuffer;
 uniform samplerBuffer	offsetsBuffer;
 uniform samplerBuffer	positionsBuffer;
-uniform samplerBuffer	densitiesBuffer;
+uniform samplerBuffer	mapDensitiesBuffer;
 
 uniform float			smoothingRadius; // TODO: CHECK IF THEY CAN BE REMOVE
 uniform float			smoothingScale;
@@ -428,69 +428,67 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 
 
 // Get density
-float	smoothingKernel(float dst)
+float	getDensityAtMapPoint(int x, int y, int z)
 {
-	if (dst > smoothingRadius)
+	if (x < 0 || x >= gridW || y < 0 || y >= gridH || z < 0 || z >= gridD)
 		return (0.0);
 
-	return (pow(smoothingRadius - dst, 2) * smoothingScale);
+	int	tid = x + z * gridW + y * idHsize;
+	float density = texelFetch(mapDensitiesBuffer, tid).r;
+	return (density);
 }
 
-float	calculateDensity(vec3 position)
+
+float	lerp(float start, float end, float ratio)
 {
-	float	density, dst, influence;
-	int		px, py, pz, gx, gy, gz, gid, startId, endId, waterId;
-	vec3	pos;
-
-	density = 0.0;
-	px = int(position.x / smoothingRadius);
-	py = int(position.y / smoothingRadius);
-	pz = int(position.z / smoothingRadius);
-
-	for (int cx = -1; cx <= 1; cx++)
-	{
-		gx = px + cx;
-		if (gx < 0 || gx >= gridW)
-			continue;
-
-		for (int cy = -1; cy <= 1; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= gridH)
-				continue;
-
-			for (int cz = -1; cz <= 1; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= gridD)
-					continue;
-
-				gid = gx + gz * gridW + gy * idHsize;
-				startId = int(texelFetch(offsetsBuffer, gid).r);
-				if (gid + 1 < offsetsSize)
-					endId = int(texelFetch(offsetsBuffer, gid + 1).r);
-				else
-					endId = gridSize;
-
-				for (int i = startId; i < endId; i++)
-				{
-					waterId = int(texelFetch(gridBuffer, i).r);
-					pos = texelFetch(positionsBuffer, waterId).rgb;
-					dst = vecLength(pos - position);
-					influence = smoothingKernel(dst);
-					density += waterMass * influence;
-				}
-			}
-		}
-	}
-
-	return (density);
+	return (start + (end - start) * ratio);
 }
 
 
 float	getDensityAtPos(vec3 pos)
 {
-	return (calculateDensity(pos));
+	int		gx, gy, gz;
+	float	densityFUL, densityFUR, densityFDL, densityFDR,
+			densityBUL, densityBUR, densityBDL, densityBDR,
+			densityFU, densityFD, densityBU, densityBD,
+			densityF, densityB,
+			density,
+			dx, dy, dz;
+
+	// Get grid coordonates
+	gx = int(pos.x / smoothingRadius);
+	gy = int(pos.y / smoothingRadius);
+	gz = int(pos.z / smoothingRadius);
+
+	// Get ratio for each axis
+	dx = (pos.x - (gx * smoothingRadius)) / smoothingRadius;
+	dy = (pos.y - (gy * smoothingRadius)) / smoothingRadius;
+	dz = (pos.z - (gz * smoothingRadius)) / smoothingRadius;
+
+	// Get density for 8 cell around pos
+	densityFUL = getDensityAtMapPoint(gx, gy, gz);
+	densityFUR = getDensityAtMapPoint(gx + 1, gy, gz);
+	densityFDL = getDensityAtMapPoint(gx, gy + 1, gz);
+	densityFDR = getDensityAtMapPoint(gx + 1, gy + 1, gz);
+	densityBUL = getDensityAtMapPoint(gx, gy, gz + 1);
+	densityBUR = getDensityAtMapPoint(gx + 1, gy, gz + 1);
+	densityBDL = getDensityAtMapPoint(gx, gy + 1, gz + 1);
+	densityBDR = getDensityAtMapPoint(gx + 1, gy + 1, gz + 1);
+
+	// Merge density on x axis
+	densityFU = lerp(densityFUL, densityFUR, dx);
+	densityFD = lerp(densityFDL, densityFDR, dx);
+	densityBU = lerp(densityBUL, densityBUR, dx);
+	densityBD = lerp(densityBDL, densityBDR, dx);
+
+	// Merge density on y axis
+	densityF = lerp(densityFU, densityFD, dy);
+	densityB = lerp(densityBU, densityBD, dy);
+
+	// Merge density on z axis
+	density = lerp(densityF, densityB, dz);
+	return (density);
+	// return (getDensityAtMapPoint(gx, gy, gz));
 }
 
 
@@ -500,7 +498,7 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	float	dist, distGround, distTriangle, distTerrain, maxDist,
 			densityAlongRay;
 
-	const float	maxDensity = 10.0;
+	const float	maxDensity = 20.0;
 
 	hitMapInfo = hitMap(rayPos, rayDir);
 	if (!hitMapInfo.inter_map)

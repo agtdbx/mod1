@@ -73,6 +73,17 @@ void	InputManager::update(GLFWwindow *window)
 	this->t.update(window);
 	this->tab.update(window);
 	this->alt.update(window);
+	this->_0.update(window);
+	this->_1.update(window);
+	this->_2.update(window);
+	this->_3.update(window);
+	this->_4.update(window);
+	this->_5.update(window);
+	this->_6.update(window);
+	this->_7.update(window);
+	this->_8.update(window);
+	this->_9.update(window);
+	this->del.update(window);
 }
 
 //**** PRIVATE METHODS *********************************************************
@@ -96,6 +107,17 @@ void	InputManager::initKeys(void)
 	this->t = Key(GLFW_KEY_T);
 	this->tab = Key(GLFW_KEY_TAB);
 	this->alt = Key(GLFW_KEY_LEFT_ALT);
+	this->_0 = Key(GLFW_KEY_0);
+	this->_1 = Key(GLFW_KEY_1);
+	this->_2 = Key(GLFW_KEY_2);
+	this->_3 = Key(GLFW_KEY_3);
+	this->_4 = Key(GLFW_KEY_4);
+	this->_5 = Key(GLFW_KEY_5);
+	this->_6 = Key(GLFW_KEY_6);
+	this->_7 = Key(GLFW_KEY_7);
+	this->_8 = Key(GLFW_KEY_8);
+	this->_9 = Key(GLFW_KEY_9);
+	this->del = Key(GLFW_KEY_BACKSPACE);
 }
 
 
@@ -118,4 +140,15 @@ void	InputManager::copyKeys(const InputManager &obj)
 	this->t = obj.t;
 	this->tab = obj.tab;
 	this->alt = obj.alt;
+	this->_0 = obj._0;
+	this->_1 = obj._1;
+	this->_2 = obj._2;
+	this->_3 = obj._3;
+	this->_4 = obj._4;
+	this->_5 = obj._5;
+	this->_6 = obj._6;
+	this->_7 = obj._7;
+	this->_8 = obj._8;
+	this->_9 = obj._9;
+	this->del = obj.del;
 }

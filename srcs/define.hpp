@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/21 19:08:36 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:49:52 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,9 @@
 # define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_INTENSITY 10
 # define FILLING_VELOCITY 20
+# define GENERATE_TIME_BEFORE_NEW_PARTICULE 0.1f
+# define GENERATE_INTENSITY 10
+# define GENERATE_START_POS MAP_SIZE / 2, MAP_MAX_HEIGHT, MAP_SIZE / 2
 # define WAVE_VELOCITY 42
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
@@ -87,6 +90,7 @@
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
 # define DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR COLOR_FFFFFF
 
+# define ENTRYTEXT_WITDH_CHAR 20
 # define PANNEL_COLOR COLOR_6C3737
 # define PANNEL_MOVE_SPEED 200
 

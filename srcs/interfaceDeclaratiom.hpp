@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:22:54 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:17:37 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define INTERFACEDECLARATION_HPP
 
 # include <model/Pannel.hpp>
+# include <engine/maths/Vec3.hpp>
 # include <model/WaterSimulation.hpp>
 
 typedef struct s_simulationVariable
@@ -25,6 +26,10 @@ typedef struct s_simulationVariable
 	bool				isFilling;
 	float				fillingIntensity;
 	float				fillingDelay;
+	bool				isGenerate;
+	float				generateIntensity;
+	float				generateDelay;
+	Vec3				generatePos;
 	int					waveThickess;
 	int					waveHeight;
 	float				waveVelocity;
@@ -50,6 +55,7 @@ void	moveWavePannel(void *arg);
 void	moveRainPannel(void *arg);
 void	moveFillingPannel(void *arg);
 void	moveSettingsPannel(void *arg);
+void	moveGeneratePannel(void *arg);
 void	resetPool(void *arg);
 
 #endif

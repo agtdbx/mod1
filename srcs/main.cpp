@@ -13,6 +13,7 @@
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
 #include <model/Slider.hpp>
+#include <model/TextEntry.hpp>
 #include <model/WaterSimulation.hpp>
 
 void		loadTexture(
@@ -92,6 +93,9 @@ int	main(int argc, char **argv)
 
 	Button::mouse = &inputManager.mouse;
 	Slider::mouse = &inputManager.mouse;
+	TextEntry::mouse = &inputManager.mouse;
+	TextEntry::inputManager = &inputManager;
+	TextEntry::textureManager = &textureManager;
 
 	try
 	{
@@ -107,8 +111,8 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	
 	initUi(&sVar, &textureManager, &simulation);
@@ -134,6 +138,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(120, 0);
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
+				sVar.pannelVector[6].addPosToGo(-120, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
 				sVar.pannelVector[5].addPosToGo(0, 300);
 			}
@@ -144,6 +149,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(-120, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
+				sVar.pannelVector[6].addPosToGo(120, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
 				sVar.pannelVector[5].addPosToGo(0, -300);
 			}
@@ -168,6 +174,8 @@ int	main(int argc, char **argv)
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
+
+			// std::cout << "value : " << sVar.pannelVector[6][(char) 0].getValue() << std::endl;
 
 		}
 

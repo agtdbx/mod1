@@ -216,6 +216,7 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 	this->computePredictedPositions(shaderManager, delta); // gpu
 	this->putParticlesInGrid(shaderManager); // cpu
 	this->computeDensity(shaderManager); // gpu
+	this->computeMapDensity(shaderManager); // gpu
 	this->calculatesAndApplyPressure(shaderManager, delta); // gpu
 	this->updatePositions(shaderManager, terrain, delta); // gpu
 }

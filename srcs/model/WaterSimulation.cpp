@@ -58,6 +58,7 @@ WaterSimulation::WaterSimulation(void)
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
+	this->generateMapDensity();
 }
 
 
@@ -82,6 +83,7 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
+	this->generateMapDensity();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -99,6 +101,9 @@ WaterSimulation::~WaterSimulation()
 
 	glDeleteBuffers(1, &this->textureBufferDensities);
 	glDeleteTextures(1, &this->textureDensities);
+
+	glDeleteBuffers(1, &this->textureBufferMapDensities);
+	glDeleteTextures(1, &this->textureMapDensities);
 
 	glDeleteBuffers(1, &this->textureBufferGridFlat);
 	glDeleteTextures(1, &this->textureGridFlat);
@@ -155,6 +160,9 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 
 void	WaterSimulation::addWater(glm::vec3 position)
 {
+	if (this->nbParticules >= NB_MAX_PARTICLES)
+		return ;
+
 	if (this->needToUpdateBuffers == false)
 	{
 		this->positionsFromBuffer();

@@ -132,6 +132,12 @@ void	WaterSimulation::computeDensity(
 }
 
 
+void	computeMapDensity(ShaderManager *shaderManager)
+{
+
+}
+
+
 void	WaterSimulation::calculatesAndApplyPressure(
 			ShaderManager *shaderManager,
 			float delta)

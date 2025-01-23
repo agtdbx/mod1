@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/23 16:05:55 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:54:16 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
 # define CAMERA_ROTATION_SPEED 42.0
 # define CAMERA_ROTATION_SPEED_MOUSE 0.1
 
+# define NB_MAX_PARTICLES 100000
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
 # define COLLISION_ENERGY_KEEP 0.5

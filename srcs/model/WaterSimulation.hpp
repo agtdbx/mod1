@@ -48,6 +48,7 @@ private:
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
+							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets,
 							textureBufferRenderGridFlat, textureRenderGridFlat,
@@ -56,6 +57,7 @@ private:
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
 	void		generateFlatGrid(void);
+	void		generateMapDensity(void);
 
 	void		positionsToBuffer(void);
 	void		positionsFromBuffer(void);
@@ -73,6 +75,7 @@ private:
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
+	void		computeMapDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };

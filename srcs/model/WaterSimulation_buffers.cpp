@@ -19,6 +19,9 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferDensities);
 	glGenTextures(1, &this->textureDensities);
 
+	glGenBuffers(1, &this->textureBufferMapDensities);
+	glGenTextures(1, &this->textureMapDensities);
+
 	glGenBuffers(1, &this->textureBufferGridFlat);
 	glGenTextures(1, &this->textureGridFlat);
 
@@ -70,6 +73,19 @@ void	WaterSimulation::generateFlatGrid(void)
 		this->renderGridFlatSize += cellSize;
 		this->renderGridOffsetsSize++;
 	}
+}
+
+
+void	WaterSimulation::generateMapDensity(void)
+{
+	std::vector<float>	mapDensity;
+
+	for (int i = 0; i < this->gridSize; i++)
+		mapDensity.push_back(0.0f);
+
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridSize,
+					mapDensity.data(), GL_DYNAMIC_DRAW);
 }
 
 

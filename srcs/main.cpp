@@ -311,10 +311,9 @@ static void	draw(
 		pannel.renderMesh(shaderManager);
 	}
 
-	// test.renderMesh(shaderManager);
 	terrain->renderMesh(camera, shaderManager);
-	simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
-	// simulation->drawTest(camera, shaderManager, terrain, &sVar->watercolor);
+	// simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
+	simulation->drawTest(camera, shaderManager, terrain, &sVar->watercolor);
 
 	// Display the new image
 	glfwSwapBuffers(window);

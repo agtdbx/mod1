@@ -1,0 +1,97 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(r32f, binding = 0) uniform imageBuffer densitiesBuffer;
+
+uniform float			smoothingRadius;
+uniform float			smoothingScale;
+uniform float			waterMass;
+uniform int				gridW;
+uniform int				gridH;
+uniform int				gridD;
+uniform int				idHsize;
+uniform int				gridSize;
+uniform samplerBuffer	gridBuffer;
+uniform int				offsetsSize;
+uniform samplerBuffer	offsetsBuffer;
+uniform samplerBuffer	positionsBuffer;
+
+float	vecLength(vec3 vec)
+{
+	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+}
+
+float	smoothingKernel(float dst)
+{
+	if (dst > smoothingRadius)
+		return (0.0);
+
+	return (pow(smoothingRadius - dst, 2) * smoothingScale);
+}
+
+float	calculateDensity(vec3 position)
+{
+	float	density, dst, influence;
+	int		px, py, pz, gx, gy, gz, gid, startId, endId, waterId;
+	vec3	pos;
+
+	density = 0.0;
+	px = int(position.x / smoothingRadius);
+	py = int(position.y / smoothingRadius);
+	pz = int(position.z / smoothingRadius);
+
+	for (int cx = -1; cx <= 1; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= gridW)
+			continue;
+
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= gridD)
+					continue;
+
+				gid = gx + gz * gridW + gy * idHsize;
+				startId = int(texelFetch(offsetsBuffer, gid).r);
+				if (gid + 1 < offsetsSize)
+					endId = int(texelFetch(offsetsBuffer, gid + 1).r);
+				else
+					endId = gridSize;
+
+				for (int i = startId; i < endId; i++)
+				{
+					waterId = int(texelFetch(gridBuffer, i).r);
+					pos = texelFetch(positionsBuffer, waterId).rgb;
+					dst = vecLength(pos - position);
+					influence = smoothingKernel(dst);
+					density += waterMass * influence;
+				}
+			}
+		}
+	}
+
+	return (density);
+}
+
+void main()
+{
+	int		particleIndex;
+	float	density;
+	vec3	position;
+
+	particleIndex = int(gl_GlobalInvocationID.x);
+	position = texelFetch(positionsBuffer, particleIndex).rgb;
+
+	density = calculateDensity(position);
+
+	// Write the value to the buffer
+	imageStore(densitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
+}

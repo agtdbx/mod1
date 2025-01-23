@@ -28,7 +28,11 @@ uniform samplerBuffer	offsetsBuffer;
 uniform samplerBuffer	positionsBuffer;
 uniform samplerBuffer	densitiesBuffer;
 
-uniform float			terrainCellSize;
+uniform float			smoothingRadius; // TODO: CHECK IF THEY CAN BE REMOVE
+uniform float			smoothingScale;
+uniform float			waterMass;
+
+uniform int				terrainCellSize;
 uniform int				terrainGridW;
 uniform int				terrainGridH;
 uniform int				terrainGridD;
@@ -257,7 +261,7 @@ s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 }
 
 
-bool	hitTriangle(
+float	hitTriangle(
 			vec3 rayPos, vec3 rayDir, vec3 p1, vec3 p2, vec3 p3)
 {
 	vec3	edge_1, edge_2, normal, ray_cross_e2, s, s_cross_e1;
@@ -273,39 +277,39 @@ bool	hitTriangle(
 	ray_cross_e2 = cross(rayDir, edge_2);
 	det = dot(edge_1, ray_cross_e2);
 	if (det > -0.000001)
-		return (false);
+		return (-1.0);
 
 	inv_det = 1.0 / det;
 	s = rayPos - p1;
 	u = inv_det * dot(s, ray_cross_e2);
 	if (u < 0.0 || u > 1.0)
-		return (false);
+		return (-1.0);
 
 	s_cross_e1 = cross(s, edge_1);
 	v = inv_det * dot(rayDir, s_cross_e1);
 	if (v < 0.0 || v + u > 1.0)
-		return (false);
+		return (-1.0);
 
-	return (true);
+	return (inv_det * dot(edge_2, s_cross_e1));
 }
 
 
-// Ray marching
-bool	checkIntersectionWithTerrain(
+// Terrain distance
+float	checkIntersectionWithTerrain(
 			vec3 rayPos, vec3 rayDir, int gx, int gy, int gz)
 {
 	int		gid, startId, endId, rectangleId;
 	vec3	position, vecX, vecZ, vecXZ, normal, dirToRect,
 			interPos, interLocalPos;
 	vec3	pul, pur, pdl, pdr;
-	float	denom, dist, interLocalx, interLocalz;
+	float	denom, dist1, dist2, interLocalx, interLocalz;
 
 	if (gx < 0 || gx >= terrainGridW)
-		return (false);
+		return (-1.0);
 	if (gy < 0 || gy >= terrainGridH)
-		return (false);
+		return (-1.0);
 	if (gz < 0 || gz >= terrainGridD)
-		return (false);
+		return (-1.0);
 
 	gid = gx + gz * terrainGridW + gy * terrainIdHsize;
 		startId = int(texelFetch(terrainOffsetsBuffer, gid).r);
@@ -329,97 +333,207 @@ bool	checkIntersectionWithTerrain(
 		pdl = position + vecZ;
 		pdr = position + vecXZ;
 
-		// if (!hitTriangle(rayPos, rayDir, pul, pur, pdl))
-		// if (!hitTriangle(rayPos, rayDir, pdl, pur, pdr))
-		if (!hitTriangle(rayPos, rayDir, pul, pur, pdl)
-			&& !hitTriangle(rayPos, rayDir, pdl, pur, pdr))
+		dist1 = hitTriangle(rayPos, rayDir, pul, pur, pdl);
+		dist2 = hitTriangle(rayPos, rayDir, pdl, pur, pdr);
+		if (dist1 == -1.0 && dist2 == -1.0)
 			continue;
 
-		return (true);
+		if (dist1 == -1.0)
+			return (dist2);
+		if (dist2 == -1.0)
+			return (dist1);
+		if (dist1 < dist2)
+			return (dist1);
+		return (dist2);
 	}
 
-
-	return (false);
+	return (-1.0);
 }
 
 
-float interWithAllTriangles(vec3 rayPos, vec3 rayDir)
+float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDist)
 {
-	float	dst = cameraFar + 2;
-	vec3	position, vecX, vecZ, vecXZ;
-	vec3	pul, pur, pdl, pdr;
+	int		gx, gy, gz;
+	float	gpx, gpy, gpz, dx, dy, dz, dist, distX, distY, distZ, totalDist;
 
-	for (int i = 0; i < terrainGridSize; i++)
+	const float gridMaxX = gridW * terrainCellSize;
+	const float gridMaxY = gridH * terrainCellSize;
+	const float gridMaxZ = gridD * terrainCellSize;
+	const float precisionLimit = 0.1;
+
+	rayPos += rayDir;
+
+	totalDist = startDist;
+	while (totalDist < maxDist)
 	{
-		int rectangleId = int(texelFetch(terrainGridBuffer, i).r);
+		// Calculate grid pos
+		gx = int(rayPos.x / terrainCellSize);
+		gy = int(rayPos.y / terrainCellSize);
+		gz = int(rayPos.z / terrainCellSize);
 
-		position = texelFetch(terrainDataBuffer, rectangleId * 5).rgb;
-		vecX = texelFetch(terrainDataBuffer, rectangleId * 5 + 1).rgb;
-		vecZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 2).rgb;
-		vecXZ = texelFetch(terrainDataBuffer, rectangleId * 5 + 3).rgb;
+		// Check intersection with triangles
+		dist = checkIntersectionWithTerrain(rayPos, rayDir, gx, gy, gz);
+		if (dist != -1.0)
+			return (totalDist + dist);
 
-		pul = position;
-		pur = position + vecX;
-		pdl = position + vecZ;
-		pdr = position + vecXZ;
+		// Get real world coordonnate of grid
+		gpx = gx * terrainCellSize;
+		gpy = gy * terrainCellSize;
+		gpz = gz * terrainCellSize;
 
-		// if (hitTriangle(rayPos, rayDir, pul, pur, pdl))
-		// if (hitTriangle(rayPos, rayDir, pdl, pur, pdr))
-		if (hitTriangle(rayPos, rayDir, pul, pur, pdl)
-			|| hitTriangle(rayPos, rayDir, pdl, pur, pdr))
-			return (0.0);
+		// Compute axis differences
+		dx = 1000.0;
+		if (rayDir.x < 0.0)
+			dx = rayPos.x - gpx;
+		else if (rayDir.x > 0.0)
+			dx = -(rayPos.x - (gpx + terrainCellSize)) - precisionLimit;
+
+		dy = 1000.0;
+		if (rayDir.y < 0.0)
+			dy = rayPos.y - gpy;
+		else if (rayDir.y > 0.0)
+			dy = -(rayPos.y - (gpy + terrainCellSize)) - precisionLimit;
+
+		dz = 1000.0;
+		if (rayDir.z < 0.0)
+			dz = rayPos.z - gpz;
+		else if (rayDir.z > 0.0)
+			dz = -(rayPos.z - (gpz + terrainCellSize)) - precisionLimit;
+
+		// Compute distances for each axis
+		distX = 1000.0;
+		if (dx != 1000.0)
+			distX = dx / abs(rayDir.x);
+
+		distY = 1000.0;
+		if (dy != 1000.0)
+			distY = dy / abs(rayDir.y);
+
+		distZ = 1000.0;
+		if (dz != 1000.0)
+			distZ = dz / abs(rayDir.z);
+
+		// Get closer dist
+		dist = min(distX, min(distY, distZ));
+		if (dist < precisionLimit)
+			dist = precisionLimit;
+
+		// Advance of a new step
+		rayPos += rayDir * dist;
+		totalDist += dist;
 	}
 
-	return (dst);
+	return (cameraFar);
 }
 
 
-int	hitTerrain(vec3 rayPos, vec3 rayDir)
+// Get density
+float	smoothingKernel(float dst)
+{
+	if (dst > smoothingRadius)
+		return (0.0);
+
+	return (pow(smoothingRadius - dst, 2) * smoothingScale);
+}
+
+float	calculateDensity(vec3 position)
+{
+	float	density, dst, influence;
+	int		px, py, pz, gx, gy, gz, gid, startId, endId, waterId;
+	vec3	pos;
+
+	density = 0.0;
+	px = int(position.x / smoothingRadius);
+	py = int(position.y / smoothingRadius);
+	pz = int(position.z / smoothingRadius);
+
+	for (int cx = -1; cx <= 1; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= gridW)
+			continue;
+
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= gridD)
+					continue;
+
+				gid = gx + gz * gridW + gy * idHsize;
+				startId = int(texelFetch(offsetsBuffer, gid).r);
+				if (gid + 1 < offsetsSize)
+					endId = int(texelFetch(offsetsBuffer, gid + 1).r);
+				else
+					endId = gridSize;
+
+				for (int i = startId; i < endId; i++)
+				{
+					waterId = int(texelFetch(gridBuffer, i).r);
+					pos = texelFetch(positionsBuffer, waterId).rgb;
+					dst = vecLength(pos - position);
+					influence = smoothingKernel(dst);
+					density += waterMass * influence;
+				}
+			}
+		}
+	}
+
+	return (density);
+}
+
+
+float	getDensityAtPos(vec3 pos)
+{
+	return (calculateDensity(pos));
+}
+
+
+vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 {
 	s_inter_map_info	hitMapInfo;
-	int	gx, gy, gz, ngx, ngy, ngz;
-	float	dist, distGround, maxDist;
+	float	dist, distGround, distTriangle, distTerrain, maxDist,
+			densityAlongRay;
+
+	const float	maxDensity = 10.0;
 
 	hitMapInfo = hitMap(rayPos, rayDir);
 	if (!hitMapInfo.inter_map)
-		return (-1);
+		return (vec4(0.0, 0.0, 0.0, 0.0));
 
 	dist = hitMapInfo.dst_map_min;
 	rayPos += rayDir * dist;
 	distGround = hitMapInfo.dst_to_ground;
 	maxDist = hitMapInfo.dst_map_max;
+	distTriangle = hitTriangleTerrain(rayPos, rayDir, dist,
+										min(distGround, maxDist));
 
-	// float triDst = interWithAllTriangles(rayPos, rayDir);
-	// if (triDst < maxDist)
-	// 	return (2);
+	distTerrain = min(distGround, distTriangle);
 
-	gx = -1;
-	gy = -1;
-	gz = -1;
-
+	densityAlongRay = 0.0;
 	while (dist <= maxDist)
 	{
 		// Check if ray collide with map bottom
-		if (dist >= distGround)
-			return (1);
+		if (dist >= distTerrain)
+			break;
 
-		ngx = int(rayPos.x / terrainCellSize);
-		ngy = int(rayPos.y / terrainCellSize);
-		ngz = int(rayPos.z / terrainCellSize);
-		if (ngx != gx || ngy != gy || ngz != gz)
+		densityAlongRay += getDensityAtPos(rayPos);
+		if (densityAlongRay > maxDensity)
 		{
-			gx = ngx;
-			gy = ngy;
-			gz = ngz;
-			if (checkIntersectionWithTerrain(rayPos, rayDir, gx, gy, gz))
-				return (2);
+			densityAlongRay = maxDensity;
+			break;
 		}
 
 		rayPos += rayDir * rayStep;
 		dist += rayStep;
 	}
 
-	return (-2);
+	return (vec4(waterColor, densityAlongRay / maxDensity));
 }
 
 
@@ -429,21 +543,5 @@ void main()
 	vec3	fakeCameraPos = cameraPos - cameraFront * 2;
 	vec3	rayDir = normalize(rayPos - fakeCameraPos);
 
-	// The default color to transparent
-	int res = hitTerrain(rayPos, rayDir);
-	// Non hit case
-	if (res == -1)
-		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-	else if (res == -2)
-		FragColor = vec4(0.5, 0.0, 0.0, 1.0);
-
-	// Hit case
-	else if (res == 1)
-		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
-	else if (res == 2)
-		FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-
-	// WTF case
-	else
-		FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	FragColor = getPixelColor(rayPos, rayDir);
 }

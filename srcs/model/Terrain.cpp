@@ -372,14 +372,13 @@ void	Terrain::createMesh(void)
 void	Terrain::generateGridTextures(void)
 {
 	// Init terrain grid size
-	int	terrain_cell_size = TERRAIN_CELL_SIZE;
-	this->terrainGridW = MAP_SIZE / terrain_cell_size;
-	if (MAP_SIZE > terrain_cell_size && MAP_SIZE % terrain_cell_size != 0)
+	this->terrainGridW = MAP_SIZE / TERRAIN_CELL_SIZE;
+	if (MAP_SIZE > TERRAIN_CELL_SIZE && MAP_SIZE % TERRAIN_CELL_SIZE != 0)
 		this->terrainGridW++;
 
-	this->terrainGridH = MAP_MAX_HEIGHT / terrain_cell_size;
-	if (MAP_MAX_HEIGHT > terrain_cell_size
-		&& (int)MAP_MAX_HEIGHT % terrain_cell_size != 0)
+	this->terrainGridH = MAP_MAX_HEIGHT / TERRAIN_CELL_SIZE;
+	if (MAP_MAX_HEIGHT > TERRAIN_CELL_SIZE
+		&& (int)MAP_MAX_HEIGHT % TERRAIN_CELL_SIZE != 0)
 		this->terrainGridH++;
 
 	this->terrainGridD = this->terrainGridW;

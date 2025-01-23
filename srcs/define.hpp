@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/22 19:00:47 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:05:55 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 # define MAX_HEIGHT 50
 # define MAP_SIZE 200
 # define TERRAIN_PRECISION 0.01
-# define TERRAIN_CELL_SIZE 5.0f
+# define TERRAIN_CELL_SIZE 3
 
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f

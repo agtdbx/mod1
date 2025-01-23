@@ -284,7 +284,11 @@ void	WaterSimulation::draw(
 								this->textureBufferDensities,
 								this->textureDensities);
 
-	giveFloatToShader(shaderId, "terrainCellSize", TERRAIN_CELL_SIZE);
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS); // TODO: CHECK IF THEY CAN BE REMOVE
+	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
+	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
+
+	giveIntToShader(shaderId, "terrainCellSize", TERRAIN_CELL_SIZE);
 	giveIntToShader(shaderId, "terrainGridW", sizes[0]);
 	giveIntToShader(shaderId, "terrainGridH", sizes[1]);
 	giveIntToShader(shaderId, "terrainGridD", sizes[2]);

@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 17:54:14 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:29:50 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,12 @@ void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
 	static Random	random;
 
-	for (size_t i = 0; i < sVar->fillingIntensity; i++)
+	for (size_t i = 0; i < sVar->generateIntensity; i++)
 	{
 		// std::cout << "deviationFactor : " << deviationFactor << std::endl;
-		simulation->addWater(glm::vec3(sVar->generatePos.x + random.random(),
+		simulation->addWater(glm::vec3(sVar->generatePos.x + (random.random() * 2) - 1,
 										sVar->generatePos.y + random.random(),
-										sVar->generatePos.z + random.random()));
+										sVar->generatePos.z + (random.random() * 2) - 1));
 	}
 }
 
@@ -207,9 +207,9 @@ void	moveGeneratePannel(void *arg)
 
 	isHide = !isHide;
 	if (isHide)
-		pannel->addPosToGo(-120, 0);
+		pannel->addPosToGo(-240, 0);
 	else
-		pannel->addPosToGo(120, -0);
+		pannel->addPosToGo(240, -0);
 }
 
 void	resetPool(void *arg)

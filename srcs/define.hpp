@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/23 18:00:54 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:26:13 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,11 @@
 # define GENERATE_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define GENERATE_INTENSITY 10
 # define GENERATE_START_POS MAP_SIZE / 2, MAP_MAX_HEIGHT, MAP_SIZE / 2
+# define GENERATE_PADDING SMOOTHING_RADIUS
+# define GENERATE_MAX_X MAP_SIZE - GENERATE_PADDING
+# define GENERATE_MAX_Z MAP_SIZE - GENERATE_PADDING
+# define GENERATE_MIN_X GENERATE_PADDING
+# define GENERATE_MIN_Z GENERATE_PADDING
 # define WAVE_VELOCITY 42
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10

@@ -138,7 +138,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(120, 0);
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
-				sVar.pannelVector[6].addPosToGo(-120, 0);
+				sVar.pannelVector[6].addPosToGo(-240, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
 				sVar.pannelVector[5].addPosToGo(0, 300);
 			}
@@ -149,7 +149,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(-120, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
-				sVar.pannelVector[6].addPosToGo(120, 0);
+				sVar.pannelVector[6].addPosToGo(240, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
 				sVar.pannelVector[5].addPosToGo(0, -300);
 			}
@@ -174,15 +174,16 @@ int	main(int argc, char **argv)
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
+			//generate parameter
 			if (sVar.pannelVector[6][(char) 0].getValue().size())
 			{
 				sVar.generatePos.x = std::stoi(sVar.pannelVector[6][(char) 0].getValue());
 				if (sVar.generatePos.x >= MAP_SIZE)
-					sVar.generatePos.x = MAP_SIZE - 1;
+					sVar.generatePos.x = GENERATE_MAX_X;
 			}
 			else
 			{
-				sVar.generatePos.x = 0;
+				sVar.generatePos.x = GENERATE_MIN_X;
 			}
 			if (sVar.pannelVector[6][(char) 1].getValue().size())
 			{
@@ -192,19 +193,20 @@ int	main(int argc, char **argv)
 			}
 			else
 			{
-				sVar.generatePos.y = 0;
+				sVar.generatePos.y = GENERATE_PADDING;
 			}
 				if (sVar.pannelVector[6][(char) 2].getValue().size())
 			{
 				sVar.generatePos.z = std::stoi(sVar.pannelVector[6][(char) 2].getValue());
 				if (sVar.generatePos.z >= MAP_SIZE)
-					sVar.generatePos.z = MAP_SIZE - 1;
+					sVar.generatePos.z = GENERATE_MAX_Z;
 			}
 			else
 			{
-				sVar.generatePos.z = 0;
+				sVar.generatePos.z = GENERATE_MIN_Z;
 			}
-
+			sVar.generateIntensity =  sVar.pannelVector[6][0.0f].getValue() * 2 * GENERATE_INTENSITY;
+			sVar.generateDelay =  sVar.pannelVector[6][1.0f].getValue() * 2 * GENERATE_TIME_BEFORE_NEW_PARTICULE;
 
 			// std::cout << "value : " << sVar.pannelVector[6][(char) 0].getValue() << std::endl;
 
@@ -299,7 +301,7 @@ static void	computation(
 		timeGenerateParticuleAdd += deltaConst;
 	else
 		timeGenerateParticuleAdd += delta;
-	if (timeGenerateParticuleAdd >= sVar->fillingDelay)
+	if (timeGenerateParticuleAdd >= sVar->generateDelay)
 	{
 		timeGenerateParticuleAdd -= sVar->generateDelay;
 		if (sVar->isGenerate && (!sVar->isStopped || deltaConst))

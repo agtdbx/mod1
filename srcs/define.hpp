@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/24 14:39:35 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 15:07:54 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
 # define VISCOSITY_FORCE 0.1f
+# define WATER_DENSITY 0.003
 
 # define RENDER_CELL_SIZE 20.0f
 # define RAY_STEP 0.1f

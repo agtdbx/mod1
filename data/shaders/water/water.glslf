@@ -17,6 +17,7 @@ uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform vec3			waterColor;
+uniform float			waterDensity;
 
 uniform int				gridW;
 uniform int				gridH;
@@ -517,7 +518,7 @@ float	getDensityAtPos(vec3 pos)
 	// Merge density on z axis
 	density = lerp(densityF, densityB, dz);
 	// return (density);
-	if (density > 0.003)
+	if (density > waterDensity)
 		return (0.1);
 	return (0.0);
 }

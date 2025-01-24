@@ -173,6 +173,8 @@ int	main(int argc, char **argv)
 			sVar.watercolor = glm::vec3(sVar.pannelVector[5][2.0f].getValue(),
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
+			sVar.waterDensity = sVar.pannelVector[5][5.0f].getValue() * (2) *  WATER_DENSITY;
+			// sVar.waterDensity = sVar.pannelVector[5][5.0f].getValue() * ( sVar.pannelVector[5][5.0f].getValue()) *  WATER_DENSITY;
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
 			//generate parameter
 			if (sVar.pannelVector[6][(char) 0].getValue().size())
@@ -273,6 +275,8 @@ static void	computation(
 		double	avg = timePrintFps / (double)nbCall;
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
+		std::cout << "water density : " << sVar->waterDensity << std::endl;
+
 		timePrintFps -= PRINT_FPS_TIME;
 		nbCall = 0;
 	}
@@ -388,7 +392,7 @@ static void	draw(
 
 	terrain->renderMesh(camera, shaderManager);
 	if (!sVar->drawDebug)
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
 	else
 		simulation->drawDebug(camera, shaderManager, terrain, &sVar->watercolor);
 

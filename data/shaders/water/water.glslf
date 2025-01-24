@@ -12,6 +12,7 @@ uniform float			cameraFar;
 uniform float			planeWidth;
 uniform float			planeHeight;
 uniform float			rayStep;
+uniform float			smoothingRadius;
 uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
@@ -25,12 +26,8 @@ uniform int				gridSize;
 uniform int				offsetsSize;
 uniform samplerBuffer	gridBuffer;
 uniform samplerBuffer	offsetsBuffer;
-uniform samplerBuffer	positionsBuffer;
 uniform samplerBuffer	mapDensitiesBuffer;
 
-uniform float			smoothingRadius; // TODO: CHECK IF THEY CAN BE REMOVE
-uniform float			smoothingScale;
-uniform float			waterMass;
 
 uniform int				terrainCellSize;
 uniform int				terrainGridW;
@@ -430,7 +427,7 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 // Get density
 float	getDensityAtMapPoint(int x, int y, int z)
 {
-	if (x < 0 || x >= gridW || y < 0 || y >= gridH || z < 0 || z >= gridD)
+	if (x >= gridW || y >= gridH || z >= gridD)
 		return (0.0);
 
 	int	tid = x + z * gridW + y * idHsize;
@@ -447,7 +444,7 @@ float	lerp(float start, float end, float ratio)
 
 float	getDensityAtPos(vec3 pos)
 {
-	int		gx, gy, gz;
+	int		gx, gy, gz, ngx, ngy, ngz;
 	float	densityFUL, densityFUR, densityFDL, densityFDR,
 			densityBUL, densityBUR, densityBDL, densityBDR,
 			densityFU, densityFD, densityBU, densityBD,
@@ -459,21 +456,53 @@ float	getDensityAtPos(vec3 pos)
 	gx = int(pos.x / smoothingRadius);
 	gy = int(pos.y / smoothingRadius);
 	gz = int(pos.z / smoothingRadius);
+	ngx = gx + 1;
+	ngy = gy + 1;
+	ngz = gz + 1;
 
 	// Get ratio for each axis
 	dx = (pos.x - (gx * smoothingRadius)) / smoothingRadius;
 	dy = (pos.y - (gy * smoothingRadius)) / smoothingRadius;
 	dz = (pos.z - (gz * smoothingRadius)) / smoothingRadius;
 
+
 	// Get density for 8 cell around pos
+	// densityFUL = getDensityAtMapPoint(gx, gy, gz);
+	// densityFUR = getDensityAtMapPoint(gx + 1, gy, gz);
+	// densityFDL = getDensityAtMapPoint(gx, gy + 1, gz);
+	// densityFDR = getDensityAtMapPoint(gx + 1, gy + 1, gz);
+	// densityBUL = getDensityAtMapPoint(gx, gy, gz + 1);
+	// densityBUR = getDensityAtMapPoint(gx + 1, gy, gz + 1);
+	// densityBDL = getDensityAtMapPoint(gx, gy + 1, gz + 1);
+	// densityBDR = getDensityAtMapPoint(gx + 1, gy + 1, gz + 1);
+
 	densityFUL = getDensityAtMapPoint(gx, gy, gz);
-	densityFUR = getDensityAtMapPoint(gx + 1, gy, gz);
-	densityFDL = getDensityAtMapPoint(gx, gy + 1, gz);
-	densityFDR = getDensityAtMapPoint(gx + 1, gy + 1, gz);
-	densityBUL = getDensityAtMapPoint(gx, gy, gz + 1);
-	densityBUR = getDensityAtMapPoint(gx + 1, gy, gz + 1);
-	densityBDL = getDensityAtMapPoint(gx, gy + 1, gz + 1);
-	densityBDR = getDensityAtMapPoint(gx + 1, gy + 1, gz + 1);
+	densityFUR = getDensityAtMapPoint(ngx, gy, gz);
+	densityFDL = getDensityAtMapPoint(gx, ngy, gz);
+	densityFDR = getDensityAtMapPoint(ngx, ngy, gz);
+	densityBUL = getDensityAtMapPoint(gx, gy, ngz);
+	densityBUR = getDensityAtMapPoint(ngx, gy, ngz);
+	densityBDL = getDensityAtMapPoint(gx, ngy, ngz);
+	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
+
+	// densityFUL = getDensityAtMapPoint(gx, gy, gz);
+	// densityFUR = getDensityAtMapPoint(gx, gy, gz);
+	// densityFDL = getDensityAtMapPoint(gx, gy, gz);
+	// densityFDR = getDensityAtMapPoint(gx, gy, gz);
+	// densityBUL = getDensityAtMapPoint(gx, gy, gz);
+	// densityBUR = getDensityAtMapPoint(gx, gy, gz);
+	// densityBDL = getDensityAtMapPoint(gx, gy, gz);
+	// densityBDR = getDensityAtMapPoint(gx, gy, gz);
+
+	// float tkt = getDensityAtMapPoint(gx, gy, gz);
+	// densityFUL = tkt;
+	// densityFUR = tkt;
+	// densityFDL = tkt;
+	// densityFDR = tkt;
+	// densityBUL = tkt;
+	// densityBUR = tkt;
+	// densityBDL = tkt;
+	// densityBDR = tkt;
 
 	// Merge density on x axis
 	densityFU = lerp(densityFUL, densityFUR, dx);
@@ -487,8 +516,10 @@ float	getDensityAtPos(vec3 pos)
 
 	// Merge density on z axis
 	density = lerp(densityF, densityB, dz);
-	return (density);
-	// return (getDensityAtMapPoint(gx, gy, gz));
+	// return (density);
+	if (density > 0.003)
+		return (0.1);
+	return (0.0);
 }
 
 
@@ -498,7 +529,7 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	float	dist, distGround, distTriangle, distTerrain, maxDist,
 			densityAlongRay;
 
-	const float	maxDensity = 20.0;
+	const float	maxDensity = 10.0;
 
 	hitMapInfo = hitMap(rayPos, rayDir);
 	if (!hitMapInfo.inter_map)
@@ -531,7 +562,7 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 		dist += rayStep;
 	}
 
-	return (vec4(waterColor, densityAlongRay / maxDensity));
+	return (vec4(waterColor, (densityAlongRay / maxDensity) * 0.8));
 }
 
 

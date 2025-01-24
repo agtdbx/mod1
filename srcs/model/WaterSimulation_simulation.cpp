@@ -170,7 +170,7 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 									this->textureMapDensities);
 
 	// Run compute shader
-	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 

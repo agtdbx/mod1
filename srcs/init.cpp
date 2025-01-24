@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 17:54:15 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:39:07 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 
 		//watershader
-		// shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 		shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
+		shaderManager->loadWaterShaderDebugFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 
 		//menu shader
 		shaderManager->loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");
@@ -100,6 +100,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->sprintSpeed = CAMERA_SPRINT_FACTOR;
 	sVar->cameraSensibility = CAMERA_ROTATION_SPEED_MOUSE;
 	sVar->watercolor = DEFAULT_WATER_COLOR;
+	sVar->drawDebug = false;
 
 	//pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W, 0.0f, 230, 250, textureManager->getTexture("noTexture"), PANNEL_COLOR));				//main pannel

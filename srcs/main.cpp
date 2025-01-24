@@ -240,6 +240,9 @@ static void	computation(
 		pannel.tick(delta);
 	}
 
+	if (inputManager->alt.isPressed())
+		sVar->drawDebug = !sVar->drawDebug;
+
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)
 		delta = MINIMUM_SIMULATION_UPDATE;
@@ -312,8 +315,10 @@ static void	draw(
 	}
 
 	terrain->renderMesh(camera, shaderManager);
-	simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
-	// simulation->drawTest(camera, shaderManager, terrain, &sVar->watercolor);
+	if (!sVar->drawDebug)
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor);
+	else
+		simulation->drawDebug(camera, shaderManager, terrain, &sVar->watercolor);
 
 	// Display the new image
 	glfwSwapBuffers(window);

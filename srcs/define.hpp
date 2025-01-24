@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/24 14:33:54 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:39:35 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,14 @@
 # define FILLING_TIME_BEFORE_NEW_PARTICULE 0.1f
 # define FILLING_INTENSITY 10
 # define FILLING_VELOCITY 20
+# define GENERATE_TIME_BEFORE_NEW_PARTICULE 0.1f
+# define GENERATE_INTENSITY 10
+# define GENERATE_START_POS MAP_SIZE / 2, MAP_MAX_HEIGHT, MAP_SIZE / 2
+# define GENERATE_PADDING SMOOTHING_RADIUS
+# define GENERATE_MAX_X MAP_SIZE - GENERATE_PADDING
+# define GENERATE_MAX_Z MAP_SIZE - GENERATE_PADDING
+# define GENERATE_MIN_X GENERATE_PADDING
+# define GENERATE_MIN_Z GENERATE_PADDING
 # define WAVE_VELOCITY 42
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
@@ -89,6 +97,7 @@
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F
 # define DEFAULT_PANNEL_MIDDLE_CURSOR_COLOR COLOR_FFFFFF
 
+# define ENTRYTEXT_WITDH_CHAR 10
 # define PANNEL_COLOR COLOR_6C3737
 # define PANNEL_MOVE_SPEED 200
 

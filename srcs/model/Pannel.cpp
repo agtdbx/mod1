@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 20:32:03 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:31:47 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ Pannel::Pannel(const Pannel &obj)
 	this->baseColor = obj.baseColor;
 	this->buttonList = obj.buttonList;
 	this->sliderList = obj.sliderList;
+	this->textEntryList = obj.textEntryList;
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -112,6 +113,15 @@ Slider& Pannel::operator[](float index)
     return this->sliderList[(int)index];
 }
 
+TextEntry& Pannel::operator[](char index)
+{
+    if (index >= (char)this->textEntryList.size() || index < 0.0f)
+	{
+		throw std::range_error("Pannel error : can't get slider of gived index");
+    }
+    return this->textEntryList[(int)index];
+}
+
 //**** PUBLIC METHODS **********************************************************
 
 
@@ -134,7 +144,10 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	{
 		slider.renderMesh(shaderManager);
 	}
-	
+	for (TextEntry & textEntry : this->textEntryList)
+	{
+		textEntry.renderMesh(shaderManager);
+	}	
 	menuShader = shaderManager->getMenuShader();
 
 	points.push_back(Point2D(Vec2(this->x_screen, this->y_screen), (*color)[0], (*color)[1], (*color)[2]));
@@ -188,6 +201,15 @@ void	Pannel::addSlider(Slider  s)
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
 
+void	Pannel::addTextEntry(TextEntry  t)
+{
+	unsigned int indButton = this->textEntryList.size();
+	this->textEntryList.push_back(t);
+	TextEntry & newButton = this->textEntryList[indButton];
+	glm::vec2 posButton= newButton.getPos();
+	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
+}
+
 void	Pannel::tick(double delta)
 {
 	if (this->x_toGo == this->x_screen && this->y_toGo == this->y_screen)
@@ -227,6 +249,10 @@ void	Pannel::moveButton(float mvx, float mvy)
 	for (Slider & slider : this->sliderList)
 	{
 		slider.setPos(slider.getPos().x + mvx, slider.getPos().y + mvy);
+	}
+	for (TextEntry & textEntry : this->textEntryList)
+	{
+		textEntry.setPos(textEntry.getPos().x + mvx, textEntry.getPos().y + mvy);
 	}
 }
 

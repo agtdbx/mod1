@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaratiom.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 12:38:32 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:42:19 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define INTERFACEDECLARATION_HPP
 
 # include <model/Pannel.hpp>
+# include <engine/maths/Vec3.hpp>
 # include <model/WaterSimulation.hpp>
 
 typedef struct s_simulationVariable
@@ -25,6 +26,10 @@ typedef struct s_simulationVariable
 	bool				isFilling;
 	float				fillingIntensity;
 	float				fillingDelay;
+	bool				isGenerate;
+	float				generateIntensity;
+	float				generateDelay;
+	Vec3				generatePos;
 	int					waveThickess;
 	int					waveHeight;
 	float				waveVelocity;
@@ -42,6 +47,7 @@ void	addWater(void * arg);
 void	changeBoolStatus(void *arg);
 void	updateRain(WaterSimulation *simulation, t_simulationVariable *sVar);
 void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar);
+void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar);
 void	generateWaveWest(void *arg);
 void	generateWaveEst(void *arg);
 void	generateWaveNorth(void *arg);
@@ -51,6 +57,7 @@ void	moveWavePannel(void *arg);
 void	moveRainPannel(void *arg);
 void	moveFillingPannel(void *arg);
 void	moveSettingsPannel(void *arg);
+void	moveGeneratePannel(void *arg);
 void	resetPool(void *arg);
 
 #endif

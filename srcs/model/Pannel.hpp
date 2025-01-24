@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:50:55 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 13:11:38 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/23 15:48:50 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <model/Point2D.hpp>
 # include <model/Button.hpp>
 # include <model/Slider.hpp>
+# include <model/TextEntry.hpp>
 
 class Pannel
 {
@@ -37,6 +38,7 @@ public:
 	Pannel	&operator=(const Pannel &obj);
 	Button& operator[](int);
 	Slider& operator[](float);
+	TextEntry& operator[](char);
 	void	setPos(float x, float y);
 	void	setPosToGo(float x, float y);
 	void	addPosToGo(float x, float y);
@@ -44,6 +46,7 @@ public:
 	void	renderMesh( ShaderManager *shaderManager);
 	void	addButton(Button  b);
 	void	addSlider(Slider  s);
+	void	addTextEntry(TextEntry  t);
 	void	tick(double delta);
 	
 
@@ -53,6 +56,7 @@ private:
 	unsigned int	texture;
 	std::vector<Button>	buttonList;
 	std::vector<Slider>	sliderList;
+	std::vector<TextEntry>	textEntryList;
 
 	void	moveButton(float mvx, float mvy);
 

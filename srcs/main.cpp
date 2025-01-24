@@ -13,6 +13,7 @@
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
 #include <model/Slider.hpp>
+#include <model/TextEntry.hpp>
 #include <model/WaterSimulation.hpp>
 
 void		loadTexture(
@@ -92,6 +93,9 @@ int	main(int argc, char **argv)
 
 	Button::mouse = &inputManager.mouse;
 	Slider::mouse = &inputManager.mouse;
+	TextEntry::mouse = &inputManager.mouse;
+	TextEntry::inputManager = &inputManager;
+	TextEntry::textureManager = &textureManager;
 
 	try
 	{
@@ -107,8 +111,8 @@ int	main(int argc, char **argv)
 		glfwTerminate();
 		return (1);
 	}
-
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	
 	initUi(&sVar, &textureManager, &simulation);
@@ -134,6 +138,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(120, 0);
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
+				sVar.pannelVector[6].addPosToGo(-240, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
 				sVar.pannelVector[5].addPosToGo(0, 300);
 			}
@@ -144,6 +149,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[1].addPosToGo(-120, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
+				sVar.pannelVector[6].addPosToGo(240, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
 				sVar.pannelVector[5].addPosToGo(0, -300);
 			}
@@ -168,6 +174,41 @@ int	main(int argc, char **argv)
 										sVar.pannelVector[5][3.0f].getValue(),
 										sVar.pannelVector[5][4.0f].getValue());
 			sVar.pannelVector[5][7].setColor(sVar.watercolor, BUTTON_BASE_COLOR_TYPE);
+			//generate parameter
+			if (sVar.pannelVector[6][(char) 0].getValue().size())
+			{
+				sVar.generatePos.x = std::stoi(sVar.pannelVector[6][(char) 0].getValue());
+				if (sVar.generatePos.x >= MAP_SIZE)
+					sVar.generatePos.x = GENERATE_MAX_X;
+			}
+			else
+			{
+				sVar.generatePos.x = GENERATE_MIN_X;
+			}
+			if (sVar.pannelVector[6][(char) 1].getValue().size())
+			{
+				sVar.generatePos.y = std::stoi(sVar.pannelVector[6][(char)1].getValue());
+				if (sVar.generatePos.y > MAP_MAX_HEIGHT)
+					sVar.generatePos.y = MAP_MAX_HEIGHT;
+			}
+			else
+			{
+				sVar.generatePos.y = GENERATE_PADDING;
+			}
+				if (sVar.pannelVector[6][(char) 2].getValue().size())
+			{
+				sVar.generatePos.z = std::stoi(sVar.pannelVector[6][(char) 2].getValue());
+				if (sVar.generatePos.z >= MAP_SIZE)
+					sVar.generatePos.z = GENERATE_MAX_Z;
+			}
+			else
+			{
+				sVar.generatePos.z = GENERATE_MIN_Z;
+			}
+			sVar.generateIntensity =  sVar.pannelVector[6][0.0f].getValue() * 2 * GENERATE_INTENSITY;
+			sVar.generateDelay =  sVar.pannelVector[6][1.0f].getValue() * 2 * GENERATE_TIME_BEFORE_NEW_PARTICULE;
+
+			// std::cout << "value : " << sVar.pannelVector[6][(char) 0].getValue() << std::endl;
 
 		}
 
@@ -217,6 +258,7 @@ static void	computation(
 	static double	timePrintFps = 0.0;
 	static double	timeRainningParticuleAdd = 0.0;
 	static double	timeFillingParticuleAdd = 0.0;
+	static double	timeGenerateParticuleAdd = 0.0;
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
@@ -254,6 +296,16 @@ static void	computation(
 		timeFillingParticuleAdd -= sVar->fillingDelay;
 		if (sVar->isFilling && (!sVar->isStopped || deltaConst))
 			fillingPool(simulation, sVar);
+	}
+	if (deltaConst)
+		timeGenerateParticuleAdd += deltaConst;
+	else
+		timeGenerateParticuleAdd += delta;
+	if (timeGenerateParticuleAdd >= sVar->generateDelay)
+	{
+		timeGenerateParticuleAdd -= sVar->generateDelay;
+		if (sVar->isGenerate && (!sVar->isStopped || deltaConst))
+			generateAt(simulation, sVar);
 	}
 	for (Pannel & pannel : sVar->pannelVector)
 	{

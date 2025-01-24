@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 12:39:07 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:41:57 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,24 @@
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
 #include <model/Slider.hpp>
+#include <model/TextEntry.hpp>
 
 void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 {
+
+		//number texture
+		textureManager->addTexture("0", "data/textures/0.png");
+		textureManager->addTexture("1", "data/textures/1.png");
+		textureManager->addTexture("2", "data/textures/2.png");
+		textureManager->addTexture("3", "data/textures/3.png");
+		textureManager->addTexture("4", "data/textures/4.png");
+		textureManager->addTexture("5", "data/textures/5.png");
+		textureManager->addTexture("6", "data/textures/6.png");
+		textureManager->addTexture("7", "data/textures/7.png");
+		textureManager->addTexture("8", "data/textures/8.png");
+		textureManager->addTexture("9", "data/textures/9.png");
+
+
 		//terrain texture
 		textureManager->addTexture("dirt", "data/textures/dirt.png");
 
@@ -30,6 +45,7 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("rain", "data/textures/rainButton.png");
 		textureManager->addTexture("reset", "data/textures/resetButton.png");
 		textureManager->addTexture("filling", "data/textures/fillingButton.png");
+		textureManager->addTexture("generate", "data/textures/generate.png");
 		textureManager->addTexture("wave", "data/textures/waveButton.png");
 		textureManager->addTexture("settings", "data/textures/settings.png");
 
@@ -51,6 +67,13 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("fillingIntensity", "data/textures/fillingIntensity.png");
 		textureManager->addTexture("fillingDelay", "data/textures/fillingDelay.png");
 
+		//generate pannel texture
+		textureManager->addTexture("generateIntensity", "data/textures/generateIntensity.png");
+		textureManager->addTexture("generateDelay", "data/textures/generateDelay.png");
+		textureManager->addTexture("X", "data/textures/X.png");
+		textureManager->addTexture("Y", "data/textures/Y.png");
+		textureManager->addTexture("Z", "data/textures/Z.png");
+
 		//pause & step pannel texture
 		textureManager->addTexture("pause", "data/textures/pause.png");
 		textureManager->addTexture("step", "data/textures/step.png");
@@ -62,6 +85,9 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("green", "data/textures/green.png");
 		textureManager->addTexture("blue", "data/textures/blue.png");
 		textureManager->addTexture("sprintSpeed", "data/textures/sprintSpeed.png");
+
+
+
 
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
@@ -100,6 +126,10 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->sprintSpeed = CAMERA_SPRINT_FACTOR;
 	sVar->cameraSensibility = CAMERA_ROTATION_SPEED_MOUSE;
 	sVar->watercolor = DEFAULT_WATER_COLOR;
+	sVar->isGenerate = false;
+	sVar->generateIntensity = GENERATE_INTENSITY;
+	sVar->generateDelay = GENERATE_TIME_BEFORE_NEW_PARTICULE;
+	sVar->generatePos = Vec3(GENERATE_START_POS);
 	sVar->drawDebug = false;
 
 	//pannel
@@ -109,6 +139,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector.push_back(Pannel(0 - 240, 320.0f, 120, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));			//filling pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W / 2 - 58, -58.0f, 112, 58, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//stop & next step pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W / 2 - 150, WIN_H + 300, 300, 300, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//settings pannel
+	sVar->pannelVector.push_back(Pannel(0 - 480, 640, 240, 310, textureManager->getTexture("noTexture"), PANNEL_COLOR));	//generate pannel
 
 	//main pannel content
 	sVar->pannelVector[0].addButton(Button(10, 10, 100, 50,moveRainPannel, &sVar->pannelVector[2], textureManager->getTexture("rain")));
@@ -119,6 +150,8 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[0][2].setSwitchMode(true);
 	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveSettingsPannel, &sVar->pannelVector[5], textureManager->getTexture("settings")));
 	sVar->pannelVector[0][3].setSwitchMode(true);
+	sVar->pannelVector[0].addButton(Button(120, 70, 100, 50,moveGeneratePannel, &sVar->pannelVector[6], textureManager->getTexture("generate")));
+	sVar->pannelVector[0][4].setSwitchMode(true);
 	sVar->pannelVector[0].addButton(Button(70, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
 
 	//wave pannel content
@@ -200,4 +233,30 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[5][4.0f].setValue(DEFAULT_WATER_COLOR[2]);
 	sVar->pannelVector[5].addButton(Button(210, 205, 80, 80,NULL, NULL, textureManager->getTexture("noTexture"), DEFAULT_WATER_COLOR, DEFAULT_WATER_COLOR));
 	sVar->pannelVector[5][7].desactive();
+
+	//filling pannel content
+	sVar->pannelVector[6].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("generate"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][0].desactive();
+	sVar->pannelVector[6].addButton(Button(70, 70, 100, 50,changeBoolStatus, &sVar->isGenerate, textureManager->getTexture("active")));
+	sVar->pannelVector[6][1].setSwitchMode(true);
+	sVar->pannelVector[6].addTextEntry(TextEntry(40, 220, 30, 30));
+	sVar->pannelVector[6][(char) 0].setValue(std::to_string((int) sVar->generatePos.x));
+	sVar->pannelVector[6].addTextEntry(TextEntry(120, 220, 30, 30));
+	sVar->pannelVector[6][(char) 1].setValue(std::to_string((int) sVar->generatePos.y));
+	sVar->pannelVector[6].addTextEntry(TextEntry(200, 220, 30, 30));
+	sVar->pannelVector[6][(char) 2].setValue(std::to_string((int) sVar->generatePos.z));
+	sVar->pannelVector[6].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager->getTexture("generateIntensity"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][2].desactive();
+	sVar->pannelVector[6].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[6][0.0f].setValue(0.5);
+	sVar->pannelVector[6].addButton(Button(130, 130, 100, 50,NULL, NULL, textureManager->getTexture("generateDelay"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][3].desactive();
+	sVar->pannelVector[6].addSlider(Slider(130, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[6][1.0f].setValue(0.5);
+	sVar->pannelVector[6].addButton(Button(10, 222, 20, 30,NULL, NULL, textureManager->getTexture("X"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][2].desactive();
+	sVar->pannelVector[6].addButton(Button(90, 222, 20, 30,NULL, NULL, textureManager->getTexture("Y"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][3].desactive();
+	sVar->pannelVector[6].addButton(Button(170, 222, 20, 30,NULL, NULL, textureManager->getTexture("Z"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[6][4].desactive();
 }

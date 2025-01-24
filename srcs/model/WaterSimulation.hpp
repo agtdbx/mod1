@@ -41,7 +41,9 @@ private:
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridFlatSize, gridOffsetsSize, idHsize, numGroups, numGroupsMapDensity,
+							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
+							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
+							numGroupsMapDensity,
 							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
 							renderGridFlatSize, renderGridOffsetsSize;
 	GLuint					textureBufferPositions, texturePositions,

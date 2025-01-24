@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/24 16:20:09 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/24 17:18:56 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@
 # define VISCOSITY_FORCE 0.1f
 # define WATER_DENSITY 0.003
 
+# define MAP_DENSITY_CELL_SIZE 2
 # define RENDER_CELL_SIZE 20.0f
 # define RAY_STEP 0.3f
 

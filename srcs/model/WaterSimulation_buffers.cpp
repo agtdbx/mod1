@@ -80,11 +80,11 @@ void	WaterSimulation::generateMapDensity(void)
 {
 	std::vector<float> mapDensities;
 
-	for (int i = 0; i < this->gridSize; i++)
+	for (int i = 0; i < this->mapDensitySize; i++)
 		mapDensities.push_back(0.0f);
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridSize,
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapDensitySize,
 					mapDensities.data(), GL_DYNAMIC_DRAW);
 }
 

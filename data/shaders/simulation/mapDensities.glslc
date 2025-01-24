@@ -7,6 +7,9 @@ layout(r32f, binding = 0) uniform imageBuffer mapDensitiesBuffer;
 uniform float			smoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
+uniform int				mapDensityCellSize;
+uniform int				mapDensityW;
+uniform int				mapDensityIdHsize;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
@@ -88,12 +91,12 @@ void main()
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
-	y = int(particleIndex / idHsize);
-	idXZ = particleIndex - (y * idHsize);
-	z = int(idXZ / gridW);
-	x = idXZ - (z * gridW);
+	y = int(particleIndex / mapDensityIdHsize);
+	idXZ = particleIndex - (y * mapDensityIdHsize);
+	z = int(idXZ / mapDensityW);
+	x = idXZ - (z * mapDensityW);
 
-	position = vec3(x, y, z) * smoothingRadius;
+	position = vec3(x, y, z) * mapDensityCellSize;
 	density = calculateDensity(position);
 
 	// Write the value to the buffer

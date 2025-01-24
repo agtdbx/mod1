@@ -149,6 +149,9 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
 	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
+	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
+	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
 	giveIntToShader(shaderId, "gridW", this->gridW);
 	giveIntToShader(shaderId, "gridH", this->gridH);
 	giveIntToShader(shaderId, "gridD", this->gridD);

@@ -33,6 +33,19 @@ WaterSimulation::WaterSimulation(void)
 		this->grid.push_back(gridContent);
 	}
 
+	// map density init
+	this->mapDensityW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
+	if (MAP_SIZE > MAP_DENSITY_CELL_SIZE && MAP_SIZE % MAP_DENSITY_CELL_SIZE != 0)
+		this->mapDensityW++;
+	this->mapDensityH = MAP_MAX_HEIGHT / MAP_DENSITY_CELL_SIZE;
+	if (MAP_MAX_HEIGHT > MAP_DENSITY_CELL_SIZE
+		&& (int)MAP_MAX_HEIGHT % MAP_DENSITY_CELL_SIZE != 0)
+		this->mapDensityH++;
+	this->mapDensityD = this->mapDensityW;
+	this->mapDensityIdHsize = this->mapDensityW * this->mapDensityD;
+	this->mapDensitySize = this->mapDensityW * this->mapDensityH * this->mapDensityD;
+	this->numGroupsMapDensity = (this->mapDensitySize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
+
 	// Render grid init
 	this->renderGridW = MAP_SIZE / render_cell_size;
 	if (MAP_SIZE > render_cell_size && MAP_SIZE % render_cell_size != 0)
@@ -54,7 +67,6 @@ WaterSimulation::WaterSimulation(void)
 	}
 
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
-	this->numGroupsMapDensity = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
@@ -272,26 +284,18 @@ void	WaterSimulation::draw(
 	giveFloatToShader(shaderId, "planeWidth", camera->getPlaneWidth());
 	giveFloatToShader(shaderId, "planeHeight", camera->getPlaneHeight());
 	giveFloatToShader(shaderId, "rayStep", RAY_STEP);
-	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
 	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
 	giveFloatToShader(shaderId, "waterMaxY", WATER_MAX_HEIGHT);
 	giveVec3ToShader(shaderId, "waterColor", *waterColor);
 	giveFloatToShader(shaderId, "waterDensity", waterDensity);
 
-	giveIntToShader(shaderId, "gridW", this->gridW);
-	giveIntToShader(shaderId, "gridH", this->gridH);
-	giveIntToShader(shaderId, "gridD", this->gridD);
-	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
-	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
-	giveFloatTextureToShader(shaderId, "gridBuffer", 0,
-								this->textureBufferGridFlat,
-								this->textureGridFlat);
-	giveFloatTextureToShader(shaderId, "offsetsBuffer", 1,
-								this->textureBufferGridOffsets,
-								this->textureGridOffsets);
-	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 2,
+	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
+	giveIntToShader(shaderId, "mapDensityH", this->mapDensityH);
+	giveIntToShader(shaderId, "mapDensityD", this->mapDensityD);
+	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
+	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 0,
 								this->textureBufferMapDensities,
 								this->textureMapDensities);
 
@@ -303,13 +307,13 @@ void	WaterSimulation::draw(
 	giveIntToShader(shaderId, "terrainGridSize", terrainFlatGridSize);
 	giveIntToShader(shaderId, "terrainOffsetsSize", terrainOffsetsSize);
 	giveIntToShader(shaderId, "terrainNbRectangles", terrain->getDataNbRectangles());
-	giveVec3TextureToShader(shaderId, "terrainDataBuffer", 3,
+	giveVec3TextureToShader(shaderId, "terrainDataBuffer", 1,
 								terrainBufferTextureDataGrid,
 								terrainTextureDataGrid);
-	giveFloatTextureToShader(shaderId, "terrainGridBuffer", 4,
+	giveFloatTextureToShader(shaderId, "terrainGridBuffer", 2,
 								terrainBufferTextureFlatGrid,
 								terrainTextureFlatGrid);
-	giveFloatTextureToShader(shaderId, "terrainOffsetsBuffer", 5,
+	giveFloatTextureToShader(shaderId, "terrainOffsetsBuffer", 3,
 								terrainBufferTextureOffsets,
 								terrainTextureOffsets);
 

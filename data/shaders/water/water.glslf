@@ -12,23 +12,18 @@ uniform float			cameraFar;
 uniform float			planeWidth;
 uniform float			planeHeight;
 uniform float			rayStep;
-uniform float			smoothingRadius;
 uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform vec3			waterColor;
 uniform float			waterDensity;
 
-uniform int				gridW;
-uniform int				gridH;
-uniform int				gridD;
-uniform int				idHsize;
-uniform int				gridSize;
-uniform int				offsetsSize;
-uniform samplerBuffer	gridBuffer;
-uniform samplerBuffer	offsetsBuffer;
+uniform int				mapDensityCellSize;
+uniform int				mapDensityW;
+uniform int				mapDensityH;
+uniform int				mapDensityD;
+uniform int				mapDensityIdHsize;
 uniform samplerBuffer	mapDensitiesBuffer;
-
 
 uniform int				terrainCellSize;
 uniform int				terrainGridW;
@@ -354,9 +349,9 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 	int		gx, gy, gz;
 	float	gpx, gpy, gpz, dx, dy, dz, dist, distX, distY, distZ, totalDist;
 
-	const float gridMaxX = gridW * terrainCellSize;
-	const float gridMaxY = gridH * terrainCellSize;
-	const float gridMaxZ = gridD * terrainCellSize;
+	const float gridMaxX = terrainGridW * terrainCellSize;
+	const float gridMaxY = terrainGridH * terrainCellSize;
+	const float gridMaxZ = terrainGridD * terrainCellSize;
 	const float precisionLimit = 0.1;
 
 	rayPos += rayDir;
@@ -428,10 +423,10 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 // Get density
 float	getDensityAtMapPoint(int x, int y, int z)
 {
-	if (x >= gridW || y >= gridH || z >= gridD)
+	if (x >= mapDensityW || y >= mapDensityH || z >= mapDensityD)
 		return (0.0);
 
-	int	tid = x + z * gridW + y * idHsize;
+	int	tid = x + z * mapDensityW + y * mapDensityIdHsize;
 	float density = texelFetch(mapDensitiesBuffer, tid).r;
 	return (density);
 }
@@ -454,17 +449,17 @@ float	getDensityAtPos(vec3 pos)
 			dx, dy, dz;
 
 	// Get grid coordonates
-	gx = int(pos.x / smoothingRadius);
-	gy = int(pos.y / smoothingRadius);
-	gz = int(pos.z / smoothingRadius);
+	gx = int(pos.x / mapDensityCellSize);
+	gy = int(pos.y / mapDensityCellSize);
+	gz = int(pos.z / mapDensityCellSize);
 	ngx = gx + 1;
 	ngy = gy + 1;
 	ngz = gz + 1;
 
 	// Get ratio for each axis
-	dx = (pos.x - (gx * smoothingRadius)) / smoothingRadius;
-	dy = (pos.y - (gy * smoothingRadius)) / smoothingRadius;
-	dz = (pos.z - (gz * smoothingRadius)) / smoothingRadius;
+	dx = (pos.x - (gx * mapDensityCellSize)) / mapDensityCellSize;
+	dy = (pos.y - (gy * mapDensityCellSize)) / mapDensityCellSize;
+	dz = (pos.z - (gz * mapDensityCellSize)) / mapDensityCellSize;
 
 	// Get density for 8 cell around pos
 	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
@@ -519,16 +514,16 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	densityAlongRay = 0.0;
 	while (dist <= maxDist)
 	{
-		// Check if ray collide with map bottom
-		if (dist >= distTerrain)
-			break;
-
 		densityAlongRay += getDensityAtPos(rayPos);
 		if (densityAlongRay > maxDensity)
 		{
 			densityAlongRay = maxDensity;
 			break;
 		}
+
+		// Check if ray collide with terrain
+		if (dist >= distTerrain)
+			break;
 
 		rayPos += rayDir * rayStep;
 		dist += rayStep;

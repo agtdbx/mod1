@@ -495,6 +495,8 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	s_inter_map_info	hitMapInfo;
 	float	dist, distGround, distTriangle, distTerrain, maxDist,
 			densityAlongRay;
+	bool	rayEnterInWater = false;
+	vec3	entryWaterPos;
 
 	const float	maxDensity = 10.0;
 
@@ -515,6 +517,12 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	while (dist <= maxDist)
 	{
 		densityAlongRay += getDensityAtPos(rayPos);
+		if (densityAlongRay != 0.0 && !rayEnterInWater)
+		{
+			rayEnterInWater = true;
+			entryWaterPos = rayPos;
+		}
+
 		if (densityAlongRay > maxDensity)
 		{
 			densityAlongRay = maxDensity;
@@ -529,7 +537,10 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 		dist += rayStep;
 	}
 
-	return (vec4(waterColor, (densityAlongRay / maxDensity) * 0.8));
+	vec3	color = waterColor;
+	float	transparency = (densityAlongRay / maxDensity) * 0.8;
+
+	return (vec4(color, transparency));
 }
 
 

@@ -132,6 +132,49 @@ void	WaterSimulation::computeDensity(
 }
 
 
+void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
+{
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("mapDensities");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
+	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
+	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
+	giveFloatTextureToShader(shaderId, "gridBuffer", 1,
+								this->textureBufferGridFlat,
+								this->textureGridFlat);
+	giveFloatTextureToShader(shaderId, "offsetsBuffer", 2,
+								this->textureBufferGridOffsets,
+								this->textureGridOffsets);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
+								this->textureBufferPositions,
+								this->texturePositions);
+
+	// Compute shader output setup
+	giveFloatTextureInputToShader(0, false, this->textureBufferMapDensities,
+									this->textureMapDensities);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+}
+
+
 void	WaterSimulation::calculatesAndApplyPressure(
 			ShaderManager *shaderManager,
 			float delta)

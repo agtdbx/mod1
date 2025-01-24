@@ -18,6 +18,7 @@ public:
 	Shader			*getShader(std::string shaderName);
 	ComputeShader	*getComputeShader(std::string shaderName);
 	WaterShader		*getWaterShader(void);
+	WaterShader		*getWaterShaderDebug(void);
 	MenuShader		*getMenuShader(void);
 	unsigned int	getVAOId();
 	unsigned int	getVBOId();
@@ -35,6 +36,9 @@ public:
 	void	loadWaterShaderFiles(
 				std::string vShaderFile,
 				std::string fShaderFile);
+	void	loadWaterShaderDebugFiles(
+				std::string vShaderFile,
+				std::string fShaderFile);
 	void	loadMenuShaderFiles(
 				std::string vShaderFile,
 				std::string fShaderFile);
@@ -43,7 +47,7 @@ private:
 	unsigned int									VAO, VBO, EBO;
 	std::unordered_map<std::string, Shader>			shaders;
 	std::unordered_map<std::string, ComputeShader>	computeShaders;
-	WaterShader										waterShader;
+	WaterShader										waterShader, waterShaderDebug;
 	MenuShader								menuShader;
 };
 

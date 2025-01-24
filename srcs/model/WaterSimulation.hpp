@@ -26,7 +26,7 @@ public:
 	void	tick(ShaderManager *shaderManager, Terrain *terrain, float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager,
 					Terrain *terrain, glm::vec3 *waterColor);
-	void	drawTest(Camera *camera, ShaderManager *shaderManager,
+	void	drawDebug(Camera *camera, ShaderManager *shaderManager,
 						Terrain *terrain, glm::vec3 *waterColor);
 	void	clear(void);
 
@@ -41,13 +41,14 @@ private:
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
+							gridFlatSize, gridOffsetsSize, idHsize, numGroups, numGroupsMapDensity,
 							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
 							renderGridFlatSize, renderGridOffsetsSize;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
+							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets,
 							textureBufferRenderGridFlat, textureRenderGridFlat,
@@ -56,6 +57,7 @@ private:
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
 	void		generateFlatGrid(void);
+	void		generateMapDensity(void);
 
 	void		positionsToBuffer(void);
 	void		positionsFromBuffer(void);
@@ -73,6 +75,7 @@ private:
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
+	void		computeMapDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };

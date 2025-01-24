@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/21 19:13:05 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:33:54 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 # define MAX_HEIGHT 50
 # define MAP_SIZE 200
 # define TERRAIN_PRECISION 0.01
-# define TERRAIN_CELL_SIZE 5.0f
+# define TERRAIN_CELL_SIZE 3
 
 # define CAMERA_FOV 45.0f
 # define CAMERA_MIN_VIEW_DIST 0.1f
@@ -43,6 +43,7 @@
 # define CAMERA_ROTATION_SPEED 42.0
 # define CAMERA_ROTATION_SPEED_MOUSE 0.1
 
+# define NB_MAX_PARTICLES 100000
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
 # define COLLISION_ENERGY_KEEP 0.5

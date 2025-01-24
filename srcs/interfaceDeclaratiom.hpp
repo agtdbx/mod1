@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaratiom.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:22:54 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 12:38:32 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_simulationVariable
 	float				sprintSpeed;
 	float				cameraSensibility;
 	glm::vec3			watercolor;
+	bool				drawDebug;
 }	t_simulationVariable;
 
 void	addWater(void * arg);

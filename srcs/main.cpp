@@ -72,7 +72,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	
+
 
 	OpenGLContext	context;
 
@@ -114,7 +114,7 @@ int	main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	
+
 	initUi(&sVar, &textureManager, &simulation);
 
 	// Main loop
@@ -275,7 +275,6 @@ static void	computation(
 		double	avg = timePrintFps / (double)nbCall;
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
-		std::cout << "water density : " << sVar->waterDensity << std::endl;
 
 		timePrintFps -= PRINT_FPS_TIME;
 		nbCall = 0;

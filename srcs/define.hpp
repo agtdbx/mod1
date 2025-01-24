@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/24 15:07:54 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:20:09 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@
 # define WATER_DENSITY 0.003
 
 # define RENDER_CELL_SIZE 20.0f
-# define RAY_STEP 0.1f
+# define RAY_STEP 0.3f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.05f

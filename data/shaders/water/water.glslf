@@ -274,7 +274,7 @@ float	hitTriangle(
 
 	ray_cross_e2 = cross(rayDir, edge_2);
 	det = dot(edge_1, ray_cross_e2);
-	if (det > -0.000001)
+	if (det > -0.000001 && det < 0.000001)
 		return (-1.0);
 
 	inv_det = 1.0 / det;
@@ -466,44 +466,15 @@ float	getDensityAtPos(vec3 pos)
 	dy = (pos.y - (gy * smoothingRadius)) / smoothingRadius;
 	dz = (pos.z - (gz * smoothingRadius)) / smoothingRadius;
 
-
 	// Get density for 8 cell around pos
-	// densityFUL = getDensityAtMapPoint(gx, gy, gz);
-	// densityFUR = getDensityAtMapPoint(gx + 1, gy, gz);
-	// densityFDL = getDensityAtMapPoint(gx, gy + 1, gz);
-	// densityFDR = getDensityAtMapPoint(gx + 1, gy + 1, gz);
-	// densityBUL = getDensityAtMapPoint(gx, gy, gz + 1);
-	// densityBUR = getDensityAtMapPoint(gx + 1, gy, gz + 1);
-	// densityBDL = getDensityAtMapPoint(gx, gy + 1, gz + 1);
-	// densityBDR = getDensityAtMapPoint(gx + 1, gy + 1, gz + 1);
-
-	densityFUL = getDensityAtMapPoint(gx, gy, gz);
-	densityFUR = getDensityAtMapPoint(ngx, gy, gz);
-	densityFDL = getDensityAtMapPoint(gx, ngy, gz);
+	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
+	densityFUR = getDensityAtMapPoint(ngx, gy,  gz);
+	densityFDL = getDensityAtMapPoint(gx,  ngy, gz);
 	densityFDR = getDensityAtMapPoint(ngx, ngy, gz);
-	densityBUL = getDensityAtMapPoint(gx, gy, ngz);
-	densityBUR = getDensityAtMapPoint(ngx, gy, ngz);
-	densityBDL = getDensityAtMapPoint(gx, ngy, ngz);
+	densityBUL = getDensityAtMapPoint(gx,  gy,  ngz);
+	densityBUR = getDensityAtMapPoint(ngx, gy,  ngz);
+	densityBDL = getDensityAtMapPoint(gx,  ngy, ngz);
 	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
-
-	// densityFUL = getDensityAtMapPoint(gx, gy, gz);
-	// densityFUR = getDensityAtMapPoint(gx, gy, gz);
-	// densityFDL = getDensityAtMapPoint(gx, gy, gz);
-	// densityFDR = getDensityAtMapPoint(gx, gy, gz);
-	// densityBUL = getDensityAtMapPoint(gx, gy, gz);
-	// densityBUR = getDensityAtMapPoint(gx, gy, gz);
-	// densityBDL = getDensityAtMapPoint(gx, gy, gz);
-	// densityBDR = getDensityAtMapPoint(gx, gy, gz);
-
-	// float tkt = getDensityAtMapPoint(gx, gy, gz);
-	// densityFUL = tkt;
-	// densityFUR = tkt;
-	// densityFDL = tkt;
-	// densityFDR = tkt;
-	// densityBUL = tkt;
-	// densityBUR = tkt;
-	// densityBDL = tkt;
-	// densityBDR = tkt;
 
 	// Merge density on x axis
 	densityFU = lerp(densityFUL, densityFUR, dx);
@@ -519,7 +490,7 @@ float	getDensityAtPos(vec3 pos)
 	density = lerp(densityF, densityB, dz);
 	// return (density);
 	if (density > waterDensity)
-		return (0.1);
+		return (0.3);
 	return (0.0);
 }
 

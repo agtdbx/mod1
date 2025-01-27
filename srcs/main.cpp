@@ -209,9 +209,6 @@ int	main(int argc, char **argv)
 			}
 			sVar.generateIntensity =  sVar.pannelVector[6][0.0f].getValue() * 2 * GENERATE_INTENSITY;
 			sVar.generateDelay =  sVar.pannelVector[6][1.0f].getValue() * 2 * GENERATE_TIME_BEFORE_NEW_PARTICULE;
-
-			// std::cout << "value : " << sVar.pannelVector[6][(char) 0].getValue() << std::endl;
-
 		}
 
 		// Compute part
@@ -219,11 +216,11 @@ int	main(int argc, char **argv)
 		{
 			computation(&inputManager, &camera, &context, &sVar, &simulation,
 						&shaderManager, &terrain, 1.0f/100.0f);
+			sVar.needStep = false;
 		}
 		else
 			computation(&inputManager, &camera, &context, &sVar, &simulation,
 						&shaderManager, &terrain, 0.0);
-		sVar.needStep = false;
 
 		// Drawing part
 		draw(context.window, &camera, &shaderManager, &terrain, &sVar, &simulation);

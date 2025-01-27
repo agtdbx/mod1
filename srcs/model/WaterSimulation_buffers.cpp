@@ -3,6 +3,10 @@
 #include <engine/render/shader/WaterShader.hpp>
 #include <engine/render/shader/ShaderFunctions.hpp>
 
+//**** STATIC VARIABLES ********************************************************
+
+static void	*BufferPredictedPositionPtr = NULL;
+
 //**** PRIVATE METHODS *********************************************************
 
 void	WaterSimulation::generateTextureBuffer(void)
@@ -85,7 +89,7 @@ void	WaterSimulation::generateMapDensity(void)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapDensitySize,
-					mapDensities.data(), GL_DYNAMIC_DRAW);
+					mapDensities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -93,7 +97,7 @@ void	WaterSimulation::positionsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->positions.data(), GL_DYNAMIC_DRAW);
+					this->positions.data(), GL_STATIC_DRAW);
 }
 
 
@@ -107,17 +111,34 @@ void	WaterSimulation::positionsFromBuffer(void)
 
 void	WaterSimulation::predictedPositionsToBuffer(void)
 {
+	unsigned long	bufferSize = sizeof(glm::vec4) * this->nbParticules;
+	int				flags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT
+							| GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+	if (BufferPredictedPositionPtr != NULL)
+	{
+		glDeleteBuffers(1, &this->textureBufferPredictedPositions);
+		glDeleteTextures(1, &this->texturePredictedPositions);
+		glGenBuffers(1, &this->textureBufferPredictedPositions);
+		glGenTextures(1, &this->texturePredictedPositions);
+	}
+
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->predictedPositions.data(), GL_DYNAMIC_DRAW);
+	glBufferStorage(GL_TEXTURE_BUFFER, bufferSize, nullptr, flags);
+	BufferPredictedPositionPtr = glMapBufferRange(GL_TEXTURE_BUFFER, 0,
+													bufferSize, flags);
+	if (BufferPredictedPositionPtr)
+		memcpy(BufferPredictedPositionPtr,
+				this->predictedPositions.data(), bufferSize);
 }
 
 
 void	WaterSimulation::predictedPositionsFromBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * this->nbParticules,
-						this->predictedPositions.data());
+	if (BufferPredictedPositionPtr)
+		memcpy(this->predictedPositions.data(), BufferPredictedPositionPtr,
+				sizeof(glm::vec4) * this->nbParticules);
 }
 
 
@@ -125,7 +146,7 @@ void	WaterSimulation::velocitiesToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferVelocities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->velocities.data(), GL_DYNAMIC_DRAW);
+					this->velocities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -141,7 +162,7 @@ void	WaterSimulation::densitiesToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferDensities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->nbParticules,
-					this->densities.data(), GL_DYNAMIC_DRAW);
+					this->densities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -157,7 +178,7 @@ void	WaterSimulation::gridFlatToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridFlatSize,
-					this->gridFlat.data(), GL_DYNAMIC_DRAW);
+					this->gridFlat.data(), GL_STATIC_DRAW);
 }
 
 
@@ -165,7 +186,7 @@ void	WaterSimulation::gridOffsetsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridOffsetsSize,
-					this->gridOffsets.data(), GL_DYNAMIC_DRAW);
+					this->gridOffsets.data(), GL_STATIC_DRAW);
 }
 
 
@@ -173,7 +194,7 @@ void	WaterSimulation::renderGridFlatToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferRenderGridFlat);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->renderGridFlatSize,
-					this->renderGridFlat.data(), GL_DYNAMIC_DRAW);
+					this->renderGridFlat.data(), GL_STATIC_DRAW);
 }
 
 
@@ -181,5 +202,5 @@ void	WaterSimulation::renderGridOffsetsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferRenderGridOffsets);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->renderGridOffsetsSize,
-					this->renderGridOffsets.data(), GL_DYNAMIC_DRAW);
+					this->renderGridOffsets.data(), GL_STATIC_DRAW);
 }

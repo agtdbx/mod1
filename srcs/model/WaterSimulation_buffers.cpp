@@ -5,7 +5,6 @@
 
 //**** STATIC VARIABLES ********************************************************
 
-static void	*BufferPredictedPositionPtr = NULL;
 
 //**** PRIVATE METHODS *********************************************************
 
@@ -111,34 +110,17 @@ void	WaterSimulation::positionsFromBuffer(void)
 
 void	WaterSimulation::predictedPositionsToBuffer(void)
 {
-	unsigned long	bufferSize = sizeof(glm::vec4) * this->nbParticules;
-	int				flags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT
-							| GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-
-	if (BufferPredictedPositionPtr != NULL)
-	{
-		glDeleteBuffers(1, &this->textureBufferPredictedPositions);
-		glDeleteTextures(1, &this->texturePredictedPositions);
-		glGenBuffers(1, &this->textureBufferPredictedPositions);
-		glGenTextures(1, &this->texturePredictedPositions);
-	}
-
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	glBufferStorage(GL_TEXTURE_BUFFER, bufferSize, nullptr, flags);
-	BufferPredictedPositionPtr = glMapBufferRange(GL_TEXTURE_BUFFER, 0,
-													bufferSize, flags);
-	if (BufferPredictedPositionPtr)
-		memcpy(BufferPredictedPositionPtr,
-				this->predictedPositions.data(), bufferSize);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
+					this->predictedPositions.data(), GL_STATIC_DRAW);
 }
 
 
 void	WaterSimulation::predictedPositionsFromBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
-	if (BufferPredictedPositionPtr)
-		memcpy(this->predictedPositions.data(), BufferPredictedPositionPtr,
-				sizeof(glm::vec4) * this->nbParticules);
+	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(glm::vec4) * this->nbParticules,
+						this->predictedPositions.data());
 }
 
 

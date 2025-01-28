@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/28 19:31:08 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/28 21:14:14 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,5 +115,29 @@ const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIU
 std::vector<Vec3>	parse(char *name);
 std::vector<std::vector<double>> interpolate(std::vector<Vec3> & parameterPoints);
 
+typedef struct s_performanceLog
+{
+	// Global time
+	int		nbCall;
+	double	timeBeforePrint;
+	double	deltas;
+
+	// More stats
+	bool	moreStats;
+
+	// Compute stats
+	double	timePredictedPos;
+	double	timePutInGrid;
+	double	timeComputeDensity;
+	double	timeComputeMapDensity;
+	double	timeApplyPressure;
+	double	timeUpdatePositions;
+
+	// Draw stats
+	double	timeDrawTerrain;
+	double	timeDrawWater;
+	double	timeSwapBuffer;
+
+}	t_performanceLog;
 
 #endif

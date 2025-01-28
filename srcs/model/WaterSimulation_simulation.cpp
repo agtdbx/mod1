@@ -39,6 +39,7 @@ void	WaterSimulation::computePredictedPositions(
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }
 
 
@@ -80,6 +81,7 @@ void	WaterSimulation::putParticlesInGrid(
 	// Run compute shader
 	glDispatchCompute(1, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }
 
 
@@ -124,6 +126,7 @@ void	WaterSimulation::computeDensity(
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }
 
 
@@ -170,6 +173,7 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }
 
 
@@ -226,6 +230,7 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }
 
 
@@ -294,4 +299,5 @@ void	WaterSimulation::updatePositions(
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	// glFlush();
 }

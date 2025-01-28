@@ -1,0 +1,66 @@
+#version 430 core
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(r32f, binding = 0) uniform imageBuffer offsetsBuffer;
+layout(r32f, binding = 1) uniform imageBuffer gridBuffer;
+
+layout(std430, binding = 2) buffer DataBuffer {
+	int gridTmp[];
+};
+
+uniform float			smoothingRadius;
+uniform int				gridW;
+uniform int				gridH;
+uniform int				gridD;
+uniform int				idHsize;
+uniform int				gridSize;
+uniform int				offsetsSize;
+uniform int				positionsSize;
+uniform samplerBuffer	positionsBuffer;
+
+void main()
+{
+	int		gx, gy, gz, gid, tmpId, particlesInCell;
+	vec3	particlePos;
+
+	for (int i = 0; i < offsetsSize; i++)
+		gridTmp[i] = 0;
+
+	// Put particles into grid
+	for (int i = 0; i < positionsSize; i++)
+	{
+		particlePos = texelFetch(positionsBuffer, i).rgb;
+
+		gx = int(particlePos.x / smoothingRadius);
+		gy = int(particlePos.y / smoothingRadius);
+		gz = int(particlePos.z / smoothingRadius);
+		gid = gx + gz * gridW + gy * idHsize;
+
+		particlesInCell = gridTmp[gid];
+		if (particlesInCell >= 2500)
+			continue;
+
+		particlesInCell++;
+		tmpId = gid + offsetsSize * particlesInCell;
+		gridTmp[tmpId] = i;
+		gridTmp[gid] = particlesInCell;
+	}
+
+	int	offset = 0;
+	int	index;
+	// Create flat data grid
+	for (int i = 0; i < offsetsSize; i++)
+	{
+		particlesInCell = gridTmp[i];
+
+		for (int j = 0; j < particlesInCell; j++)
+		{
+			tmpId = i + (j + 1) * offsetsSize;
+			index = gridTmp[tmpId];
+			imageStore(gridBuffer, offset + j, vec4(index, 0.0, 0.0, 0.0));
+		}
+		imageStore(offsetsBuffer, i, vec4(offset, 0.0, 0.0, 0.0));
+		offset += particlesInCell;
+	}
+}

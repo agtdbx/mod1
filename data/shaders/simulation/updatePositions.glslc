@@ -134,7 +134,7 @@ void main()
 		velocityDir = normalize(velocityDir);
 		velocity = velocityDir * velocityLength;
 
-		newPosition = position;
+		newPosition = position + velocity * delta;
 		needUpdateVelocity = true;
 	}
 

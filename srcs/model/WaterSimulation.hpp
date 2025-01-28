@@ -23,11 +23,10 @@ public:
 
 	void	addWater(glm::vec3 position);
 	void	addWater(glm::vec3 position, glm::vec3 velociy);
-	void	tick(ShaderManager *shaderManager, Terrain *terrain, float delta);
+	void	tick(ShaderManager *shaderManager, Terrain *terrain,
+					t_performanceLog *perfLog, float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager,
 					Terrain *terrain, glm::vec3 *waterColor, float waterDensity);
-	void	drawDebug(Camera *camera, ShaderManager *shaderManager,
-						Terrain *terrain, glm::vec3 *waterColor);
 	void	clear(void);
 
 private:
@@ -36,28 +35,26 @@ private:
 	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
-	std::vector<std::vector<int>> renderGrid;
-	std::vector<float>		gridFlat, gridOffsets, renderGridFlat, renderGridOffsets;
+	std::vector<float>		gridFlat, gridOffsets;
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
 							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
-							numGroupsMapDensity,
-							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
-							renderGridFlatSize, renderGridOffsetsSize;
+							numGroupsPutInGrid, numGroupsMapDensity;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
+							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets,
-							textureBufferRenderGridFlat, textureRenderGridFlat,
-							textureBufferRenderGridOffsets, textureRenderGridOffsets;
+							ssboGridTmp;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
+	void		generateOffsetGrid(void);
 	void		generateFlatGrid(void);
 	void		generateMapDensity(void);
 
@@ -69,10 +66,9 @@ private:
 	void		velocitiesFromBuffer(void);
 	void		densitiesToBuffer(void);
 	void		densitiesFromBuffer(void);
+	void		pressuresToBuffer(void);
 	void		gridFlatToBuffer(void);
 	void		gridOffsetsToBuffer(void);
-	void		renderGridFlatToBuffer(void);
-	void		renderGridOffsetsToBuffer(void);
 
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);

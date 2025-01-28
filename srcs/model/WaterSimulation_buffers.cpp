@@ -3,6 +3,9 @@
 #include <engine/render/shader/WaterShader.hpp>
 #include <engine/render/shader/ShaderFunctions.hpp>
 
+//**** STATIC VARIABLES ********************************************************
+
+
 //**** PRIVATE METHODS *********************************************************
 
 void	WaterSimulation::generateTextureBuffer(void)
@@ -19,6 +22,9 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferDensities);
 	glGenTextures(1, &this->textureDensities);
 
+	glGenBuffers(1, &this->textureBufferPressures);
+	glGenTextures(1, &this->texturePressures);
+
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
@@ -28,51 +34,37 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferGridOffsets);
 	glGenTextures(1, &this->textureGridOffsets);
 
-	glGenBuffers(1, &this->textureBufferRenderGridFlat);
-	glGenTextures(1, &this->textureRenderGridFlat);
+	glGenBuffers(1, &this->ssboGridTmp);
+}
 
-	glGenBuffers(1, &this->textureBufferRenderGridOffsets);
-	glGenTextures(1, &this->textureRenderGridOffsets);
+
+void	WaterSimulation::generateOffsetGrid(void)
+{
+	// Default value for offsets
+	this->gridOffsets.clear();
+	this->gridOffsetsSize = this->gridSize;
+	for (int i = 0; i < this->gridOffsetsSize; i++)
+		this->gridOffsets.push_back(0.0f);
+	this->gridOffsetsToBuffer();
+
+	// Grid tmp
+	int	size = this->gridSize * 2500;
+	int	bufferSize = sizeof(int) * size;
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGridTmp);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
+	std::vector<int> initialData(size, 0);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
 }
 
 
 void	WaterSimulation::generateFlatGrid(void)
 {
-	int	cellSize;
-
-	// grid
+	// Default value of flat grid
 	this->gridFlat.clear();
-	this->gridOffsets.clear();
-
-	this->gridFlatSize = 0;
-	this->gridOffsetsSize = 0;
-
-	for (std::vector<int> &cell : this->grid)
-	{
-		cellSize = cell.size();
-		for (int i = 0; i < cellSize; i++)
-			this->gridFlat.push_back(cell[i]);
-		this->gridOffsets.push_back(this->gridFlatSize);
-		this->gridFlatSize += cellSize;
-		this->gridOffsetsSize++;
-	}
-
-	// render grid
-	this->renderGridFlat.clear();
-	this->renderGridOffsets.clear();
-
-	this->renderGridFlatSize = 0;
-	this->renderGridOffsetsSize = 0;
-
-	for (std::vector<int> &cell : this->renderGrid)
-	{
-		cellSize = cell.size();
-		for (int i = 0; i < cellSize; i++)
-			this->renderGridFlat.push_back(cell[i]);
-		this->renderGridOffsets.push_back(this->renderGridFlatSize);
-		this->renderGridFlatSize += cellSize;
-		this->renderGridOffsetsSize++;
-	}
+	this->gridFlatSize = this->nbParticules;
+	for (int i = 0; i < this->gridFlatSize; i++)
+		this->gridFlat.push_back(0.0f);
+	this->gridFlatToBuffer();
 }
 
 
@@ -85,7 +77,7 @@ void	WaterSimulation::generateMapDensity(void)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapDensitySize,
-					mapDensities.data(), GL_DYNAMIC_DRAW);
+					mapDensities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -93,7 +85,7 @@ void	WaterSimulation::positionsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPositions);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->positions.data(), GL_DYNAMIC_DRAW);
+					this->positions.data(), GL_STATIC_DRAW);
 }
 
 
@@ -109,7 +101,7 @@ void	WaterSimulation::predictedPositionsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPredictedPositions);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->predictedPositions.data(), GL_DYNAMIC_DRAW);
+					this->predictedPositions.data(), GL_STATIC_DRAW);
 }
 
 
@@ -125,7 +117,7 @@ void	WaterSimulation::velocitiesToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferVelocities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4) * this->nbParticules,
-					this->velocities.data(), GL_DYNAMIC_DRAW);
+					this->velocities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -141,7 +133,7 @@ void	WaterSimulation::densitiesToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferDensities);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->nbParticules,
-					this->densities.data(), GL_DYNAMIC_DRAW);
+					this->densities.data(), GL_STATIC_DRAW);
 }
 
 
@@ -153,11 +145,19 @@ void	WaterSimulation::densitiesFromBuffer(void)
 }
 
 
+void	WaterSimulation::pressuresToBuffer(void)
+{
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPressures);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->nbParticules,
+					this->densities.data(), GL_STATIC_DRAW);
+}
+
+
 void	WaterSimulation::gridFlatToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridFlatSize,
-					this->gridFlat.data(), GL_DYNAMIC_DRAW);
+					this->gridFlat.data(), GL_STATIC_DRAW);
 }
 
 
@@ -165,21 +165,5 @@ void	WaterSimulation::gridOffsetsToBuffer(void)
 {
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridOffsetsSize,
-					this->gridOffsets.data(), GL_DYNAMIC_DRAW);
-}
-
-
-void	WaterSimulation::renderGridFlatToBuffer(void)
-{
-	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferRenderGridFlat);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->renderGridFlatSize,
-					this->renderGridFlat.data(), GL_DYNAMIC_DRAW);
-}
-
-
-void	WaterSimulation::renderGridOffsetsToBuffer(void)
-{
-	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferRenderGridOffsets);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->renderGridOffsetsSize,
-					this->renderGridOffsets.data(), GL_DYNAMIC_DRAW);
+					this->gridOffsets.data(), GL_STATIC_DRAW);
 }

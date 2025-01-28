@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   uiTick.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:28:30 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 20:37:11 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 22:46:41 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
-#include <ui/interfaceDeclaratiom.hpp>
+#include <ui/interfaceDeclaration.hpp>
 
 
 

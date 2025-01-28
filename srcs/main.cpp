@@ -1,8 +1,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <ctime>
 #include <define.hpp>
-#include <ui/interfaceDeclaratiom.hpp>
+#include <ui/interfaceDeclaration.hpp>
 #include <engine/inputs/InputManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
@@ -31,16 +32,18 @@ static void	computation(
 				Camera *camera,
 				OpenGLContext *context,
 				t_simulationVariable *sVar,
+				t_performanceLog *perfLog,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager,
 				Terrain *terrain,
-				double	deltaConst);
+				double	delta);
 static void	draw(
 				GLFWwindow* window,
 				Camera *camera,
 				ShaderManager *shaderManager,
 				Terrain *terrain,
 				t_simulationVariable *sVar,
+				t_performanceLog *perfLog,
 				WaterSimulation	*simulation);
 
 
@@ -72,8 +75,6 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-
-
 	OpenGLContext	context;
 
 	if (!context.isInitGood())
@@ -82,12 +83,12 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
-	Terrain			terrain;
-	InputManager	inputManager(context.window);
-	ShaderManager	shaderManager;
-	TextureManager	textureManager;
-	WaterSimulation	simulation;
-	Camera			camera;
+	Terrain				terrain;
+	InputManager		inputManager(context.window);
+	ShaderManager		shaderManager;
+	TextureManager		textureManager;
+	WaterSimulation		simulation;
+	Camera				camera;
 
 	t_simulationVariable	sVar;
 
@@ -114,20 +115,32 @@ int	main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
 	initUi(&sVar, &textureManager, &simulation);
 
 	// Main loop
 	inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
 	inputManager.mouse.setVisible(context.window, false);
+	t_performanceLog	perfLog = (t_performanceLog){0};
+	double				delta;
+	double				currentTime = 0;
+	double				lastTime = 0;
 
 	while (!glfwWindowShouldClose(context.window))
 	{
+		currentTime = glfwGetTime();
+		delta = currentTime - lastTime;
+		lastTime = currentTime;
+
+		perfLog.deltas += delta;
+		perfLog.timeBeforePrint -= delta;
+		perfLog.nbCall++;
+
 		events(context.window, &inputManager);
 
 		// Close window on escape
 		if (inputManager.escape.isPressed())
 			break;
+
 		if (inputManager.tab.isPressed())
 		{
 			if (!sVar.isPannelHide)
@@ -161,18 +174,74 @@ int	main(int argc, char **argv)
 		}
 
 		// Compute part
-		if (sVar.needStep)
-		{
-			computation(&inputManager, &camera, &context, &sVar, &simulation,
-						&shaderManager, &terrain, 1.0f/100.0f);
-		}
-		else
-			computation(&inputManager, &camera, &context, &sVar, &simulation,
-						&shaderManager, &terrain, 0.0);
-		sVar.needStep = false;
+		computation(&inputManager, &camera, &context, &sVar, &perfLog,
+					&simulation, &shaderManager, &terrain, delta);
 
 		// Drawing part
-		draw(context.window, &camera, &shaderManager, &terrain, &sVar, &simulation);
+		draw(context.window, &camera, &shaderManager, &terrain,
+				&sVar, &perfLog, &simulation);
+
+		if (perfLog.timeBeforePrint <= 0.0)
+		{
+			// Compute main stats
+			float	avgDelta = perfLog.deltas / perfLog.nbCall;
+			printf("fps : %8.3f, %5i particules\n",
+					1.0 / avgDelta, simulation.getNbParticules());
+
+			if (perfLog.moreStats)
+			{
+				printf("average delta %.6f\n", avgDelta);
+
+				// Compute computation stats
+				printf("Computation stats : \n");
+				float	predictedPos = perfLog.timePredictedPos / perfLog.nbCall;
+				float	putInGrid = perfLog.timePutInGrid / perfLog.nbCall;
+				float	density = perfLog.timeComputeDensity / perfLog.nbCall;
+				float	mapDensity = perfLog.timeComputeMapDensity / perfLog.nbCall;
+				float	pressure = perfLog.timeApplyPressure / perfLog.nbCall;
+				float	updatePos = perfLog.timeUpdatePositions / perfLog.nbCall;
+				float	computeTotal = predictedPos + putInGrid + density
+										+ mapDensity + pressure + updatePos;
+				printf(" - predicted pos %9.3f ms\n", predictedPos * 1000.0f);
+				printf(" - put in grid   %9.3f ms\n", putInGrid * 1000.0f);
+				printf(" - density       %9.3f ms\n", density * 1000.0f);
+				printf(" - map density   %9.3f ms\n", mapDensity * 1000.0f);
+				printf(" - pressure      %9.3f ms\n", pressure * 1000.0f);
+				printf(" - update pos    %9.3f ms\n", updatePos * 1000.0f);
+				printf(" - total compute %9.3f ms\n", computeTotal * 1000.0f);
+
+				// Compute draw stats
+				printf("Draw stats : \n");
+				float	drawTerrain = perfLog.timeDrawTerrain / perfLog.nbCall;
+				float	drawWater = perfLog.timeDrawWater / perfLog.nbCall;
+				float	swapBuffer = perfLog.timeSwapBuffer / perfLog.nbCall;
+				float	drawTotal = drawTerrain + drawWater + swapBuffer;
+				printf(" - draw terrain  %9.3f ms\n", drawTerrain * 1000.0f);
+				printf(" - draw water    %9.3f ms\n", drawWater * 1000.0f);
+				printf(" - glSwapBuffer  %9.3f ms\n", swapBuffer * 1000.0f);
+				printf(" - total draw    %9.3f ms\n", drawTotal * 1000.0f);
+
+				// Total stats
+				float	totalTime = computeTotal + drawTotal;
+				printf("Total time per tick %9.3f ms\n\n", totalTime * 1000.0f);
+			}
+
+			// Reset main times
+			perfLog.deltas = 0.0;
+			perfLog.timeBeforePrint += PRINT_FPS_TIME;
+			perfLog.nbCall = 0;
+			// Reset computation times
+			perfLog.timePredictedPos = 0.0;
+			perfLog.timePutInGrid = 0.0;
+			perfLog.timeComputeDensity = 0.0;
+			perfLog.timeComputeMapDensity = 0.0;
+			perfLog.timeApplyPressure = 0.0;
+			perfLog.timeUpdatePositions = 0.0;
+			// Reset draw times
+			perfLog.timeDrawTerrain = 0.0;
+			perfLog.timeDrawWater = 0.0;
+			perfLog.timeSwapBuffer = 0.0;
+		}
 	}
 
 	context.close();
@@ -197,77 +266,31 @@ static void	computation(
 				Camera *camera,
 				OpenGLContext *context,
 				t_simulationVariable *sVar,
+				t_performanceLog *perfLog,
 				WaterSimulation	*simulation,
 				ShaderManager *shaderManager,
 				Terrain *terrain,
-				double	deltaConst)
+				double delta)
 {
-	static int		nbCall = 0;
-	static double	timePrintFps = 0.0;
 	static double	timeRainningParticuleAdd = 0.0;
 	static double	timeFillingParticuleAdd = 0.0;
 	static double	timeGenerateParticuleAdd = 0.0;
-	static double	lastTime = 0.0;
-	double			currentTime, delta, cameraSpeed;
+	double			cameraSpeed;
 
-	currentTime = glfwGetTime();
-	delta = currentTime - lastTime;
-	lastTime = currentTime;
-
-	timePrintFps += delta;
-	nbCall++;
-	if (timePrintFps >= PRINT_FPS_TIME)
-	{
-		double	avg = timePrintFps / (double)nbCall;
-		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
-				simulation->getNbParticules());
-
-		timePrintFps -= PRINT_FPS_TIME;
-		nbCall = 0;
-	}
-	if (deltaConst)
-		timeRainningParticuleAdd += deltaConst;
-	else
-		timeRainningParticuleAdd += delta;
-	if (timeRainningParticuleAdd >= sVar->rainDelay)
-	{
-		timeRainningParticuleAdd -= sVar->rainDelay;
-		if (sVar->isRainning && (!sVar->isStopped || deltaConst))
-			updateRain(simulation, sVar);
-	}
-
-	if (deltaConst)
-		timeFillingParticuleAdd += deltaConst;
-	else
-		timeFillingParticuleAdd += delta;
-	if (timeFillingParticuleAdd >= sVar->fillingDelay)
-	{
-		timeFillingParticuleAdd -= sVar->fillingDelay;
-		if (sVar->isFilling && (!sVar->isStopped || deltaConst))
-			fillingPool(simulation, sVar);
-	}
-	if (deltaConst)
-		timeGenerateParticuleAdd += deltaConst;
-	else
-		timeGenerateParticuleAdd += delta;
-	if (timeGenerateParticuleAdd >= sVar->generateDelay)
-	{
-		timeGenerateParticuleAdd -= sVar->generateDelay;
-		if (sVar->isGenerate && (!sVar->isStopped || deltaConst))
-			generateAt(simulation, sVar);
-	}
 	for (Pannel & pannel : sVar->pannelVector)
 	{
 		pannel.tick(delta);
 	}
 
-	if (inputManager->alt.isPressed())
-		sVar->drawDebug = !sVar->drawDebug;
-
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)
 		delta = MINIMUM_SIMULATION_UPDATE;
 
+	// Enable or disable more log when press tab
+	if (inputManager->alt.isPressed())
+		perfLog->moreStats = !perfLog->moreStats;
+
+	// Compute camera speed
 	cameraSpeed = CAMERA_SPEED * delta;
 	if (inputManager->lcontrol.isDown())
 		cameraSpeed *= sVar->sprintSpeed;
@@ -311,10 +334,37 @@ static void	computation(
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
 	// Water simulation
-	if (!sVar->isStopped)
-		simulation->tick(shaderManager, terrain, delta);
-	if (deltaConst)
-		simulation->tick(shaderManager, terrain, deltaConst);
+	if (sVar->isStopped || sVar->needStep)
+		return ;
+
+	if (sVar->isStopped && sVar->needStep)
+		delta = 0.01;
+
+	timeRainningParticuleAdd += delta;
+	if (timeRainningParticuleAdd >= sVar->rainDelay)
+	{
+		timeRainningParticuleAdd -= sVar->rainDelay;
+		if (sVar->isRainning && (!sVar->isStopped || sVar->needStep))
+			updateRain(simulation, sVar);
+	}
+
+	timeFillingParticuleAdd += delta;
+	if (timeFillingParticuleAdd >= sVar->fillingDelay)
+	{
+		timeFillingParticuleAdd -= sVar->fillingDelay;
+		if (sVar->isFilling && (!sVar->isStopped || sVar->needStep))
+			fillingPool(simulation, sVar);
+	}
+	timeGenerateParticuleAdd += delta;
+	if (timeGenerateParticuleAdd >= sVar->generateDelay)
+	{
+		timeGenerateParticuleAdd -= sVar->generateDelay;
+		if (sVar->isGenerate && (!sVar->isStopped || sVar->needStep))
+			generateAt(simulation, sVar);
+	}
+
+	if (!sVar->isStopped || sVar->needStep)
+		simulation->tick(shaderManager, terrain, perfLog, delta);
 }
 
 
@@ -324,8 +374,11 @@ static void	draw(
 				ShaderManager *shaderManager,
 				Terrain *terrain,
 				t_simulationVariable *sVar,
+				t_performanceLog *perfLog,
 				WaterSimulation	*simulation)
 {
+	std::clock_t	start;
+
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -335,19 +388,24 @@ static void	draw(
 		pannel.renderMesh(shaderManager);
 	}
 
-	terrain->renderMesh(camera, shaderManager);
-	if (!sVar->drawDebug)
+	if (perfLog->moreStats)
+	{
+		start = std::clock();
+		terrain->renderMesh(camera, shaderManager);
+		perfLog->timeDrawTerrain += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+
+		start = std::clock();
 		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
+		perfLog->timeDrawWater += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+
+		start = std::clock();
+		glfwSwapBuffers(window);
+		perfLog->timeSwapBuffer += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+	}
 	else
-		simulation->drawDebug(camera, shaderManager, terrain, &sVar->watercolor);
-
-	// Display the new image
-	glfwSwapBuffers(window);
-}
-
-
-void	addWater(void * arg)
-{
-	WaterSimulation & simulation = *((WaterSimulation *)(arg));
-	simulation.addWater(glm::vec3(5, 5, 5));
+	{
+		terrain->renderMesh(camera, shaderManager);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
+		glfwSwapBuffers(window);
+	}
 }

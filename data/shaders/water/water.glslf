@@ -471,6 +471,25 @@ float	getDensityAtPos(vec3 pos)
 	densityBDL = getDensityAtMapPoint(gx,  ngy, ngz);
 	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
 
+	// densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityFUR = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityFDL = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityFDR = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityBUL = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityBUR = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityBDL = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityBDR = getDensityAtMapPoint(gx,  gy,  gz);
+
+	// float tkt = getDensityAtMapPoint(gx,  gy,  gz);
+	// densityFUL = tkt;
+	// densityFUR = tkt;
+	// densityFDL = tkt;
+	// densityFDR = tkt;
+	// densityBUL = tkt;
+	// densityBUR = tkt;
+	// densityBDL = tkt;
+	// densityBDR = tkt;
+
 	// Merge density on x axis
 	densityFU = lerp(densityFUL, densityFUR, dx);
 	densityFD = lerp(densityFDL, densityFDR, dx);
@@ -485,7 +504,7 @@ float	getDensityAtPos(vec3 pos)
 	density = lerp(densityF, densityB, dz);
 	// return (density);
 	if (density > waterDensity)
-		return (0.3);
+		return (rayStep);
 	return (0.0);
 }
 

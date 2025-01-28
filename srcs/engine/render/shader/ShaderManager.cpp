@@ -74,12 +74,6 @@ WaterShader	*ShaderManager::getWaterShader(void)
 }
 
 
-WaterShader	*ShaderManager::getWaterShaderDebug(void)
-{
-	return (&this->waterShaderDebug);
-}
-
-
 MenuShader	*ShaderManager::getMenuShader(void)
 {
 	return (&this->menuShader);
@@ -168,14 +162,6 @@ void	ShaderManager::loadWaterShaderFiles(
 						std::string fShaderFile)
 {
 	this->waterShader.load(vShaderFile, fShaderFile);
-}
-
-
-void	ShaderManager::loadWaterShaderDebugFiles(
-						std::string vShaderFile,
-						std::string fShaderFile)
-{
-	this->waterShaderDebug.load(vShaderFile, fShaderFile);
 }
 
 

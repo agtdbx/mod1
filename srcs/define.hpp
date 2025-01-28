@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/28 20:09:07 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 22:44:22 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@
 # define WATER_DENSITY 0.003
 
 # define MAP_DENSITY_CELL_SIZE 2
-# define RENDER_CELL_SIZE 20.0f
 # define RAY_STEP 0.3f
 
 # define PRINT_FPS_TIME 1.0f
@@ -109,6 +108,7 @@ const float		WATER_RADIUS = 2.0f;
 const float		WATER_RADIUS2 = WATER_RADIUS * WATER_RADIUS;
 const float		WATER_MAX_XZ = MAP_SIZE - WATER_RADIUS;
 const float		WATER_MAX_HEIGHT = MAP_MAX_HEIGHT - WATER_RADIUS;
+const float		SMOOTHING_RADIUS2 = SMOOTHING_RADIUS * SMOOTHING_RADIUS;
 const float		SMOOTHING_SCALE = 15.0f / (2 * PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_DERIVATE_SCALE = 15.0f / (PI * pow(SMOOTHING_RADIUS, 5));
 const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIUS, 9));
@@ -116,5 +116,29 @@ const float		SMOOTHING_VISCOSITY_SCALE = 315.0f / (64 * PI * pow(SMOOTHING_RADIU
 std::vector<Vec3>	parse(char *name);
 std::vector<std::vector<double>> interpolate(std::vector<Vec3> & parameterPoints);
 
+typedef struct s_performanceLog
+{
+	// Global time
+	int		nbCall;
+	double	timeBeforePrint;
+	double	deltas;
+
+	// More stats
+	bool	moreStats;
+
+	// Compute stats
+	double	timePredictedPos;
+	double	timePutInGrid;
+	double	timeComputeDensity;
+	double	timeComputeMapDensity;
+	double	timeApplyPressure;
+	double	timeUpdatePositions;
+
+	// Draw stats
+	double	timeDrawTerrain;
+	double	timeDrawWater;
+	double	timeSwapBuffer;
+
+}	t_performanceLog;
 
 #endif

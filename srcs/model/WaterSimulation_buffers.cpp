@@ -41,41 +41,55 @@ void	WaterSimulation::generateTextureBuffer(void)
 
 void	WaterSimulation::generateFlatGrid(void)
 {
-	int	cellSize;
+	// int	cellSize;
 
-	// grid
+	// // grid
+	// this->gridFlat.clear();
+	// this->gridOffsets.clear();
+
+	// this->gridFlatSize = 0;
+	// this->gridOffsetsSize = 0;
+
+	// for (std::vector<int> &cell : this->grid)
+	// {
+	// 	cellSize = cell.size();
+	// 	for (int i = 0; i < cellSize; i++)
+	// 		this->gridFlat.push_back(cell[i]);
+	// 	this->gridOffsets.push_back(this->gridFlatSize);
+	// 	this->gridFlatSize += cellSize;
+	// 	this->gridOffsetsSize++;
+	// }
+
+	// // render grid
+	// this->renderGridFlat.clear();
+	// this->renderGridOffsets.clear();
+
+	// this->renderGridFlatSize = 0;
+	// this->renderGridOffsetsSize = 0;
+
+	// for (std::vector<int> &cell : this->renderGrid)
+	// {
+	// 	cellSize = cell.size();
+	// 	for (int i = 0; i < cellSize; i++)
+	// 		this->renderGridFlat.push_back(cell[i]);
+	// 	this->renderGridOffsets.push_back(this->renderGridFlatSize);
+	// 	this->renderGridFlatSize += cellSize;
+	// 	this->renderGridOffsetsSize++;
+	// }
+
+	// Default value of flat grid
 	this->gridFlat.clear();
+	this->gridFlatSize = this->nbParticules;
+	for (int i = 0; i < this->gridFlatSize; i++)
+		this->gridFlat.push_back(0.0f);
+	this->gridFlatToBuffer();
+
+	// Default value for offsets
 	this->gridOffsets.clear();
-
-	this->gridFlatSize = 0;
-	this->gridOffsetsSize = 0;
-
-	for (std::vector<int> &cell : this->grid)
-	{
-		cellSize = cell.size();
-		for (int i = 0; i < cellSize; i++)
-			this->gridFlat.push_back(cell[i]);
-		this->gridOffsets.push_back(this->gridFlatSize);
-		this->gridFlatSize += cellSize;
-		this->gridOffsetsSize++;
-	}
-
-	// render grid
-	this->renderGridFlat.clear();
-	this->renderGridOffsets.clear();
-
-	this->renderGridFlatSize = 0;
-	this->renderGridOffsetsSize = 0;
-
-	for (std::vector<int> &cell : this->renderGrid)
-	{
-		cellSize = cell.size();
-		for (int i = 0; i < cellSize; i++)
-			this->renderGridFlat.push_back(cell[i]);
-		this->renderGridOffsets.push_back(this->renderGridFlatSize);
-		this->renderGridFlatSize += cellSize;
-		this->renderGridOffsetsSize++;
-	}
+	this->gridOffsetsSize = this->gridSize;
+	for (int i = 0; i < this->gridOffsetsSize; i++)
+		this->gridOffsets.push_back(0.0f);
+	this->gridOffsetsToBuffer();
 }
 
 

@@ -39,52 +39,85 @@ void	WaterSimulation::computePredictedPositions(
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-	// Buffer to vector
-	this->predictedPositionsFromBuffer();
 }
 
 
 void	WaterSimulation::putParticlesInGrid(
 			ShaderManager *shaderManager)
 {
-	int	gx, gy, gz, gid;
+	// int	gx, gy, gz, gid;
 
-	// Clear grid
-	for (int i = 0; i < this->gridSize; i++)
-		this->grid[i].clear();
+	// // Buffer to vector
+	// this->predictedPositionsFromBuffer();
+	// // Clear grid
+	// for (int i = 0; i < this->gridSize; i++)
+	// 	this->grid[i].clear();
 
-	// Put particles into grid
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		gx = this->predictedPositions[i].x / SMOOTHING_RADIUS;
-		gy = this->predictedPositions[i].y / SMOOTHING_RADIUS;
-		gz = this->predictedPositions[i].z / SMOOTHING_RADIUS;
+	// // Put particles into grid
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	gx = this->predictedPositions[i].x / SMOOTHING_RADIUS;
+	// 	gy = this->predictedPositions[i].y / SMOOTHING_RADIUS;
+	// 	gz = this->predictedPositions[i].z / SMOOTHING_RADIUS;
 
-		gid = gx + gz * this->gridW + gy * this->idHsize;
-		this->grid[gid].push_back(i);
-	}
+	// 	gid = gx + gz * this->gridW + gy * this->idHsize;
+	// 	this->grid[gid].push_back(i);
+	// }
 
-	// Clear render grid
-	for (int i = 0; i < this->renderGridSize; i++)
-		this->renderGrid[i].clear();
+	// // Clear render grid
+	// for (int i = 0; i < this->renderGridSize; i++)
+	// 	this->renderGrid[i].clear();
 
-	// Put particles into render grid
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		gx = this->predictedPositions[i].x / RENDER_CELL_SIZE;
-		gy = this->predictedPositions[i].y / RENDER_CELL_SIZE;
-		gz = this->predictedPositions[i].z / RENDER_CELL_SIZE;
+	// // Put particles into render grid
+	// for (int i = 0; i < this->nbParticules; i++)
+	// {
+	// 	gx = this->predictedPositions[i].x / RENDER_CELL_SIZE;
+	// 	gy = this->predictedPositions[i].y / RENDER_CELL_SIZE;
+	// 	gz = this->predictedPositions[i].z / RENDER_CELL_SIZE;
 
-		gid = gx + gz * this->renderGridW + gy * this->renderIdHsize;
-		this->renderGrid[gid].push_back(i);
-	}
+	// 	gid = gx + gz * this->renderGridW + gy * this->renderIdHsize;
+	// 	this->renderGrid[gid].push_back(i);
+	// }
 
-	this->generateFlatGrid();
-	this->gridFlatToBuffer();
-	this->gridOffsetsToBuffer();
-	this->renderGridFlatToBuffer();
-	this->renderGridOffsetsToBuffer();
+	// this->generateFlatGrid();
+	// this->gridFlatToBuffer();
+	// this->gridOffsetsToBuffer();
+	// this->renderGridFlatToBuffer();
+	// this->renderGridOffsetsToBuffer();
+
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("putInGrid");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
+	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
+	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
+								this->textureBufferPositions,
+								this->texturePositions);
+
+	// Compute shader output setup
+	giveFloatTextureInputToShader(0, true, this->textureBufferGridOffsets,
+									this->textureGridOffsets);
+	giveFloatTextureInputToShader(1, true, this->textureBufferGridFlat,
+									this->textureGridFlat);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 

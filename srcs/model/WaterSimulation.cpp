@@ -26,6 +26,7 @@ WaterSimulation::WaterSimulation(void)
 	this->gridSize = this->gridW * this->gridH * this->gridD;
 	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
+	this->numGroupsPutInGrid = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
 	for (int i = 0; i < this->gridSize; i++)
 	{
@@ -93,7 +94,7 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->gridOffsets = obj.gridOffsets;
 	this->numGroups = obj.numGroups;
 	this->numGroupsMapDensity = obj.numGroupsMapDensity;
-	this->needToUpdateBuffers = obj.needToUpdateBuffers;
+	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
@@ -165,7 +166,7 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	this->gridFlat = obj.gridFlat;
 	this->gridOffsets = obj.gridOffsets;
 	this->numGroups = obj.numGroups;
-	this->needToUpdateBuffers = obj.needToUpdateBuffers;
+	this->needToUpdateBuffers = true;
 
 	return (*this);
 }
@@ -179,6 +180,7 @@ void	WaterSimulation::addWater(glm::vec3 position)
 
 	if (this->needToUpdateBuffers == false)
 	{
+		this->generateFlatGrid();
 		this->positionsFromBuffer();
 		this->predictedPositionsFromBuffer();
 		this->velocitiesFromBuffer();

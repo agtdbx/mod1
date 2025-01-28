@@ -43,7 +43,7 @@ private:
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
 							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
-							numGroupsMapDensity,
+							numGroupsPutInGrid, numGroupsMapDensity,
 							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
 							renderGridFlatSize, renderGridOffsetsSize;
 	GLuint					textureBufferPositions, texturePositions,

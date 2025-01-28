@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 15:08:08 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 12:44:34 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,6 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("sprintSpeed", "data/textures/sprintSpeed.png");
 		textureManager->addTexture("waterDensity", "data/textures/waterDensity.png");
 
-
-
-
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 
@@ -102,6 +99,7 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 
 		//compute shader
 		shaderManager->addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
+		shaderManager->addComputeShader("putInGrid", "data/shaders/simulation/putInGrid.glslc");
 		shaderManager->addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager->addComputeShader("mapDensities", "data/shaders/simulation/mapDensities.glslc");
 		shaderManager->addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");

@@ -536,7 +536,6 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 		rayPos += rayDir * rayStep;
 		dist += rayStep;
 	}
-
 	vec3	color = waterColor;
 	float	transparency = (densityAlongRay / maxDensity) * 0.8;
 

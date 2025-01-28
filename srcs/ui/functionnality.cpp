@@ -6,12 +6,12 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 13:29:50 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:29:11 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
-#include <interfaceDeclaratiom.hpp>
+#include <ui/interfaceDeclaratiom.hpp>
 #include <model/WaterSimulation.hpp>
 #include <model/Pannel.hpp>
 #include <engine/maths/Random.hpp>

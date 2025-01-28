@@ -6,13 +6,13 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 15:08:08 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:34:11 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
-#include <interfaceDeclaratiom.hpp>
+#include <ui/interfaceDeclaratiom.hpp>
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
 #include <model/Slider.hpp>

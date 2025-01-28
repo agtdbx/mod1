@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 15:04:13 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:33:20 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ typedef struct s_simulationVariable
 	bool				drawDebug;
 	float				waterDensity;
 }	t_simulationVariable;
+
+void	uiTick(t_simulationVariable *sVar);
 
 void	addWater(void * arg);
 void	changeBoolStatus(void *arg);

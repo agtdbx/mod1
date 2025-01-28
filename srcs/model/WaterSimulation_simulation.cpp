@@ -195,6 +195,7 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	// Compute shader inputs setup
 	giveFloatToShader(shaderId, "delta", delta);
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingRadius2", SMOOTHING_RADIUS2);
 	giveFloatToShader(shaderId, "smoothingDerivateScale",
 						SMOOTHING_DERIVATE_SCALE);
 	giveFloatToShader(shaderId, "smoothingViscosityScale",

@@ -46,6 +46,7 @@ private:
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
+							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
 							textureBufferGridOffsets, textureGridOffsets,
@@ -65,6 +66,7 @@ private:
 	void		velocitiesFromBuffer(void);
 	void		densitiesToBuffer(void);
 	void		densitiesFromBuffer(void);
+	void		pressuresToBuffer(void);
 	void		gridFlatToBuffer(void);
 	void		gridOffsetsToBuffer(void);
 

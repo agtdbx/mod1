@@ -100,6 +100,9 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferDensities);
 	glDeleteTextures(1, &this->textureDensities);
 
+	glDeleteBuffers(1, &this->textureBufferPressures);
+	glDeleteTextures(1, &this->texturePressures);
+
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
@@ -108,6 +111,8 @@ WaterSimulation::~WaterSimulation()
 
 	glDeleteBuffers(1, &this->textureBufferGridOffsets);
 	glDeleteTextures(1, &this->textureGridOffsets);
+
+	glDeleteBuffers(1, &this->ssboGridTmp);
 }
 
 
@@ -209,6 +214,7 @@ void	WaterSimulation::tick(
 		this->predictedPositionsToBuffer();
 		this->velocitiesToBuffer();
 		this->densitiesToBuffer();
+		this->pressuresToBuffer();
 
 		this->needToUpdateBuffers = false;
 	}

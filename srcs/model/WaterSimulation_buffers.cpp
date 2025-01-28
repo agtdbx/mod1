@@ -22,6 +22,9 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferDensities);
 	glGenTextures(1, &this->textureDensities);
 
+	glGenBuffers(1, &this->textureBufferPressures);
+	glGenTextures(1, &this->texturePressures);
+
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
@@ -139,6 +142,14 @@ void	WaterSimulation::densitiesFromBuffer(void)
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferDensities);
 	glGetBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(float) * this->nbParticules,
 						this->densities.data());
+}
+
+
+void	WaterSimulation::pressuresToBuffer(void)
+{
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPressures);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->nbParticules,
+					this->densities.data(), GL_STATIC_DRAW);
 }
 
 

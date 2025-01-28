@@ -3,10 +3,13 @@
 layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 
 layout(r32f, binding = 0) uniform imageBuffer densitiesBuffer;
+layout(r32f, binding = 1) uniform imageBuffer pressuresBuffer;
 
 uniform float			smoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
+uniform float			targetDensity;
+uniform float			pressureMultiplier;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
@@ -81,17 +84,25 @@ float	calculateDensity(vec3 position)
 	return (density);
 }
 
+float	convertDensityToPressure(float density)
+{
+	return ((density - targetDensity) * pressureMultiplier);
+}
+
 void main()
 {
 	int		particleIndex;
 	float	density;
+	float	pressure;
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
 	position = texelFetch(positionsBuffer, particleIndex).rgb;
 
 	density = calculateDensity(position);
+	pressure = convertDensityToPressure(density);
 
 	// Write the value to the buffer
 	imageStore(densitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
+	imageStore(pressuresBuffer, particleIndex, vec4(pressure, 0.0, 0.0, 1.0));
 }

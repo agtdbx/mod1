@@ -53,6 +53,7 @@ WaterSimulation::WaterSimulation(void)
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
 	this->generateMapDensity();
+	this->generateOffsetGrid();
 }
 
 
@@ -79,6 +80,7 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
 	this->generateMapDensity();
+	this->generateOffsetGrid();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -172,6 +174,9 @@ void	WaterSimulation::addWater(glm::vec3 position)
 
 void	WaterSimulation::addWater(glm::vec3 position, glm::vec3 velocity)
 {
+	if (this->nbParticules >= NB_MAX_PARTICLES)
+		return ;
+
 	if (this->needToUpdateBuffers == false)
 	{
 		this->positionsFromBuffer();
@@ -194,7 +199,7 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 {
 	if (this->needToUpdateBuffers == true)
 	{
-		// this->generateFlatGrid();
+		this->generateFlatGrid();
 		this->positionsToBuffer();
 		this->predictedPositionsToBuffer();
 		this->velocitiesToBuffer();
@@ -204,7 +209,7 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 	}
 
 	this->computePredictedPositions(shaderManager, delta); // gpu
-	this->putParticlesInGrid(shaderManager); // cpu
+	this->putParticlesInGrid(shaderManager); // gpu
 	this->computeDensity(shaderManager); // gpu
 	this->computeMapDensity(shaderManager); // gpu
 	this->calculatesAndApplyPressure(shaderManager, delta); // gpu

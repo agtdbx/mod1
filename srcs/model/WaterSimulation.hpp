@@ -47,10 +47,12 @@ private:
 							textureBufferDensities, textureDensities,
 							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
-							textureBufferGridOffsets, textureGridOffsets;
+							textureBufferGridOffsets, textureGridOffsets,
+							ssboGridTmp;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
+	void		generateOffsetGrid(void);
 	void		generateFlatGrid(void);
 	void		generateMapDensity(void);
 

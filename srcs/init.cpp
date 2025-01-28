@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 15:51:59 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/28 19:32:01 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 
 		//watershader
 		shaderManager->loadWaterShaderFiles("data/shaders/water/water.glslv", "data/shaders/water/water.glslf");
-		shaderManager->loadWaterShaderDebugFiles("data/shaders/water/water.glslv", "data/shaders/water/waterBall.glslf");
 
 		//menu shader
 		shaderManager->loadMenuShaderFiles("data/shaders/menu.vs", "data/shaders/menu.fs");

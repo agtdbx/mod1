@@ -26,7 +26,7 @@ void		initUi(
 static void	events(
 				GLFWwindow* window,
 				InputManager *inputManager);
-static bool	computation(
+static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				OpenGLContext *context,
@@ -44,7 +44,6 @@ static void	draw(
 				WaterSimulation	*simulation);
 
 
-#include <ctime> // TODO: REMOVE
 int	main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -72,8 +71,6 @@ int	main(int argc, char **argv)
 		std::cerr << "Error : Opengl init failed" << std::endl;
 		return (1);
 	}
-
-
 
 	OpenGLContext	context;
 
@@ -121,15 +118,10 @@ int	main(int argc, char **argv)
 	inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
 	inputManager.mouse.setVisible(context.window, false);
 
-	std::clock_t	start; // TODO : REMOVE
-	int				nbLoop = 0; // TODO : REMOVE
-	double			timeSimulation = 0.0; // TODO : REMOVE
-	double			timeDraw = 0.0; // TODO : REMOVE
 	while (!glfwWindowShouldClose(context.window))
 	{
 		events(context.window, &inputManager);
 
-		start = std::clock();
 		// Close window on escape
 		if (inputManager.escape.isPressed())
 			break;
@@ -216,40 +208,19 @@ int	main(int argc, char **argv)
 			sVar.generateDelay =  sVar.pannelVector[6][1.0f].getValue() * 2 * GENERATE_TIME_BEFORE_NEW_PARTICULE;
 		}
 
-		start = std::clock();
-		bool print;
 		// Compute part
 		if (sVar.needStep)
 		{
-			print = computation(&inputManager, &camera, &context, &sVar, &simulation,
+			computation(&inputManager, &camera, &context, &sVar, &simulation,
 						&shaderManager, &terrain, 1.0f/100.0f);
 			sVar.needStep = false;
 		}
 		else
-			print = computation(&inputManager, &camera, &context, &sVar, &simulation,
+			computation(&inputManager, &camera, &context, &sVar, &simulation,
 						&shaderManager, &terrain, 0.0);
-		timeSimulation += ((double)(std::clock() - start) / CLOCKS_PER_SEC) * 1000000.0;
 
 		// Drawing part
-		start = std::clock();
 		draw(context.window, &camera, &shaderManager, &terrain, &sVar, &simulation);
-		timeDraw += ((double)(std::clock() - start) / CLOCKS_PER_SEC) * 1000000.0;
-
-		nbLoop++;
-		if (print)
-		{
-			int	avgSimulation = timeSimulation / nbLoop;
-			int	avgDraw = timeDraw / nbLoop;
-			int	avgTotal = (timeSimulation + timeDraw) / nbLoop;
-
-			printf("simulation : %7i us\n", avgSimulation);
-			printf("render     : %7i us\n", avgDraw);
-			printf("total      : %7i us\n\n", avgTotal);
-
-			nbLoop = 0;
-			timeSimulation = 0.0;
-			timeDraw = 0.0;
-		}
 	}
 
 	context.close();
@@ -269,7 +240,7 @@ static void	events(
 }
 
 
-static bool	computation(
+static void	computation(
 				InputManager *inputManager,
 				Camera *camera,
 				OpenGLContext *context,
@@ -287,8 +258,6 @@ static bool	computation(
 	static double	lastTime = 0.0;
 	double			currentTime, delta, cameraSpeed;
 
-	bool	print = false;
-
 	currentTime = glfwGetTime();
 	delta = currentTime - lastTime;
 	lastTime = currentTime;
@@ -297,12 +266,11 @@ static bool	computation(
 	nbCall++;
 	if (timePrintFps >= PRINT_FPS_TIME)
 	{
-		print = true;
 		double	avg = timePrintFps / (double)nbCall;
 		printf("fps : %8.3f, %5i particules\n", 1.0 / avg,
 				simulation->getNbParticules());
-
-		timePrintFps -= PRINT_FPS_TIME;
+		while (timePrintFps >= PRINT_FPS_TIME)
+			timePrintFps -= PRINT_FPS_TIME;
 		nbCall = 0;
 	}
 	if (deltaConst)
@@ -392,8 +360,6 @@ static bool	computation(
 		simulation->tick(shaderManager, terrain, delta);
 	if (deltaConst)
 		simulation->tick(shaderManager, terrain, deltaConst);
-
-	return (print);
 }
 
 

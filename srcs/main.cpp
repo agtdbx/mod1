@@ -2,7 +2,7 @@
 #include <sstream>
 
 #include <define.hpp>
-#include <interfaceDeclaratiom.hpp>
+#include <interfaceDeclaration.hpp>
 #include <engine/inputs/InputManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
 #include <engine/render/Mesh.hpp>
@@ -342,9 +342,6 @@ static bool	computation(
 		pannel.tick(delta);
 	}
 
-	if (inputManager->alt.isPressed())
-		sVar->drawDebug = !sVar->drawDebug;
-
 	// To avoid big simulation step
 	if (delta > MINIMUM_SIMULATION_UPDATE)
 		delta = MINIMUM_SIMULATION_UPDATE;
@@ -419,10 +416,7 @@ static void	draw(
 	}
 
 	terrain->renderMesh(camera, shaderManager);
-	if (!sVar->drawDebug)
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
-	else
-		simulation->drawDebug(camera, shaderManager, terrain, &sVar->watercolor);
+	simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
 
 	// Display the new image
 	glfwSwapBuffers(window);

@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/27 15:27:48 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:47:26 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@
 # define WATER_DENSITY 0.003
 
 # define MAP_DENSITY_CELL_SIZE 2
-# define RENDER_CELL_SIZE 20.0f
 # define RAY_STEP 0.3f
 
 # define PRINT_FPS_TIME 1.0f

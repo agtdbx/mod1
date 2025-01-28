@@ -26,8 +26,6 @@ public:
 	void	tick(ShaderManager *shaderManager, Terrain *terrain, float delta);
 	void	draw(Camera *camera, ShaderManager *shaderManager,
 					Terrain *terrain, glm::vec3 *waterColor, float waterDensity);
-	void	drawDebug(Camera *camera, ShaderManager *shaderManager,
-						Terrain *terrain, glm::vec3 *waterColor);
 	void	clear(void);
 
 private:
@@ -36,25 +34,20 @@ private:
 	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
 	std::vector<std::vector<int>> grid;
-	std::vector<std::vector<int>> renderGrid;
-	std::vector<float>		gridFlat, gridOffsets, renderGridFlat, renderGridOffsets;
+	std::vector<float>		gridFlat, gridOffsets;
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							gridFlatSize, gridOffsetsSize, idHsize, numGroups,
 							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
-							numGroupsPutInGrid, numGroupsMapDensity,
-							renderGridSize, renderGridW, renderGridH, renderGridD, renderIdHsize,
-							renderGridFlatSize, renderGridOffsetsSize;
+							numGroupsPutInGrid, numGroupsMapDensity;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
 							textureBufferMapDensities, textureMapDensities,
 							textureBufferGridFlat, textureGridFlat,
-							textureBufferGridOffsets, textureGridOffsets,
-							textureBufferRenderGridFlat, textureRenderGridFlat,
-							textureBufferRenderGridOffsets, textureRenderGridOffsets;
+							textureBufferGridOffsets, textureGridOffsets;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
@@ -71,8 +64,6 @@ private:
 	void		densitiesFromBuffer(void);
 	void		gridFlatToBuffer(void);
 	void		gridOffsetsToBuffer(void);
-	void		renderGridFlatToBuffer(void);
-	void		renderGridOffsetsToBuffer(void);
 
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);

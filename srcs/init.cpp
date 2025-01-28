@@ -6,13 +6,13 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 12:44:34 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:51:59 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
-#include <interfaceDeclaratiom.hpp>
+#include <interfaceDeclaration.hpp>
 #include <model/Button.hpp>
 #include <model/Pannel.hpp>
 #include <model/Slider.hpp>
@@ -129,7 +129,6 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->generateIntensity = GENERATE_INTENSITY;
 	sVar->generateDelay = GENERATE_TIME_BEFORE_NEW_PARTICULE;
 	sVar->generatePos = Vec3(GENERATE_START_POS);
-	sVar->drawDebug = false;
 	sVar->waterDensity = WATER_DENSITY;
 
 	//pannel

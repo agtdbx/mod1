@@ -11,7 +11,6 @@ WaterSimulation::WaterSimulation(void)
 	this->nbParticules = 0;
 
 	int smoothing_radius = SMOOTHING_RADIUS;
-	int render_cell_size = RENDER_CELL_SIZE;
 
 	// Grid init
 	this->gridW = MAP_SIZE / smoothing_radius;
@@ -47,25 +46,6 @@ WaterSimulation::WaterSimulation(void)
 	this->mapDensitySize = this->mapDensityW * this->mapDensityH * this->mapDensityD;
 	this->numGroupsMapDensity = (this->mapDensitySize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
-	// Render grid init
-	this->renderGridW = MAP_SIZE / render_cell_size;
-	if (MAP_SIZE > render_cell_size && MAP_SIZE % render_cell_size != 0)
-		this->renderGridW++;
-	this->renderGridH = MAP_MAX_HEIGHT / render_cell_size;
-	if (MAP_MAX_HEIGHT > render_cell_size
-		&& (int)MAP_MAX_HEIGHT % render_cell_size != 0)
-		this->renderGridH++;
-	this->renderGridD = this->renderGridW;
-	this->renderIdHsize = this->renderGridW * this->renderGridD;
-	this->renderGridSize = this->renderGridW * this->renderGridH * this->renderGridD;
-	this->renderGridFlatSize = 0;
-	this->renderGridOffsetsSize = 0;
-
-	for (int i = 0; i < this->renderGridSize; i++)
-	{
-		std::vector<int>	rGridContent;
-		this->renderGrid.push_back(rGridContent);
-	}
 
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	this->needToUpdateBuffers = true;
@@ -125,12 +105,6 @@ WaterSimulation::~WaterSimulation()
 
 	glDeleteBuffers(1, &this->textureBufferGridOffsets);
 	glDeleteTextures(1, &this->textureGridOffsets);
-
-	glDeleteBuffers(1, &this->textureBufferRenderGridFlat);
-	glDeleteTextures(1, &this->textureRenderGridFlat);
-
-	glDeleteBuffers(1, &this->textureBufferRenderGridOffsets);
-	glDeleteTextures(1, &this->textureRenderGridOffsets);
 }
 
 
@@ -180,7 +154,6 @@ void	WaterSimulation::addWater(glm::vec3 position)
 
 	if (this->needToUpdateBuffers == false)
 	{
-		this->generateFlatGrid();
 		this->positionsFromBuffer();
 		this->predictedPositionsFromBuffer();
 		this->velocitiesFromBuffer();
@@ -221,6 +194,7 @@ void	WaterSimulation::tick(ShaderManager *shaderManager, Terrain *terrain, float
 {
 	if (this->needToUpdateBuffers == true)
 	{
+		// this->generateFlatGrid();
 		this->positionsToBuffer();
 		this->predictedPositionsToBuffer();
 		this->velocitiesToBuffer();
@@ -252,8 +226,8 @@ void	WaterSimulation::draw(
 				terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
 				terrainBufferTextureOffsets, terrainTextureOffsets;
 
-	// if (this->nbParticules == 0)
-	// 	return ;
+	if (this->nbParticules == 0)
+		return ;
 
 	// Get terrain data
 	terrainBufferTextureDataGrid = terrain->getTextureBufferTerrainGridData();
@@ -320,59 +294,6 @@ void	WaterSimulation::draw(
 								terrainTextureOffsets);
 
 	// Draw triangles
-	glBindVertexArray(shaderManager->getVAOId());
-	glDrawArrays(GL_TRIANGLES, 0, 12);
-}
-
-
-void	WaterSimulation::drawDebug(
-			Camera *camera,
-			ShaderManager *shaderManager,
-			Terrain *terrain,
-			glm::vec3 *waterColor)
-{
-	WaterShader *shader;
-	int			shaderId;
-
-	if (this->nbParticules == 0)
-		return ;
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12,
-					this->triangleOverScreen, GL_STATIC_DRAW);
-
-	shader = shaderManager->getWaterShaderDebug();
-	shader->use();
-	shaderId = shader->getShaderId();
-
-	giveVec3ToShader(shaderId, "lightPos", camera->getLightPosition());
-	giveVec3ToShader(shaderId, "cameraPos", camera->getPosition());
-	giveVec3ToShader(shaderId, "cameraFront", camera->getFront());
-	giveVec3ToShader(shaderId, "cameraRight", camera->getRight());
-	giveVec3ToShader(shaderId, "cameraUp", camera->getUp());
-	giveVec3ToShader(shaderId, "waterColor", *waterColor);
-	giveFloatToShader(shaderId, "cameraFOV", CAMERA_FOV);
-	giveFloatToShader(shaderId, "cameraFar", CAMERA_MAX_VIEW_DIST);
-	giveFloatToShader(shaderId, "planeWidth", camera->getPlaneWidth());
-	giveFloatToShader(shaderId, "planeHeight", camera->getPlaneHeight());
-	giveFloatToShader(shaderId, "waterRadius2", WATER_RADIUS2);
-	giveFloatToShader(shaderId, "renderCellSize", RENDER_CELL_SIZE);
-	giveIntToShader(shaderId, "nbPositions", this->nbParticules);
-	giveIntToShader(shaderId, "mapSize", MAP_SIZE);
-	giveIntToShader(shaderId, "mapHeight", WATER_MAX_HEIGHT);
-	giveIntToShader(shaderId, "renderGridW", this->renderGridW);
-	giveIntToShader(shaderId, "renderGridH", this->renderGridH);
-	giveIntToShader(shaderId, "renderGridD", this->renderGridD);
-	giveIntToShader(shaderId, "renderGridSize", this->renderGridFlatSize);
-	giveIntToShader(shaderId, "renderOffsetsSize", this->renderGridOffsetsSize);
-	giveVec4TextureToShader(shaderId, "positionsBuffer", 0,
-							this->textureBufferPositions, this->texturePositions);
-	giveFloatTextureToShader(shaderId, "renderGridBuffer", 1,
-							this->textureBufferRenderGridFlat,
-							this->textureRenderGridFlat);
-	giveFloatTextureToShader(shaderId, "renderOffsetsBuffer", 2,
-							this->textureBufferRenderGridOffsets,
-							this->textureRenderGridOffsets);
-
 	glBindVertexArray(shaderManager->getVAOId());
 	glDrawArrays(GL_TRIANGLES, 0, 12);
 }

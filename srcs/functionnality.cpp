@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/24 13:29:50 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:52:02 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
-#include <interfaceDeclaratiom.hpp>
+#include <interfaceDeclaration.hpp>
 #include <model/WaterSimulation.hpp>
 #include <model/Pannel.hpp>
 #include <engine/maths/Random.hpp>
@@ -74,7 +74,7 @@ void	generateWaveWest(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
-	
+
 	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
 	{
 		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
@@ -82,11 +82,11 @@ void	generateWaveWest(void *arg)
 			for (float z = 0; z < sVar->waveThickess; z += WATER_RADIUS * 2)
 			{
 				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 1.0f) * sVar->waveVelocity);
-			
+
 			}
 		}
 	}
-	
+
 }
 
 void	generateWaveEst(void *arg)
@@ -104,14 +104,14 @@ void	generateWaveEst(void *arg)
 			}
 		}
 	}
-	
+
 }
 
 void	generateWaveNorth(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
-	
+
 	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
 	{
 		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
@@ -119,11 +119,11 @@ void	generateWaveNorth(void *arg)
 			for (float x = 0; x < sVar->waveThickess; x += WATER_RADIUS * 2)
 			{
 				simulation->addWater(glm::vec3(x, y, z), glm::vec3(1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
-			
+
 			}
 		}
 	}
-	
+
 }
 
 void	generateWaveSouth(void *arg)
@@ -141,7 +141,7 @@ void	generateWaveSouth(void *arg)
 			}
 		}
 	}
-	
+
 }
 
 void	generateWaveAll(void *arg)

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 17:27:11 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:05:55 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
 #include <ui/interfaceDeclaration.hpp>
+#include <ui/Pannel.hpp>
 #include <model/WaterSimulation.hpp>
-#include <model/Pannel.hpp>
 #include <engine/maths/Random.hpp>
 
 
@@ -22,6 +22,7 @@ void	changeBoolStatus(void *arg)
 	bool	*boolean = (bool *)arg;
 	*boolean = !(*boolean);
 }
+
 
 void	updateRain(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
@@ -33,6 +34,7 @@ void	updateRain(WaterSimulation *simulation, t_simulationVariable *sVar)
 								glm::vec3(0.0f, 1.0f, 0.0f) * RAIN_VELOCITY);
 	}
 }
+
 
 void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
@@ -57,6 +59,7 @@ void	fillingPool(WaterSimulation *simulation, t_simulationVariable *sVar)
 	}
 }
 
+
 void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar)
 {
 	static Random	random;
@@ -69,6 +72,7 @@ void	generateAt(WaterSimulation *simulation, t_simulationVariable *sVar)
 										sVar->generatePos.z + (random.random() * 2) - 1));
 	}
 }
+
 
 void	generateWaveWest(void *arg)
 {
@@ -89,6 +93,7 @@ void	generateWaveWest(void *arg)
 
 }
 
+
 void	generateWaveEst(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
@@ -106,6 +111,7 @@ void	generateWaveEst(void *arg)
 	}
 
 }
+
 
 void	generateWaveNorth(void *arg)
 {
@@ -126,6 +132,7 @@ void	generateWaveNorth(void *arg)
 
 }
 
+
 void	generateWaveSouth(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
@@ -144,6 +151,7 @@ void	generateWaveSouth(void *arg)
 
 }
 
+
 void	generateWaveAll(void *arg)
 {
 	generateWaveEst(arg);
@@ -151,6 +159,7 @@ void	generateWaveAll(void *arg)
 	generateWaveNorth(arg);
 	generateWaveSouth(arg);
 }
+
 
 void	moveWavePannel(void *arg)
 {
@@ -164,6 +173,7 @@ void	moveWavePannel(void *arg)
 		pannel->addPosToGo(-120, 0);
 }
 
+
 void	moveRainPannel(void *arg)
 {
 	static bool isHide = true;
@@ -176,6 +186,7 @@ void	moveRainPannel(void *arg)
 		pannel->addPosToGo(120, 0);
 }
 
+
 void	moveFillingPannel(void *arg)
 {
 	static bool isHide = true;
@@ -187,6 +198,7 @@ void	moveFillingPannel(void *arg)
 	else
 		pannel->addPosToGo(120, 0);
 }
+
 
 void	moveSettingsPannel(void *arg)
 {
@@ -229,6 +241,7 @@ void	moveLightPannel(void *arg)
 	}
 }
 
+
 void	moveGeneratePannel(void *arg)
 {
 	static bool isHide = true;
@@ -240,6 +253,7 @@ void	moveGeneratePannel(void *arg)
 	else
 		pannel->addPosToGo(240, -0);
 }
+
 
 void	resetPool(void *arg)
 {

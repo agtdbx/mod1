@@ -3,21 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 16:45:42 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:04 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <model/Pannel.hpp>
-
-// #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
-// #include <stdexcept>
-
-// #define STB_IMAGE_IMPLEMENTATION
-// #include <stb_image.h>
+#include <ui/Pannel.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -32,6 +25,7 @@ Pannel::Pannel(float x, float y, float width, float height, unsigned int texture
 	this->baseColor = DEFAULT_PANNEL_COLOR;
 }
 
+
 Pannel::Pannel(float x, float y, float width, float height, unsigned int texture, glm::vec3 baseColor)
 :x_screen(x), y_screen(y), width(width), height(height), x_toGo(x), y_toGo(y)
 {
@@ -39,7 +33,6 @@ Pannel::Pannel(float x, float y, float width, float height, unsigned int texture
 	this->texture = texture;
 	this->baseColor = baseColor;
 }
-
 
 
 Pannel::Pannel(const Pannel &obj)
@@ -60,10 +53,8 @@ Pannel::~Pannel()
 
 }
 
-
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
-
 
 //---- Setters -----------------------------------------------------------------
 
@@ -73,11 +64,13 @@ void	Pannel::setPos(float x, float y)
 	this->y_screen = y;
 }
 
+
 void	Pannel::setPosToGo(float x, float y)
 {
 	this->x_toGo = x;
 	this->y_toGo = y;
 }
+
 
 void	Pannel::addPosToGo(float x, float y)
 {
@@ -97,34 +90,34 @@ Pannel	&Pannel::operator=(const Pannel &obj)
 
 Button& Pannel::operator[](int index)
 {
-    if (index >= this->buttonList.size() || index < 0)
+	if (index >= (int)this->buttonList.size() || index < 0)
 	{
 		throw std::range_error("Pannel error : can't get button of gived index");
-    }
-    return this->buttonList[index];
+	}
+	return this->buttonList[index];
 }
+
 
 Slider& Pannel::operator[](float index)
 {
-    if (index >= (float)this->sliderList.size() || index < 0.0f)
+	if (index >= (float)this->sliderList.size() || index < 0.0f)
 	{
 		throw std::range_error("Pannel error : can't get slider of gived index");
-    }
-    return this->sliderList[(int)index];
+	}
+	return this->sliderList[(int)index];
 }
+
 
 TextEntry& Pannel::operator[](char index)
 {
-    if (index >= (char)this->textEntryList.size() || index < 0.0f)
+	if (index >= (char)this->textEntryList.size() || index < 0.0f)
 	{
 		throw std::range_error("Pannel error : can't get slider of gived index");
-    }
-    return this->textEntryList[(int)index];
+	}
+	return this->textEntryList[(int)index];
 }
 
 //**** PUBLIC METHODS **********************************************************
-
-
 
 void	Pannel::renderMesh( ShaderManager *shaderManager)
 {
@@ -134,7 +127,6 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
 	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
 	glm::vec3 *					color = &this->baseColor;
-	// std::cout << "draw pos : " << this->x_screen << " | " << this->y_screen << std::endl;
 
 	for (Button & button : this->buttonList)
 	{
@@ -147,7 +139,7 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	for (TextEntry & textEntry : this->textEntryList)
 	{
 		textEntry.renderMesh(shaderManager);
-	}	
+	}
 	menuShader = shaderManager->getMenuShader();
 
 	points.push_back(Point2D(Vec2(this->x_screen, this->y_screen), (*color)[0], (*color)[1], (*color)[2]));
@@ -175,13 +167,13 @@ void	Pannel::renderMesh( ShaderManager *shaderManager)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture);
 
-
 	menuShader->use();
 
 	glBindVertexArray(shaderManager->getVAOId());
-	
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
 
 void	Pannel::addButton(Button  b)
 {
@@ -192,6 +184,7 @@ void	Pannel::addButton(Button  b)
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
 
+
 void	Pannel::addSlider(Slider  s)
 {
 	unsigned int indButton = this->sliderList.size();
@@ -201,6 +194,7 @@ void	Pannel::addSlider(Slider  s)
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
 
+
 void	Pannel::addTextEntry(TextEntry  t)
 {
 	unsigned int indButton = this->textEntryList.size();
@@ -209,6 +203,7 @@ void	Pannel::addTextEntry(TextEntry  t)
 	glm::vec2 posButton= newButton.getPos();
 	newButton.setPos(posButton[0] + this->x_screen + this->padding, posButton[1] + this->y_screen + this->padding);
 }
+
 
 void	Pannel::tick(double delta)
 {
@@ -233,11 +228,10 @@ void	Pannel::tick(double delta)
 	if ((this->y_toGo < this->y_screen && this->y_screen + velocity[1]  < this->y_toGo)
 		|| (this->y_toGo > this->y_screen && this->y_screen + velocity[1]  > this->y_toGo))
 			velocity[1] = this->y_toGo - this->y_screen;
-	this->x_screen += velocity[0]; 
+	this->x_screen += velocity[0];
 	this->y_screen += velocity[1];
 	this->moveButton(velocity[0], velocity[1]);
 }
-
 
 //**** PRIVATE METHODS *********************************************************
 
@@ -256,4 +250,3 @@ void	Pannel::moveButton(float mvx, float mvy)
 		textEntry.setPos(textEntry.getPos().x + mvx, textEntry.getPos().y + mvy);
 	}
 }
-

@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 17:25:33 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:04:58 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
 #include <ui/interfaceDeclaration.hpp>
-#include <model/Button.hpp>
-#include <model/Pannel.hpp>
-#include <model/Slider.hpp>
-#include <model/TextEntry.hpp>
+#include <ui/Button.hpp>
+#include <ui/Pannel.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextEntry.hpp>
 
 void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 {
@@ -239,7 +239,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[5][5.0f].setValue(0.5);
 	sVar->pannelVector[5].addButton(Button(310, 150, 30, 30, moveLightPannel, sVar, textureManager->getTexture("noTexture")));
 	sVar->pannelVector[5][9].setSwitchMode(true);
-	
+
 	//filling pannel content
 	sVar->pannelVector[6].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("generate"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[6][0].desactive();
@@ -265,7 +265,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[6][3].desactive();
 	sVar->pannelVector[6].addButton(Button(170, 222, 20, 30,NULL, NULL, textureManager->getTexture("Z"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[6][4].desactive();
-	
+
 	//light pannel content
 	sVar->pannelVector[7].addButton(Button(100, 10, 150, 50,NULL, NULL, textureManager->getTexture("waterColor"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[7][0].desactive();

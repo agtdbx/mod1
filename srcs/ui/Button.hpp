@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Button.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:07 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:08:47 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:48:19 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,15 @@ public:
 	glm::vec2	getPos();
 	void		active();
 	void		desactive();
-	bool	isActive();
-	void	press();
-	void	setArg(void *arg);
-	void	setSwitchMode(bool isSwitch);
-	void	setPos(float x, float y);
-	void	setColor(glm::vec3, int type);
-
-	
+	bool		isActive();
+	void		press();
+	void		setArg(void *arg);
+	void		setSwitchMode(bool isSwitch);
+	void		setPos(float x, float y);
+	void		setColor(glm::vec3, int type);
 
 private:
-	float		x_screen, y_screen, width, height;
+	float			x_screen, y_screen, width, height;
 	unsigned int	texture;
 	glm::vec3		baseColor, underlineColor;
 	void			(*functionToExecute)(void *);
@@ -59,8 +57,6 @@ private:
 	bool			active_B, isSwitch, isON;
 
 	bool			mouseOnButton();
-
-
 };
 
 #endif

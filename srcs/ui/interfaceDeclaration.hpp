@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 16:59:43 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:01 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef INTERFACEDECLARATION_HPP
 # define INTERFACEDECLARATION_HPP
 
-# include <model/Pannel.hpp>
+# include <ui/Pannel.hpp>
 # include <engine/maths/Vec3.hpp>
 # include <model/WaterSimulation.hpp>
 

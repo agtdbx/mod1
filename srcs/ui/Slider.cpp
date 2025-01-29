@@ -3,21 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Slider.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 17:26:31 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 20:06:38 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <model/Slider.hpp>
-
-// #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
-// #include <stdexcept>
-
-// #define STB_IMAGE_IMPLEMENTATION
-// #include <stb_image.h>
+#include <ui/Slider.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -35,6 +28,7 @@ Slider::Slider(float x, float y, float width, float height)
 	this->underlineColor = DEFAULT_BUTTON_UNDERLINE_COLOR;
 }
 
+
 Slider::Slider(float x, float y, float width, float height, glm::vec3 baseColor, glm::vec3 underlineColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
@@ -44,7 +38,6 @@ Slider::Slider(float x, float y, float width, float height, glm::vec3 baseColor,
 	this->baseColor = baseColor;
 	this->underlineColor = underlineColor;
 }
-
 
 
 Slider::Slider(const Slider &obj)
@@ -64,7 +57,6 @@ Slider::~Slider()
 
 }
 
-
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
@@ -73,11 +65,11 @@ glm::vec2	Slider::getPos()
 	return glm::vec2(this->x_screen, this->y_screen);
 }
 
+
 bool	Slider::isActive()
 {
 	return this->active_B;
 }
-
 
 //---- Setters -----------------------------------------------------------------
 
@@ -86,10 +78,12 @@ void	Slider::active()
 	this->active_B = true;
 }
 
+
 void	Slider::desactive()
 {
 	this->active_B = false;
 }
+
 
 void	Slider::setValue(float value)
 {
@@ -100,11 +94,11 @@ void	Slider::setValue(float value)
 		this->value = 1.0f;
 }
 
+
 float	Slider::getValue()
 {
 	return this->value;
 }
-
 
 
 void	Slider::setPos(float x, float y)
@@ -112,7 +106,6 @@ void	Slider::setPos(float x, float y)
 	this->x_screen = x;
 	this->y_screen = y;
 }
-
 
 //---- Operators ---------------------------------------------------------------
 
@@ -124,8 +117,6 @@ Slider	&Slider::operator=(const Slider &obj)
 }
 
 //**** PUBLIC METHODS **********************************************************
-
-
 
 void	Slider::renderMesh( ShaderManager *shaderManager)
 {
@@ -194,11 +185,10 @@ void	Slider::renderMesh( ShaderManager *shaderManager)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Slider::texture);
 
-
 	menuShader->use();
 
 	glBindVertexArray(shaderManager->getVAOId());
-	
+
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 }
 

@@ -28,43 +28,22 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
-	glGenBuffers(1, &this->textureBufferGridFlat);
-	glGenTextures(1, &this->textureGridFlat);
-
-	glGenBuffers(1, &this->textureBufferGridOffsets);
-	glGenTextures(1, &this->textureGridOffsets);
-
-	glGenBuffers(1, &this->ssboGridTmp);
+	glGenBuffers(1, &this->ssboGrid);
 }
 
 
 void	WaterSimulation::generateOffsetGrid(void)
 {
 	// Default value for offsets
-	this->gridOffsets.clear();
 	this->gridOffsetsSize = this->gridSize;
-	for (int i = 0; i < this->gridOffsetsSize; i++)
-		this->gridOffsets.push_back(0.0f);
-	this->gridOffsetsToBuffer();
 
-	// Grid tmp
+	// Grid buffer
 	int	size = this->gridSize * 2500;
 	int	bufferSize = sizeof(int) * size;
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGridTmp);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
 	std::vector<int> initialData(size, 0);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
-}
-
-
-void	WaterSimulation::generateFlatGrid(void)
-{
-	// Default value of flat grid
-	this->gridFlat.clear();
-	this->gridFlatSize = this->nbParticules;
-	for (int i = 0; i < this->gridFlatSize; i++)
-		this->gridFlat.push_back(0.0f);
-	this->gridFlatToBuffer();
 }
 
 
@@ -150,20 +129,4 @@ void	WaterSimulation::pressuresToBuffer(void)
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferPressures);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->nbParticules,
 					this->densities.data(), GL_STATIC_DRAW);
-}
-
-
-void	WaterSimulation::gridFlatToBuffer(void)
-{
-	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridFlat);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridFlatSize,
-					this->gridFlat.data(), GL_STATIC_DRAW);
-}
-
-
-void	WaterSimulation::gridOffsetsToBuffer(void)
-{
-	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferGridOffsets);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->gridOffsetsSize,
-					this->gridOffsets.data(), GL_STATIC_DRAW);
 }

@@ -377,8 +377,6 @@ static void	draw(
 				t_performanceLog *perfLog,
 				WaterSimulation	*simulation)
 {
-	std::clock_t	start;
-
 	// Clear window
 	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -390,17 +388,27 @@ static void	draw(
 
 	if (perfLog->moreStats)
 	{
-		start = std::clock();
+		GLuint query;
+		GLuint64 elapsed_time = 0;
+		glGenQueries(1, &query);
+
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		terrain->renderMesh(camera, shaderManager);
-		perfLog->timeDrawTerrain += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeDrawTerrain += elapsed_time / 1000000000.0;
 
-		start = std::clock();
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
-		perfLog->timeDrawWater += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeDrawWater += elapsed_time / 1000000000.0;
 
-		start = std::clock();
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		glfwSwapBuffers(window);
-		perfLog->timeSwapBuffer += (double)(std::clock() - start) / CLOCKS_PER_SEC;
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeSwapBuffer += elapsed_time / 1000000000.0;
 	}
 	else
 	{

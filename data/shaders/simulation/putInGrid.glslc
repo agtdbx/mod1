@@ -62,5 +62,6 @@ void main()
 		}
 		imageStore(offsetsBuffer, i, vec4(offset, 0.0, 0.0, 0.0));
 		offset += particlesInCell;
+		gridTmp[i] = 0;
 	}
 }

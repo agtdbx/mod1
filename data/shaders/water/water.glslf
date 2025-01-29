@@ -232,21 +232,18 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	return (result);
 }
 
+const vec3	p_luf = vec3(0.0, waterMaxY, 0.0);
+const vec3	p_ruf = vec3(waterMaxXZ, waterMaxY, 0.0);
+const vec3	p_ldf = vec3(0.0, 0.0, 0.0);
+const vec3	p_rdf = vec3(waterMaxXZ, 0.0, 0.0);
+const vec3	p_lub = vec3(0.0, waterMaxY, waterMaxXZ);
+const vec3	p_rub = vec3(waterMaxXZ, waterMaxY, waterMaxXZ);
+const vec3	p_ldb = vec3(0.0, 0.0, waterMaxXZ);
+const vec3	p_rdb = vec3(waterMaxXZ, 0.0, waterMaxXZ);
 
 s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 {
 	s_inter_map_info	result;
-	vec3				p_luf, p_ruf, p_ldf, p_rdf,
-						p_lub, p_rub, p_ldb, p_rdb;
-
-	p_luf = vec3(0.0, waterMaxY, 0.0);
-	p_ruf = vec3(waterMaxXZ, waterMaxY, 0.0);
-	p_ldf = vec3(0.0, 0.0, 0.0);
-	p_rdf = vec3(waterMaxXZ, 0.0, 0.0);
-	p_lub = vec3(0.0, waterMaxY, waterMaxXZ);
-	p_rub = vec3(waterMaxXZ, waterMaxY, waterMaxXZ);
-	p_ldb = vec3(0.0, 0.0, waterMaxXZ);
-	p_rdb = vec3(waterMaxXZ, 0.0, waterMaxXZ);
 	return (intersectWithCube(
 				rayPos, rayDir,
 				p_luf, p_ruf, p_ldf, p_rdf,
@@ -438,7 +435,7 @@ float	lerp(float start, float end, float ratio)
 }
 
 
-float	getDensityAtPos(vec3 pos)
+float	getDensityAtPos(vec3 pos, float densityValue)
 {
 	int		gx, gy, gz, ngx, ngy, ngz;
 	float	densityFUL, densityFUR, densityFDL, densityFDR,
@@ -471,25 +468,6 @@ float	getDensityAtPos(vec3 pos)
 	densityBDL = getDensityAtMapPoint(gx,  ngy, ngz);
 	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
 
-	// densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityFUR = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityFDL = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityFDR = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityBUL = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityBUR = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityBDL = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityBDR = getDensityAtMapPoint(gx,  gy,  gz);
-
-	// float tkt = getDensityAtMapPoint(gx,  gy,  gz);
-	// densityFUL = tkt;
-	// densityFUR = tkt;
-	// densityFDL = tkt;
-	// densityFDR = tkt;
-	// densityBUL = tkt;
-	// densityBUR = tkt;
-	// densityBDL = tkt;
-	// densityBDR = tkt;
-
 	// Merge density on x axis
 	densityFU = lerp(densityFUL, densityFUR, dx);
 	densityFD = lerp(densityFDL, densityFDR, dx);
@@ -504,8 +482,61 @@ float	getDensityAtPos(vec3 pos)
 	density = lerp(densityF, densityB, dz);
 	// return (density);
 	if (density > waterDensity)
-		return (rayStep);
+		return (densityValue);
 	return (0.0);
+}
+
+const float	maxDensity = 10.0;
+const float	invMaxDensity = 1.0 / maxDensity;
+const float	quickRaySize = 50.0;
+const float	quickRayStep = rayStep * quickRaySize;
+
+float	getDensityToLight(vec3 rayPos)
+{
+	float	dstToLight, dst, maxDst, densityAlongRay;
+	vec3	rayToLight, rayDir;
+	int		fullResRay = 5;
+
+	// Get new ray direction
+	rayToLight = lightPos - rayPos;
+	dstToLight = vecLength(rayToLight);
+	if (dstToLight == 0.0)
+		return (0.0);
+	rayDir = rayToLight / dstToLight;
+
+	// Get distance to top bbox face
+	dst = intersectWithCubeFace(rayPos, rayDir, normalUp,
+								p_lub, p_rub,
+								p_luf, p_ruf);
+	if (dst == -1.0)
+		return (0.0);
+
+	maxDst = max(dst, dstToLight);
+	dst = 0;
+	densityAlongRay = 0;
+	fullResRay = 5;
+	// Full resolution ray
+	while (dst < maxDst && fullResRay > 0)
+	{
+		fullResRay--;
+		densityAlongRay += getDensityAtPos(rayPos, rayStep);
+		if (densityAlongRay >= maxDensity)
+			return (maxDensity);
+		rayPos += rayDir * rayStep;
+		dst += rayStep;
+
+	}
+	// Quick ray
+	while (dst < maxDst)
+	{
+		densityAlongRay += getDensityAtPos(rayPos, quickRayStep);
+		if (densityAlongRay >= maxDensity)
+			return (maxDensity);
+		rayPos += rayDir * quickRayStep;
+		dst += quickRayStep;
+	}
+
+	return (densityAlongRay);
 }
 
 
@@ -514,10 +545,6 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	s_inter_map_info	hitMapInfo;
 	float	dist, distGround, distTriangle, distTerrain, maxDist,
 			densityAlongRay;
-	bool	rayEnterInWater = false;
-	vec3	entryWaterPos;
-
-	const float	maxDensity = 10.0;
 
 	hitMapInfo = hitMap(rayPos, rayDir);
 	if (!hitMapInfo.inter_map)
@@ -533,15 +560,30 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	distTerrain = min(distGround, distTriangle);
 
 	densityAlongRay = 0.0;
+	float	density, densityToLight;
+	vec3	color;
+	vec3	colorOnLight = vec3(0.2, 0.4, 1.0);
+	vec3	colorDiff = waterColor - colorOnLight;
+	vec4	pixelColor = vec4(0, 0, 0, 0);
 	while (dist <= maxDist)
 	{
-		densityAlongRay += getDensityAtPos(rayPos);
-		if (densityAlongRay != 0.0 && !rayEnterInWater)
+		density = getDensityAtPos(rayPos, rayStep);
+		if (density > 0)
 		{
-			rayEnterInWater = true;
-			entryWaterPos = rayPos;
+			densityToLight = getDensityToLight(rayPos);
+
+			if (densityToLight != 0.0)
+			{
+				densityToLight *= invMaxDensity;
+				color = colorOnLight + colorDiff * densityToLight;
+			}
+			else
+				color = waterColor;
+
+			pixelColor += vec4(color, 0.8) * (density * invMaxDensity);
 		}
 
+		densityAlongRay += density;
 		if (densityAlongRay > maxDensity)
 		{
 			densityAlongRay = maxDensity;
@@ -555,10 +597,8 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 		rayPos += rayDir * rayStep;
 		dist += rayStep;
 	}
-	vec3	color = waterColor;
-	float	transparency = (densityAlongRay / maxDensity) * 0.8;
 
-	return (vec4(color, transparency));
+	return (pixelColor);
 }
 
 

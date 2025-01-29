@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/28 22:44:22 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 15:19:59 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@
 # define WATER_DENSITY 0.003
 
 # define MAP_DENSITY_CELL_SIZE 2
-# define RAY_STEP 0.3f
+# define RAY_STEP 0.5f
 
 # define PRINT_FPS_TIME 1.0f
 # define MINIMUM_SIMULATION_UPDATE 0.05f
@@ -86,6 +86,7 @@
 # define COLOR_0000CC glm::vec3(0.0, 0.0, 0.8)
 # define COLOR_29266F glm::vec3(0.160784314f, 0.149019608f, 0.435294118f)
 # define COLOR_2C26E4 glm::vec3(0.17254902f, 0.149019608f, 0.894117647f)
+# define COLOR_3366FF glm::vec3(0.2, 0.4, 1.0)
 # define COLOR_3EAFDF glm::vec3(0.243137255f, 0.68627451f, 0.874509804f)
 # define COLOR_666666 glm::vec3(0.4f, 0.4f, 0.4f)
 # define COLOR_6C3737 glm::vec3(0.423529412f, 0.215686275f, 0.215686275f)
@@ -93,6 +94,7 @@
 # define COLOR_FFFFFF glm::vec3(1.0f, 1.0f, 1.0f)
 
 # define DEFAULT_WATER_COLOR COLOR_0000CC
+# define DEFAULT_LIGHT_WATER_COLOR COLOR_3366FF
 # define DEFAULT_PANNEL_COLOR COLOR_7F7F7F
 # define DEFAULT_BUTTON_UNDERLINE_COLOR COLOR_666666
 # define DEFAULT_BUTTON_BASE_COLOR COLOR_7F7F7F

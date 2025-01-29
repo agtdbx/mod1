@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 17:01:32 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:25:33 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,7 +237,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[5][8].desactive();
 	sVar->pannelVector[5].addSlider(Slider(240, 120, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[5][5.0f].setValue(0.5);
-	sVar->pannelVector[5].addButton(Button(310, 150, 30, 30, moveLightPannel, &sVar->pannelVector[7], textureManager->getTexture("noTexture")));
+	sVar->pannelVector[5].addButton(Button(310, 150, 30, 30, moveLightPannel, sVar, textureManager->getTexture("noTexture")));
 	sVar->pannelVector[5][9].setSwitchMode(true);
 	
 	//filling pannel content
@@ -273,14 +273,17 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[7][1].desactive();
 	sVar->pannelVector[7].addSlider(Slider(125, 70, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[7][0.0f].setValue(DEFAULT_LIGHT_WATER_COLOR[0]);
+	sVar->pannelVector[7][0.0f].desactive();
 	sVar->pannelVector[7].addButton(Button(25, 90, 80, 50,NULL, NULL, textureManager->getTexture("green"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[7][2].desactive();
 	sVar->pannelVector[7].addSlider(Slider(125, 110, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[7][1.0f].setValue(DEFAULT_LIGHT_WATER_COLOR[1]);
+	sVar->pannelVector[7][1.0f].desactive();
 	sVar->pannelVector[7].addButton(Button(25, 130, 80, 50,NULL, NULL, textureManager->getTexture("blue"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[7][3].desactive();
 	sVar->pannelVector[7].addSlider(Slider(125, 150, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[7][2.0f].setValue(DEFAULT_LIGHT_WATER_COLOR[2]);
+	sVar->pannelVector[7][2.0f].desactive();
 	sVar->pannelVector[7].addButton(Button(235, 75, 80, 80,NULL, NULL, textureManager->getTexture("noTexture"), DEFAULT_LIGHT_WATER_COLOR, DEFAULT_LIGHT_WATER_COLOR));
 	sVar->pannelVector[7][4].desactive();
 }

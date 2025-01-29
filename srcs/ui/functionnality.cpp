@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 16:57:59 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:27:11 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,13 +209,24 @@ void	moveSettingsPannel(void *arg)
 void	moveLightPannel(void *arg)
 {
 	static bool isHide = true;
-	Pannel *pannel = (Pannel *)arg;
+	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
+
 
 	isHide = !isHide;
 	if (isHide)
-		pannel->addPosToGo(-350, 0);
+	{
+		sVar->pannelVector[7].addPosToGo(-350, 0);
+		sVar->pannelVector[7][0.0f].desactive();
+		sVar->pannelVector[7][1.0f].desactive();
+		sVar->pannelVector[7][2.0f].desactive();
+	}
 	else
-		pannel->addPosToGo(350, 0);
+	{
+		sVar->pannelVector[7].addPosToGo(350, 0);
+		sVar->pannelVector[7][0.0f].active();
+		sVar->pannelVector[7][1.0f].active();
+		sVar->pannelVector[7][2.0f].active();
+	}
 }
 
 void	moveGeneratePannel(void *arg)

@@ -16,6 +16,7 @@ uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform vec3			waterColor;
+uniform vec3			lightColor;
 uniform float			waterDensity;
 
 uniform int				mapDensityCellSize;
@@ -562,7 +563,8 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	densityAlongRay = 0.0;
 	float	density, densityToLight;
 	vec3	color;
-	vec3	colorOnLight = vec3(0.2, 0.4, 1.0);
+	// vec3	colorOnLight = vec3(0.2, 0.4, 1.0);
+	vec3	colorOnLight = lightColor;
 	vec3	colorDiff = waterColor - colorOnLight;
 	vec4	pixelColor = vec4(0, 0, 0, 0);
 	while (dist <= maxDist)

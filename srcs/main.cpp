@@ -154,6 +154,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[6].addPosToGo(-240, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
 				sVar.pannelVector[5].addPosToGo(0, 300);
+				sVar.pannelVector[7].addPosToGo(0, 170);
 			}
 			else
 			{
@@ -165,6 +166,7 @@ int	main(int argc, char **argv)
 				sVar.pannelVector[6].addPosToGo(240, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
 				sVar.pannelVector[5].addPosToGo(0, -300);
+				sVar.pannelVector[7].addPosToGo(0, -170);
 			}
 			sVar.isPannelHide = !sVar.isPannelHide;
 		}
@@ -399,7 +401,7 @@ static void	draw(
 		perfLog->timeDrawTerrain += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, &sVar->lightcolor, sVar->waterDensity);
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timeDrawWater += elapsed_time / 1000000000.0;
@@ -413,7 +415,7 @@ static void	draw(
 	else
 	{
 		terrain->renderMesh(camera, shaderManager);
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, sVar->waterDensity);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, &sVar->lightcolor, sVar->waterDensity);
 		glfwSwapBuffers(window);
 	}
 }

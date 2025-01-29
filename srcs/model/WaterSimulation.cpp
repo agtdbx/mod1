@@ -278,6 +278,7 @@ void	WaterSimulation::draw(
 			ShaderManager *shaderManager,
 			Terrain *terrain,
 			glm::vec3 *waterColor,
+			glm::vec3 *lightColor,
 			float waterDensity)
 {
 	WaterShader *shader;
@@ -325,6 +326,7 @@ void	WaterSimulation::draw(
 	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
 	giveFloatToShader(shaderId, "waterMaxY", WATER_MAX_HEIGHT);
 	giveVec3ToShader(shaderId, "waterColor", *waterColor);
+	giveVec3ToShader(shaderId, "lightColor", *lightColor);
 	giveFloatToShader(shaderId, "waterDensity", waterDensity);
 
 	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Pannel.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:50:55 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 15:48:50 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:49:51 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,13 @@
 # include <engine/render/shader/ShaderManager.hpp>
 # include <engine/render/TextureManager.hpp>
 # include <model/Point2D.hpp>
-# include <model/Button.hpp>
-# include <model/Slider.hpp>
-# include <model/TextEntry.hpp>
+# include <ui/Button.hpp>
+# include <ui/Slider.hpp>
+# include <ui/TextEntry.hpp>
 
 class Pannel
 {
 public:
-
 	static Mouse * mouse;
 
 	Pannel(float x, float y, float width, float height, unsigned int texture);
@@ -48,7 +47,6 @@ public:
 	void	addSlider(Slider  s);
 	void	addTextEntry(TextEntry  t);
 	void	tick(double delta);
-	
 
 private:
 	float		x_screen, y_screen, width, height, padding, x_toGo, y_toGo;
@@ -59,9 +57,6 @@ private:
 	std::vector<TextEntry>	textEntryList;
 
 	void	moveButton(float mvx, float mvy);
-
-
-
 };
 
 #endif

@@ -11,11 +11,11 @@
 #include <engine/render/Camera.hpp>
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
-#include <model/Button.hpp>
-#include <model/Pannel.hpp>
-#include <model/Slider.hpp>
-#include <model/TextEntry.hpp>
 #include <model/WaterSimulation.hpp>
+#include <ui/Button.hpp>
+#include <ui/Pannel.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextEntry.hpp>
 
 void		loadTexture(
 				TextureManager *textureManager,

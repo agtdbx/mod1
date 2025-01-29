@@ -1,23 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TextEntry.cpp                                         :+:      :+:    :+:   */
+/*   TextEntry.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:19:34 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:52:50 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <model/TextEntry.hpp>
-
-// #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
-// #include <stdexcept>
-
-// #define STB_IMAGE_IMPLEMENTATION
-// #include <stb_image.h>
+#include <ui/TextEntry.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -35,6 +28,7 @@ TextEntry::TextEntry(float x, float y, float width, float height)
 	this->isSelected = false;
 }
 
+
 TextEntry::TextEntry(float x, float y, float width, float height, glm::vec3 baseColor, glm::vec3 underlineColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
@@ -43,7 +37,6 @@ TextEntry::TextEntry(float x, float y, float width, float height, glm::vec3 base
 	this->underlineColor = underlineColor;
 	this->isSelected = false;
 }
-
 
 
 TextEntry::TextEntry(const TextEntry &obj)
@@ -62,7 +55,6 @@ TextEntry::~TextEntry()
 
 }
 
-
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
@@ -71,13 +63,11 @@ glm::vec2	TextEntry::getPos()
 	return glm::vec2(this->x_screen, this->y_screen);
 }
 
+
 std::string	TextEntry::getValue()
 {
 	return this->value;
 }
-
-
-
 
 //---- Setters -----------------------------------------------------------------
 
@@ -93,6 +83,7 @@ void	TextEntry::setPos(float x, float y)
 	this->y_screen = y;
 }
 
+
 void	TextEntry::setColor(glm::vec3 color, int type)
 {
 	switch (type)
@@ -107,8 +98,6 @@ void	TextEntry::setColor(glm::vec3 color, int type)
 	}
 }
 
-
-
 //---- Operators ---------------------------------------------------------------
 
 TextEntry	&TextEntry::operator=(const TextEntry &obj)
@@ -120,14 +109,12 @@ TextEntry	&TextEntry::operator=(const TextEntry &obj)
 
 //**** PUBLIC METHODS **********************************************************
 
-
-
 void	TextEntry::renderMesh( ShaderManager *shaderManager)
 {
-	MenuShader					*menuShader;
-	unsigned int				indices[6] = {0, 1, 2, 3, 1, 2};
-	float						texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
-	glm::vec3 *					color;
+	MenuShader		*menuShader;
+	unsigned int	indices[6] = {0, 1, 2, 3, 1, 2};
+	float			texturePos[4][2] = {{0.0f,0.0f},{1.0f,0.0f},{0.0f,1.0f},{1.0f,1.0f}};
+	glm::vec3 *		color;
 
 	menuShader = shaderManager->getMenuShader();
 
@@ -161,13 +148,12 @@ void	TextEntry::renderMesh( ShaderManager *shaderManager)
 			this->addCharToValue('9');
 		if (TextEntry::inputManager->del.isPressed())
 			this->removeLastCharFromValue();
-
 	}
 	else
 	{
-			color = &this->baseColor;
+		color = &this->baseColor;
 	}
-	for (int i = 0; i < this->value.size(); i++)
+	for (int i = 0; i < (int)this->value.size(); i++)
 	{
 		std::vector<Point2D>		points;
 		std::vector<float>			vertices;
@@ -201,7 +187,7 @@ void	TextEntry::renderMesh( ShaderManager *shaderManager)
 		menuShader->use();
 
 		glBindVertexArray(shaderManager->getVAOId());
-		
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 	std::vector<Point2D>		points;
@@ -231,11 +217,10 @@ void	TextEntry::renderMesh( ShaderManager *shaderManager)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextEntry::textureManager->getTexture("noTexture"));
 
-
 	menuShader->use();
 
 	glBindVertexArray(shaderManager->getVAOId());
-	
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -243,17 +228,19 @@ void	TextEntry::renderMesh( ShaderManager *shaderManager)
 
 bool 	TextEntry::mouseOnTextEntry()
 {
-	if (TextEntry::mouse->getPos().x >= this->x_screen and TextEntry::mouse->getPos().x < this->x_screen + this->width and
-		TextEntry::mouse->getPos().y >= this->y_screen and TextEntry::mouse->getPos().y < this->y_screen + this->height)
+	if (TextEntry::mouse->getPos().x >= this->x_screen && TextEntry::mouse->getPos().x < this->x_screen + this->width &&
+		TextEntry::mouse->getPos().y >= this->y_screen && TextEntry::mouse->getPos().y < this->y_screen + this->height)
 		return true;
 	return false;
 }
+
 
 void	TextEntry::addCharToValue(char c)
 {
 	if ((this->value.size() + 1) * ENTRYTEXT_WITDH_CHAR <= this->width)
 		this->value += c;
 }
+
 
 void	TextEntry::removeLastCharFromValue()
 {

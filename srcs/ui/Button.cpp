@@ -3,21 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Button.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:19:34 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:47:55 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <model/Button.hpp>
-
-// #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
-// #include <stdexcept>
-
-// #define STB_IMAGE_IMPLEMENTATION
-// #include <stb_image.h>
+#include <ui/Button.hpp>
 
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
@@ -37,6 +30,7 @@ Button::Button(float x, float y, float width, float height, void (*functionToExe
 	this->underlineColor = DEFAULT_BUTTON_UNDERLINE_COLOR;
 }
 
+
 Button::Button(float x, float y, float width, float height, void (*functionToExecute)(void *), void *arg, unsigned int texture, glm::vec3 baseColor, glm::vec3 underlineColor)
 :x_screen(x), y_screen(y), width(width), height(height)
 {
@@ -49,7 +43,6 @@ Button::Button(float x, float y, float width, float height, void (*functionToExe
 	this->baseColor = baseColor;
 	this->underlineColor = underlineColor;
 }
-
 
 
 Button::Button(const Button &obj)
@@ -72,7 +65,6 @@ Button::~Button()
 
 }
 
-
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
 
@@ -87,9 +79,6 @@ bool	Button::isActive()
 	return this->active_B;
 }
 
-
-
-
 //---- Setters -----------------------------------------------------------------
 
 void	Button::active()
@@ -97,26 +86,31 @@ void	Button::active()
 	this->active_B = true;
 }
 
+
 void	Button::desactive()
 {
 	this->active_B = false;
 }
+
 
 void	Button::setArg(void *arg)
 {
 	this->arg = arg;
 }
 
+
 void	Button::setSwitchMode(bool isSwitch)
 {
 	this->isSwitch = isSwitch;
 }
+
 
 void	Button::setPos(float x, float y)
 {
 	this->x_screen = x;
 	this->y_screen = y;
 }
+
 
 void	Button::setColor(glm::vec3 color, int type)
 {
@@ -132,8 +126,6 @@ void	Button::setColor(glm::vec3 color, int type)
 	}
 }
 
-
-
 //---- Operators ---------------------------------------------------------------
 
 Button	&Button::operator=(const Button &obj)
@@ -144,8 +136,6 @@ Button	&Button::operator=(const Button &obj)
 }
 
 //**** PUBLIC METHODS **********************************************************
-
-
 
 void	Button::renderMesh( ShaderManager *shaderManager)
 {
@@ -207,17 +197,16 @@ void	Button::renderMesh( ShaderManager *shaderManager)
 	menuShader->use();
 
 	glBindVertexArray(shaderManager->getVAOId());
-	
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
 
 void	Button::press()
 {
 	if (this->active_B && this->functionToExecute)
 		this->functionToExecute(this->arg);
 }
-
-
 
 //**** PRIVATE METHODS *********************************************************
 

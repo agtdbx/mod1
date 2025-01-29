@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 14:06:10 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:54:49 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <engine/render/TextureManager.hpp>
 #include <engine/render/shader/ShaderManager.hpp>
 #include <ui/interfaceDeclaration.hpp>
-#include <model/Button.hpp>
-#include <model/Pannel.hpp>
-#include <model/Slider.hpp>
-#include <model/TextEntry.hpp>
+#include <ui/Button.hpp>
+#include <ui/Pannel.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextEntry.hpp>
 
 void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 {

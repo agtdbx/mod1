@@ -3,25 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   uiTick.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:28:30 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 22:46:41 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 19:53:38 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <define.hpp>
 #include <ui/interfaceDeclaration.hpp>
 
-
-
 #include <engine/OpenGLContext.hpp>
 #include <model/Terrain.hpp>
-#include <model/Button.hpp>
-#include <model/Pannel.hpp>
-#include <model/Slider.hpp>
-#include <model/TextEntry.hpp>
-
+#include <ui/Button.hpp>
+#include <ui/Pannel.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextEntry.hpp>
 
 void	uiTick(t_simulationVariable *sVar)
 {
@@ -68,7 +65,7 @@ void	uiTick(t_simulationVariable *sVar)
 	{
 		sVar->generatePos.y = GENERATE_PADDING;
 	}
-		if (sVar->pannelVector[6][(char) 2].getValue().size())
+	if (sVar->pannelVector[6][(char) 2].getValue().size())
 	{
 		sVar->generatePos.z = std::stoi(sVar->pannelVector[6][(char) 2].getValue());
 		if (sVar->generatePos.z >= MAP_SIZE)

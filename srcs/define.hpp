@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/29 15:19:59 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:19:15 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,12 @@
 # define CAMERA_ROTATION_SPEED 42.0
 # define CAMERA_ROTATION_SPEED_MOUSE 0.1
 
-# define NB_MAX_PARTICLES 100000
+# define NB_MAX_PARTICLES 150000
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
 # define COLLISION_ENERGY_KEEP 0.5
 # define COLLISION_REPULSION_FORCE 0.1f
-# define SMOOTHING_RADIUS 5.0f
+# define SMOOTHING_RADIUS 3.0f
 # define TARGET_DENSITY 0.01f
 # define PRESSURE_MULTIPLIER 100.0f
 # define VISCOSITY_FORCE 0.1f
@@ -106,7 +106,7 @@
 
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		MAP_MAX_HEIGHT = MAX_HEIGHT + 10;
-const float		WATER_RADIUS = 2.0f;
+const float		WATER_RADIUS = 1.0f;
 const float		WATER_RADIUS2 = WATER_RADIUS * WATER_RADIUS;
 const float		WATER_MAX_XZ = MAP_SIZE - WATER_RADIUS;
 const float		WATER_MAX_HEIGHT = MAP_MAX_HEIGHT - WATER_RADIUS;

@@ -59,10 +59,7 @@ void	WaterSimulation::putParticlesInGrid(
 	// Compute shader inputs setup
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveIntToShader(shaderId, "gridW", this->gridW);
-	giveIntToShader(shaderId, "gridH", this->gridH);
-	giveIntToShader(shaderId, "gridD", this->gridD);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
 	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
 	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
 	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
@@ -70,12 +67,7 @@ void	WaterSimulation::putParticlesInGrid(
 								this->texturePositions);
 
 	// Compute shader output setup
-	giveFloatTextureInputToShader(0, true, this->textureBufferGridOffsets,
-									this->textureGridOffsets);
-	giveFloatTextureInputToShader(1, true, this->textureBufferGridFlat,
-									this->textureGridFlat);
-
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboGridTmp);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this->ssboGrid);
 
 	// Run compute shader
 	glDispatchCompute(1, 1, 1);
@@ -107,15 +99,8 @@ void	WaterSimulation::computeDensity(
 	giveIntToShader(shaderId, "gridH", this->gridH);
 	giveIntToShader(shaderId, "gridD", this->gridD);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
 	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
-	giveFloatTextureToShader(shaderId, "gridBuffer", 2,
-								this->textureBufferGridFlat,
-								this->textureGridFlat);
-	giveFloatTextureToShader(shaderId, "offsetsBuffer", 3,
-								this->textureBufferGridOffsets,
-								this->textureGridOffsets);
-	giveVec4TextureToShader(shaderId, "positionsBuffer", 4,
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
 								this->textureBufferPositions,
 								this->texturePositions);
 
@@ -124,6 +109,7 @@ void	WaterSimulation::computeDensity(
 									this->textureDensities);
 	giveFloatTextureInputToShader(1, false, this->textureBufferPressures,
 									this->texturePressures);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboGrid);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
@@ -155,21 +141,15 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 	giveIntToShader(shaderId, "gridH", this->gridH);
 	giveIntToShader(shaderId, "gridD", this->gridD);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
 	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
-	giveFloatTextureToShader(shaderId, "gridBuffer", 1,
-								this->textureBufferGridFlat,
-								this->textureGridFlat);
-	giveFloatTextureToShader(shaderId, "offsetsBuffer", 2,
-								this->textureBufferGridOffsets,
-								this->textureGridOffsets);
-	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
 								this->textureBufferPositions,
 								this->texturePositions);
 
 	// Compute shader output setup
 	giveFloatTextureInputToShader(0, false, this->textureBufferMapDensities,
 									this->textureMapDensities);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboGrid);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
@@ -207,27 +187,21 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	giveIntToShader(shaderId, "gridH", this->gridH);
 	giveIntToShader(shaderId, "gridD", this->gridD);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridFlatSize);
 	giveIntToShader(shaderId, "offsetsSize", this->gridOffsetsSize);
-	giveFloatTextureToShader(shaderId, "gridBuffer", 1,
-								this->textureBufferGridFlat,
-								this->textureGridFlat);
-	giveFloatTextureToShader(shaderId, "offsetsBuffer", 2,
-								this->textureBufferGridOffsets,
-								this->textureGridOffsets);
-	giveVec4TextureToShader(shaderId, "predictedPositionsBuffer", 3,
+	giveVec4TextureToShader(shaderId, "predictedPositionsBuffer", 2,
 								this->textureBufferPredictedPositions,
 								this->texturePredictedPositions);
-	giveFloatTextureToShader(shaderId, "densitiesBuffer", 4,
+	giveFloatTextureToShader(shaderId, "densitiesBuffer", 3,
 								this->textureBufferDensities,
 								this->textureDensities);
-	giveFloatTextureToShader(shaderId, "pressuresBuffer", 5,
+	giveFloatTextureToShader(shaderId, "pressuresBuffer", 4,
 								this->textureBufferPressures,
 								this->texturePressures);
 
 	// Compute shader output setup
 	giveVec4TextureInputToShader(0, true, this->textureBufferVelocities,
 									this->textureVelocities);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboGrid);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);

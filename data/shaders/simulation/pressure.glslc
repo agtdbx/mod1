@@ -3,6 +3,9 @@
 layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 
 layout(rgba32f, binding = 0) uniform imageBuffer velocitiesBuffer;
+layout(std430, binding = 1) buffer DataBuffer {
+	int gridBuffer[];
+};
 
 uniform float			delta;
 uniform float			smoothingRadius;
@@ -16,18 +19,17 @@ uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
 uniform int				idHsize;
-uniform int				gridSize;
-uniform samplerBuffer	gridBuffer;
 uniform int				offsetsSize;
-uniform samplerBuffer	offsetsBuffer;
 uniform samplerBuffer	predictedPositionsBuffer;
 uniform samplerBuffer	densitiesBuffer;
 uniform samplerBuffer	pressuresBuffer;
+
 
 float	vecLength(vec3 vec)
 {
 	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
+
 
 float	vecLength2(vec3 vec)
 {
@@ -66,7 +68,7 @@ vec3	calculatePressureForce(int particleIndex)
 {
 	float	density, densityWater, pressure, pressureWater,
 			dst, slope, sharedPressure;
-	int		px, py, pz, gx, gy, gz, gid, startId, endId, waterId;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
 	vec3	pressureForce, position, positionWater, dir;
 
 	pressureForce = vec3(0.0, 0.0, 0.0);
@@ -97,15 +99,11 @@ vec3	calculatePressureForce(int particleIndex)
 					continue;
 
 				gid = gx + gz * gridW + gy * idHsize;
-				startId = int(texelFetch(offsetsBuffer, gid).r);
-				if (gid + 1 < offsetsSize)
-					endId = int(texelFetch(offsetsBuffer, gid + 1).r);
-				else
-					endId = gridSize;
-
-				for (int i = startId; i < endId; i++)
+				nbParticleInCell = gridBuffer[gid];
+				for (int i = 0; i < nbParticleInCell; i++)
 				{
-					waterId = int(texelFetch(gridBuffer, i).r);
+					gid += offsetsSize;
+					waterId = gridBuffer[gid];
 					if (waterId == particleIndex)
 						continue;
 
@@ -132,7 +130,7 @@ vec3	calculatePressureForce(int particleIndex)
 vec3	calculateViscosityForce(int particleIndex)
 {
 	float	velocityLength, dst2, influence;
-	int		px, py, pz, gx, gy, gz, gid, startId, endId, waterId;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
 	vec3	viscosityForce, position, positionWater, velocity, velocityWater, velocityDir;
 
 	viscosityForce = vec3(0.0, 0.0, 0.0);
@@ -162,15 +160,11 @@ vec3	calculateViscosityForce(int particleIndex)
 					continue;
 
 				gid = gx + gz * gridW + gy * idHsize;
-				startId = int(texelFetch(offsetsBuffer, gid).r);
-				if (gid + 1 < offsetsSize)
-					endId = int(texelFetch(offsetsBuffer, gid + 1).r);
-				else
-					endId = gridSize;
-
-				for (int i = startId; i < endId; i++)
+				nbParticleInCell = gridBuffer[gid];
+				for (int i = 0; i < nbParticleInCell; i++)
 				{
-					waterId = int(texelFetch(gridBuffer, i).r);
+					gid += offsetsSize;
+					waterId = gridBuffer[gid];
 					if (waterId == particleIndex)
 						continue;
 

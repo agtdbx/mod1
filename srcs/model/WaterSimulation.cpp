@@ -24,15 +24,8 @@ WaterSimulation::WaterSimulation(void)
 	this->gridD = this->gridW;
 	this->idHsize = this->gridW * this->gridD;
 	this->gridSize = this->gridW * this->gridH * this->gridD;
-	this->gridFlatSize = 0;
 	this->gridOffsetsSize = 0;
 	this->numGroupsPutInGrid = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
-
-	for (int i = 0; i < this->gridSize; i++)
-	{
-		std::vector<int>	gridContent;
-		this->grid.push_back(gridContent);
-	}
 
 	// map density init
 	this->mapDensityW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
@@ -65,15 +58,11 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->predictedPositions = obj.predictedPositions;
 	this->velocities = obj.velocities;
 	this->densities = obj.densities;
-	this->grid = obj.grid;
 	this->gridSize = obj.gridSize;
 	this->gridW = obj.gridW;
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
-	this->gridFlatSize = obj.gridFlatSize;
 	this->gridOffsetsSize = obj.gridOffsetsSize;
-	this->gridFlat = obj.gridFlat;
-	this->gridOffsets = obj.gridOffsets;
 	this->numGroups = obj.numGroups;
 	this->numGroupsMapDensity = obj.numGroupsMapDensity;
 	this->needToUpdateBuffers = true;
@@ -106,13 +95,7 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
-	glDeleteBuffers(1, &this->textureBufferGridFlat);
-	glDeleteTextures(1, &this->textureGridFlat);
-
-	glDeleteBuffers(1, &this->textureBufferGridOffsets);
-	glDeleteTextures(1, &this->textureGridOffsets);
-
-	glDeleteBuffers(1, &this->ssboGridTmp);
+	glDeleteBuffers(1, &this->ssboGrid);
 }
 
 
@@ -138,15 +121,11 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	this->predictedPositions = obj.predictedPositions;
 	this->velocities = obj.velocities;
 	this->densities = obj.densities;
-	this->grid = obj.grid;
 	this->gridSize = obj.gridSize;
 	this->gridW = obj.gridW;
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
-	this->gridFlatSize = obj.gridFlatSize;
 	this->gridOffsetsSize = obj.gridOffsetsSize;
-	this->gridFlat = obj.gridFlat;
-	this->gridOffsets = obj.gridOffsets;
 	this->numGroups = obj.numGroups;
 	this->needToUpdateBuffers = true;
 
@@ -209,7 +188,6 @@ void	WaterSimulation::tick(
 {
 	if (this->needToUpdateBuffers == true)
 	{
-		this->generateFlatGrid();
 		this->positionsToBuffer();
 		this->predictedPositionsToBuffer();
 		this->velocitiesToBuffer();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   uiTick.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:28:30 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 22:46:41 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:02:07 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,4 +80,11 @@ void	uiTick(t_simulationVariable *sVar)
 	}
 	sVar->generateIntensity =  sVar->pannelVector[6][0.0f].getValue() * 2 * GENERATE_INTENSITY;
 	sVar->generateDelay =  sVar->pannelVector[6][1.0f].getValue() * 2 * GENERATE_TIME_BEFORE_NEW_PARTICULE;
+
+	//light parameter
+	sVar->lightcolor = glm::vec3(sVar->pannelVector[7][0.0f].getValue(),
+								sVar->pannelVector[7][1.0f].getValue(),
+								sVar->pannelVector[7][2.0f].getValue());
+	sVar->pannelVector[7][4].setColor(sVar->lightcolor, BUTTON_BASE_COLOR_TYPE);
+	
 }

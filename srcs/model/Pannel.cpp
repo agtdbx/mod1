@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:16 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/23 16:31:47 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:45:42 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,7 +225,8 @@ void	Pannel::tick(double delta)
 	else if (this->y_toGo > this->y_screen)
 		velocity[1] = 1.0f;
 
-	velocity *= PANNEL_MOVE_SPEED * (this->width / 120) * delta;
+	velocity[0] *= PANNEL_MOVE_SPEED * (this->width / 120) * delta;
+	velocity[1] *= PANNEL_MOVE_SPEED * (this->height/ 120) * delta;
 	if ((this->x_toGo < this->x_screen && this->x_screen + velocity[0]  < this->x_toGo)
 		|| (this->x_toGo > this->x_screen && this->x_screen + velocity[0]  > this->x_toGo))
 			velocity[0] = this->x_toGo - this->x_screen;

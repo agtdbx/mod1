@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:07 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 13:14:18 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:21:29 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ public:
 
 	Slider	&operator=(const Slider &obj);
 
+	void		active();
+	void		desactive();
+	bool	isActive();
 	void		renderMesh( ShaderManager *shaderManager);
 	glm::vec2	getPos();
 	void	setValue(float value);
@@ -46,7 +49,7 @@ public:
 private:
 	float		x_screen, y_screen, width, height, value;
 	glm::vec3		baseColor, underlineColor;
-	bool			hasBeenClick;
+	bool			hasBeenClick, active_B;
 
 	bool			mouseOnSlider();
 

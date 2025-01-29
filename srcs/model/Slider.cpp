@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 21:51:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/14 22:15:19 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:26:31 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Slider::Slider(float x, float y, float width, float height)
 {
 	this->value = 0.0f;
 	this->hasBeenClick = false;
+	this->active_B = true;
 	this->baseColor = DEFAULT_BUTTON_BASE_COLOR;
 	this->underlineColor = DEFAULT_BUTTON_UNDERLINE_COLOR;
 }
@@ -39,6 +40,7 @@ Slider::Slider(float x, float y, float width, float height, glm::vec3 baseColor,
 {
 	this->value = 0.0f;
 	this->hasBeenClick = false;
+	this->active_B = true;
 	this->baseColor = baseColor;
 	this->underlineColor = underlineColor;
 }
@@ -49,6 +51,7 @@ Slider::Slider(const Slider &obj)
 :x_screen(obj.x_screen), y_screen(obj.y_screen), width(obj.width), height(obj.height)
 {
 	this->value = obj.value;
+	this->active_B = obj.active_B;
 	this->hasBeenClick = obj.hasBeenClick;
 	this->baseColor = obj.baseColor;
 	this->underlineColor = obj.underlineColor;
@@ -70,8 +73,23 @@ glm::vec2	Slider::getPos()
 	return glm::vec2(this->x_screen, this->y_screen);
 }
 
+bool	Slider::isActive()
+{
+	return this->active_B;
+}
+
 
 //---- Setters -----------------------------------------------------------------
+
+void	Slider::active()
+{
+	this->active_B = true;
+}
+
+void	Slider::desactive()
+{
+	this->active_B = false;
+}
 
 void	Slider::setValue(float value)
 {
@@ -131,7 +149,7 @@ void	Slider::renderMesh( ShaderManager *shaderManager)
 
 	menuShader = shaderManager->getMenuShader();
 
-	if (this->mouseOnSlider() && Slider::mouse->left.isDown())
+	if (this->active_B && this->mouseOnSlider() && Slider::mouse->left.isDown())
 		this->hasBeenClick = true;
 	else if (this->hasBeenClick and !Slider::mouse->left.isDown())
 		this->hasBeenClick = false;

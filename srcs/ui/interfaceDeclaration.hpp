@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/28 22:46:11 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:59:43 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_simulationVariable
 	float				sprintSpeed;
 	float				cameraSensibility;
 	glm::vec3			watercolor;
+	glm::vec3			lightcolor;
 	float				waterDensity;
 }	t_simulationVariable;
 
@@ -59,6 +60,7 @@ void	moveWavePannel(void *arg);
 void	moveRainPannel(void *arg);
 void	moveFillingPannel(void *arg);
 void	moveSettingsPannel(void *arg);
+void	moveLightPannel(void *arg);
 void	moveGeneratePannel(void *arg);
 void	resetPool(void *arg);
 

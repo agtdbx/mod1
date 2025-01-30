@@ -226,6 +226,8 @@ int	main(int argc, char **argv)
 				// Total stats
 				float	totalTime = computeTotal + drawTotal;
 				printf("Total time per tick %9.3f ms\n\n", totalTime * 1000.0f);
+				std::cout << "Pause value : " << sVar.isStopped << std::endl;
+				std::cout << "Next step value : " << sVar.needStep << std::endl;
 			}
 
 			// Reset main times
@@ -336,7 +338,7 @@ static void	computation(
 		camera->rotateY(CAMERA_ROTATION_SPEED * delta);
 
 	// Water simulation
-	if (sVar->isStopped || sVar->needStep)
+	if (sVar->isStopped && !sVar->needStep)
 		return ;
 
 	if (sVar->isStopped && sVar->needStep)
@@ -367,6 +369,8 @@ static void	computation(
 
 	if (!sVar->isStopped || sVar->needStep)
 		simulation->tick(shaderManager, terrain, perfLog, delta);
+	if (sVar->needStep)
+		sVar->needStep = false;
 }
 
 

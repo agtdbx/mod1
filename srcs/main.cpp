@@ -226,8 +226,6 @@ int	main(int argc, char **argv)
 				// Total stats
 				float	totalTime = computeTotal + drawTotal;
 				printf("Total time per tick %9.3f ms\n\n", totalTime * 1000.0f);
-				std::cout << "Pause value : " << sVar.isStopped << std::endl;
-				std::cout << "Next step value : " << sVar.needStep << std::endl;
 			}
 
 			// Reset main times

@@ -340,7 +340,7 @@ static void	computation(
 		return ;
 
 	if (sVar->isStopped && sVar->needStep)
-		delta = 0.01;
+		delta = MINIMUM_SIMULATION_UPDATE;
 
 	timeRainningParticuleAdd += delta;
 	if (timeRainningParticuleAdd >= sVar->rainDelay)

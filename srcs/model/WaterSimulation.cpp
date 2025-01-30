@@ -39,14 +39,13 @@ WaterSimulation::WaterSimulation(void)
 	this->mapDensitySize = this->mapDensityW * this->mapDensityH * this->mapDensityD;
 	this->numGroupsMapDensity = (this->mapDensitySize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
-
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
 	this->generateMapDensity();
-	this->generateOffsetGrid();
+	this->generateGridBuffer();
 }
 
 
@@ -74,7 +73,7 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
 	this->generateMapDensity();
-	this->generateOffsetGrid();
+	this->generateGridBuffer();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -99,7 +98,8 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
-	glDeleteBuffers(1, &this->ssboGrid);
+	glDeleteBuffers(1, &this->ssboGrid1);
+	glDeleteBuffers(1, &this->ssboGrid2);
 }
 
 
@@ -203,6 +203,7 @@ void	WaterSimulation::tick(
 		this->velocitiesToBuffer();
 		this->densitiesToBuffer();
 		this->pressuresToBuffer();
+		this->putParticlesInGrid(shaderManager);
 
 		this->needToUpdateBuffers = false;
 	}

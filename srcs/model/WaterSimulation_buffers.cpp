@@ -28,19 +28,29 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
-	glGenBuffers(1, &this->ssboGrid);
+	glGenBuffers(1, &this->ssboGrid1);
+	glGenBuffers(1, &this->ssboGrid2);
 }
 
 
-void	WaterSimulation::generateOffsetGrid(void)
+void	WaterSimulation::generateGridBuffer(void)
 {
-	// Grid buffer
+	// Grid buffer size
 	int	size = this->gridSize * 1001;
 	int	bufferSize = sizeof(int) * size;
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
 	std::vector<int> initialData(size, 0);
+
+	// Grid buffer 1 init
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid1);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
+
+	// Grid buffer 2 init
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid2);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
+
+	this->ssboGrid1Used = true;
 }
 
 

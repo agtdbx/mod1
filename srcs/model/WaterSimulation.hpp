@@ -34,7 +34,7 @@ private:
 	std::vector<glm::vec4>	predictedPositions;
 	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
-	bool					needToUpdateBuffers;
+	bool					needToUpdateBuffers, ssboGrid1Used;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							idHsize, numGroups,
@@ -46,11 +46,11 @@ private:
 							textureBufferDensities, textureDensities,
 							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
-							ssboGrid;
+							ssboCurrent, ssboGrid1, ssboGrid2;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
-	void		generateOffsetGrid(void);
+	void		generateGridBuffer(void);
 	void		generateMapDensity(void);
 
 	void		positionsToBuffer(void);

@@ -66,8 +66,8 @@ private:
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
-	void		computeDensity(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
+	void		computeDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };

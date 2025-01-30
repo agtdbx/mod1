@@ -125,49 +125,6 @@ void	WaterSimulation::putParticlesInGridInParallel(
 }
 
 
-void	WaterSimulation::computeDensity(
-			ShaderManager *shaderManager)
-{
-	ComputeShader	*computeShader;
-	unsigned int	shaderId;
-
-	// Get the compute shader
-	computeShader = shaderManager->getComputeShader("densities");
-	if (!computeShader)
-		return ;
-	shaderId = computeShader->getShaderId();
-
-	computeShader->use();
-
-	// Compute shader inputs setup
-	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
-	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
-	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
-	giveFloatToShader(shaderId, "targetDensity", TARGET_DENSITY);
-	giveFloatToShader(shaderId, "pressureMultiplier", PRESSURE_MULTIPLIER);
-	giveIntToShader(shaderId, "gridW", this->gridW);
-	giveIntToShader(shaderId, "gridH", this->gridH);
-	giveIntToShader(shaderId, "gridD", this->gridD);
-	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridSize);
-	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
-	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
-								this->textureBufferPredictedPositions,
-								this->texturePredictedPositions);
-
-	// Compute shader output setup
-	giveFloatTextureInputToShader(0, false, this->textureBufferDensities,
-									this->textureDensities);
-	giveFloatTextureInputToShader(1, false, this->textureBufferPressures,
-									this->texturePressures);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboCurrent);
-
-	// Run compute shader
-	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-}
-
-
 void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 {
 	ComputeShader	*computeShader;
@@ -205,6 +162,58 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+}
+
+
+void	WaterSimulation::computeDensity(
+			ShaderManager *shaderManager)
+{
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("densities");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
+	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
+	giveFloatToShader(shaderId, "targetDensity", TARGET_DENSITY);
+	giveFloatToShader(shaderId, "pressureMultiplier", PRESSURE_MULTIPLIER);
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridSize);
+	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
+								this->textureBufferPredictedPositions,
+								this->texturePredictedPositions);
+
+	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
+	giveIntToShader(shaderId, "mapDensityH", this->mapDensityH);
+	giveIntToShader(shaderId, "mapDensityD", this->mapDensityD);
+	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
+	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 4,
+								this->textureBufferMapDensities,
+								this->textureMapDensities);
+
+	// Compute shader output setup
+	giveFloatTextureInputToShader(0, false, this->textureBufferDensities,
+									this->textureDensities);
+	giveFloatTextureInputToShader(1, false, this->textureBufferPressures,
+									this->texturePressures);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboCurrent);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 

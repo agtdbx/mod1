@@ -21,6 +21,15 @@ uniform int				gridSize;
 uniform int				positionsSize;
 uniform samplerBuffer	positionsBuffer;
 
+uniform int				mapDensityCellSize;
+uniform int				mapDensityW;
+uniform int				mapDensityH;
+uniform int				mapDensityD;
+uniform int				mapDensityIdHsize;
+uniform samplerBuffer	mapDensitiesBuffer;
+
+
+// Utils
 float	vecLength(vec3 vec)
 {
 	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
@@ -34,6 +43,7 @@ float	smoothingKernel(float dst)
 	return (pow(smoothingRadius - dst, 2) * smoothingScale);
 }
 
+// Density function
 float	calculateDensity(vec3 position)
 {
 	float	density, dst, influence;
@@ -81,9 +91,76 @@ float	calculateDensity(vec3 position)
 	return (density);
 }
 
+// Pressure function
 float	convertDensityToPressure(float density)
 {
 	return ((density - targetDensity) * pressureMultiplier);
+}
+
+// interpolate function
+float	getDensityAtMapPoint(int x, int y, int z)
+{
+	if (x >= mapDensityW || y >= mapDensityH || z >= mapDensityD)
+		return (0.0);
+
+	int	tid = x + z * mapDensityW + y * mapDensityIdHsize;
+	float density = texelFetch(mapDensitiesBuffer, tid).r;
+	return (density);
+}
+
+
+float	lerp(float start, float end, float ratio)
+{
+	return (start + (end - start) * ratio);
+}
+
+
+float	getDensityAtPos(vec3 pos)
+{
+	int		gx, gy, gz, ngx, ngy, ngz;
+	float	densityFUL, densityFUR, densityFDL, densityFDR,
+			densityBUL, densityBUR, densityBDL, densityBDR,
+			densityFU, densityFD, densityBU, densityBD,
+			densityF, densityB,
+			density,
+			dx, dy, dz;
+
+	// Get grid coordonates
+	gx = int(pos.x / mapDensityCellSize);
+	gy = int(pos.y / mapDensityCellSize);
+	gz = int(pos.z / mapDensityCellSize);
+	ngx = gx + 1;
+	ngy = gy + 1;
+	ngz = gz + 1;
+
+	// Get ratio for each axis
+	dx = (pos.x - (gx * mapDensityCellSize)) / mapDensityCellSize;
+	dy = (pos.y - (gy * mapDensityCellSize)) / mapDensityCellSize;
+	dz = (pos.z - (gz * mapDensityCellSize)) / mapDensityCellSize;
+
+	// Get density for 8 cell around pos
+	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
+	densityFUR = getDensityAtMapPoint(ngx, gy,  gz);
+	densityFDL = getDensityAtMapPoint(gx,  ngy, gz);
+	densityFDR = getDensityAtMapPoint(ngx, ngy, gz);
+	densityBUL = getDensityAtMapPoint(gx,  gy,  ngz);
+	densityBUR = getDensityAtMapPoint(ngx, gy,  ngz);
+	densityBDL = getDensityAtMapPoint(gx,  ngy, ngz);
+	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
+
+	// Merge density on x axis
+	densityFU = lerp(densityFUL, densityFUR, dx);
+	densityFD = lerp(densityFDL, densityFDR, dx);
+	densityBU = lerp(densityBUL, densityBUR, dx);
+	densityBD = lerp(densityBDL, densityBDR, dx);
+
+	// Merge density on y axis
+	densityF = lerp(densityFU, densityFD, dy);
+	densityB = lerp(densityBU, densityBD, dy);
+
+	// Merge density on z axis
+	density = lerp(densityF, densityB, dz);
+	return (density);
 }
 
 void main()
@@ -99,7 +176,8 @@ void main()
 
 	position = texelFetch(positionsBuffer, particleIndex).rgb;
 
-	density = calculateDensity(position);
+	// density = calculateDensity(position);
+	density = getDensityAtPos(position);
 	pressure = convertDensityToPressure(density);
 
 	// Write the value to the buffer

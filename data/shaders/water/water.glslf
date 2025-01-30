@@ -480,7 +480,6 @@ float	getDensityAtPos(vec3 pos, float densityValue)
 
 	// Merge density on z axis
 	density = lerp(densityF, densityB, dz);
-	// return (density);
 	if (density > waterDensity)
 		return (densityValue);
 	return (0.0);

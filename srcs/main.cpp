@@ -204,8 +204,8 @@ int	main(int argc, char **argv)
 										+ mapDensity + pressure + updatePos;
 				printf(" - predicted pos %9.3f ms\n", predictedPos * 1000.0f);
 				printf(" - put in grid   %9.3f ms\n", putInGrid * 1000.0f);
-				printf(" - density       %9.3f ms\n", density * 1000.0f);
 				printf(" - map density   %9.3f ms\n", mapDensity * 1000.0f);
+				printf(" - density       %9.3f ms\n", density * 1000.0f);
 				printf(" - pressure      %9.3f ms\n", pressure * 1000.0f);
 				printf(" - update pos    %9.3f ms\n", updatePos * 1000.0f);
 				printf(" - total compute %9.3f ms\n", computeTotal * 1000.0f);

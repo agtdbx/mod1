@@ -34,11 +34,8 @@ void	WaterSimulation::generateTextureBuffer(void)
 
 void	WaterSimulation::generateOffsetGrid(void)
 {
-	// Default value for offsets
-	this->gridOffsetsSize = this->gridSize;
-
 	// Grid buffer
-	int	size = this->gridSize * 2500;
+	int	size = this->gridSize * 1001;
 	int	bufferSize = sizeof(int) * size;
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);

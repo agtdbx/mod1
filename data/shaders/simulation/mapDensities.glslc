@@ -13,11 +13,12 @@ uniform float			waterMass;
 uniform int				mapDensityCellSize;
 uniform int				mapDensityW;
 uniform int				mapDensityIdHsize;
+uniform int				mapDensitySize;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
 uniform int				idHsize;
-uniform int				offsetsSize;
+uniform int				gridSize;
 uniform samplerBuffer	positionsBuffer;
 
 float	vecLength(vec3 vec)
@@ -66,7 +67,7 @@ float	calculateDensity(vec3 position)
 				nbParticleInCell = gridBuffer[gid];
 				for (int i = 0; i < nbParticleInCell; i++)
 				{
-					gid += offsetsSize;
+					gid += gridSize;
 					waterId = gridBuffer[gid];
 					pos = texelFetch(positionsBuffer, waterId).rgb;
 					dst = vecLength(pos - position);
@@ -87,6 +88,9 @@ void main()
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
+	if (particleIndex >= mapDensitySize)
+		return ;
+
 	y = int(particleIndex / mapDensityIdHsize);
 	idXZ = particleIndex - (y * mapDensityIdHsize);
 	z = int(idXZ / mapDensityW);

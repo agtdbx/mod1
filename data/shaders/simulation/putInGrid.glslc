@@ -9,7 +9,7 @@ layout(std430, binding = 0) buffer DataBuffer {
 uniform float			smoothingRadius;
 uniform int				gridW;
 uniform int				idHsize;
-uniform int				offsetsSize;
+uniform int				gridSize;
 uniform int				positionsSize;
 uniform samplerBuffer	positionsBuffer;
 
@@ -18,7 +18,7 @@ void main()
 	int		gx, gy, gz, gid, gridId, particlesInCell;
 	vec3	particlePos;
 
-	for (int i = 0; i < offsetsSize; i++)
+	for (int i = 0; i < gridSize; i++)
 		gridBuffer[i] = 0;
 
 	// Put particles into grid
@@ -32,11 +32,11 @@ void main()
 		gid = gx + gz * gridW + gy * idHsize;
 
 		particlesInCell = gridBuffer[gid];
-		if (particlesInCell >= 2500)
+		if (particlesInCell >= 1000)
 			continue;
 
 		particlesInCell++;
-		gridId = gid + offsetsSize * particlesInCell;
+		gridId = gid + gridSize * particlesInCell;
 		gridBuffer[gridId] = i;
 		gridBuffer[gid] = particlesInCell;
 	}

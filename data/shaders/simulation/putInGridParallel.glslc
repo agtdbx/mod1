@@ -1,0 +1,62 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) buffer DataBuffer {
+	int gridBuffer[];
+};
+
+uniform float			smoothingRadius;
+uniform int				gridW;
+uniform int				idHsize;
+uniform int				gridSize;
+uniform int				positionsSize;
+uniform samplerBuffer	positionsBuffer;
+
+void main()
+{
+	int		cellIndex, idXZ, cx, cy, cz, particlesInCell, gid;
+	vec3	startPos, endPos, particlePos;
+
+	cellIndex = int(gl_GlobalInvocationID.x);
+
+	if (cellIndex >= gridSize)
+		return ;
+
+	if (cellIndex == 0)
+	{
+		for (int i = 0; i < gridSize; i++)
+			gridBuffer[i] = 0;
+	}
+	memoryBarrier();
+	barrier();
+
+	cy = cellIndex / idHsize;
+	idXZ = cellIndex - (cy * idHsize);
+	cz = idXZ / gridW;
+	cx = idXZ - (cz * gridW);
+
+	startPos = vec3(cx, cy, cz) * smoothingRadius;
+	endPos = vec3(cx + 1, cy + 1, cz + 1) * smoothingRadius;
+
+	particlesInCell = 0;
+	gid = cellIndex;
+	for (int i = 0; i < positionsSize; i++)
+	{
+		particlePos = texelFetch(positionsBuffer, i).rgb;
+
+		if (particlePos.x < startPos.x || particlePos.x >= endPos.x
+			|| particlePos.y < startPos.y || particlePos.y >= endPos.y
+			|| particlePos.z < startPos.z || particlePos.z >= endPos.z)
+			continue;
+
+		if (particlesInCell >= 1000)
+			break;
+		// Put particle into grid
+		particlesInCell++;
+		gid = cellIndex + gridSize * particlesInCell;
+		gridBuffer[gid] = i;
+	}
+	// Put nb particles in cell into grid
+	gridBuffer[cellIndex] = particlesInCell;
+}

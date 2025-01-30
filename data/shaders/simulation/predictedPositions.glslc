@@ -10,17 +10,22 @@ uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform float			gravityForce;
+uniform int				positionsSize;
 uniform samplerBuffer	positionsBuffer;
 
 void main()
 {
-	int		particleIndex = int(gl_GlobalInvocationID.x);
-	vec3	position = texelFetch(positionsBuffer, particleIndex).rgb;
-	vec3	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
+	int		particleIndex;
+	vec3	position, velocity, predictedPosition;
 
+	particleIndex = int(gl_GlobalInvocationID.x);
+	if (particleIndex >= positionsSize)
+		return ;
+
+	position = texelFetch(positionsBuffer, particleIndex).rgb;
+	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
 	velocity += vec3(0.0, -gravityForce, 0.0) * delta;
-
-	vec3	predictedPosition = position + velocity * delta;
+	predictedPosition = position + velocity * delta;
 
 	// Check if particule is out of the map on x axis
 	if (predictedPosition.x < waterRadius)

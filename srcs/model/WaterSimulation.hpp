@@ -37,9 +37,9 @@ private:
 	bool					needToUpdateBuffers;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridOffsetsSize, idHsize, numGroups,
-							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
-							numGroupsPutInGrid, numGroupsMapDensity;
+							idHsize, numGroups,
+							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize,
+							mapDensitySize, numGroupsPutInGrid, numGroupsMapDensity;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
@@ -65,6 +65,7 @@ private:
 
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
+	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);

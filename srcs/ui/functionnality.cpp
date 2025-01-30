@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 20:05:55 by gugus            ###   ########.fr       */
+/*   Updated: 2025/01/30 18:36:54 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,14 @@ void	generateWaveWest(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
-	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
+	for (float x = 0; x < MAP_SIZE - SMOOTHING_RADIUS; x += SMOOTHING_RADIUS) 
 	{
-		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS )
 		{
-			for (float z = 0; z < sVar->waveThickess; z += WATER_RADIUS * 2)
+			for (float z = 0; z < sVar->waveThickess; z += SMOOTHING_RADIUS)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 1.0f) * sVar->waveVelocity);
+				simulation->addWater(glm::vec3(x + SMOOTHING_RADIUS, y + SMOOTHING_RADIUS, z + SMOOTHING_RADIUS),
+				glm::vec3(0.0f, 0.0f, 1.0f) * sVar->waveVelocity);
 
 			}
 		}
@@ -99,13 +100,14 @@ void	generateWaveEst(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
-	for (float x = 0; x < MAP_SIZE; x += WATER_RADIUS * 2)
+	for (float x = 0; x < MAP_SIZE - SMOOTHING_RADIUS; x += SMOOTHING_RADIUS)
 	{
-		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS)
 		{
-			for (float z = MAP_SIZE - sVar->waveThickess - 1 ; z < MAP_SIZE; z += WATER_RADIUS * 2)
+			for (float z = MAP_SIZE - sVar->waveThickess - SMOOTHING_RADIUS ; z < MAP_SIZE; z += SMOOTHING_RADIUS)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, -1.0f) * sVar->waveVelocity);
+				simulation->addWater(glm::vec3(x + SMOOTHING_RADIUS, y + SMOOTHING_RADIUS, z - SMOOTHING_RADIUS),
+				glm::vec3(0.0f, 0.0f, -1.0f) * sVar->waveVelocity);
 			}
 		}
 	}
@@ -118,13 +120,14 @@ void	generateWaveNorth(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
-	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
+	for (float z = 0; z < MAP_SIZE - SMOOTHING_RADIUS; z += SMOOTHING_RADIUS)
 	{
-		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS)
 		{
-			for (float x = 0; x < sVar->waveThickess; x += WATER_RADIUS * 2)
+			for (float x = 0; x < sVar->waveThickess; x += SMOOTHING_RADIUS)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
+				simulation->addWater(glm::vec3(x + SMOOTHING_RADIUS, y + SMOOTHING_RADIUS, z + SMOOTHING_RADIUS),
+				glm::vec3(1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
 
 			}
 		}
@@ -138,13 +141,14 @@ void	generateWaveSouth(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
-	for (float z = 0; z < MAP_SIZE; z += WATER_RADIUS * 2)
+	for (float z = 0; z < MAP_SIZE - SMOOTHING_RADIUS; z += SMOOTHING_RADIUS)
 	{
-		for (float y = 0; y < sVar->waveHeight; y += WATER_RADIUS * 2)
+		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS)
 		{
-			for (float x = MAP_SIZE - sVar->waveThickess - 1 ; x < MAP_SIZE; x += WATER_RADIUS * 2)
+			for (float x = MAP_SIZE - sVar->waveThickess - SMOOTHING_RADIUS ; x < MAP_SIZE; x += SMOOTHING_RADIUS)
 			{
-				simulation->addWater(glm::vec3(x, y, z), glm::vec3(-1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
+				simulation->addWater(glm::vec3(x - SMOOTHING_RADIUS, y + SMOOTHING_RADIUS, z + SMOOTHING_RADIUS),
+				glm::vec3(-1.0f, 0.0f, 0.0f) * sVar->waveVelocity);
 			}
 		}
 	}

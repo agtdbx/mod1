@@ -68,7 +68,7 @@ vec3	calculatePressureForce(int particleIndex)
 {
 	float	density, densityWater, pressure, pressureWater,
 			dst, slope, sharedPressure;
-	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId, weirdDirection;
 	vec3	pressureForce, position, positionWater, dir;
 
 	pressureForce = vec3(0.0, 0.0, 0.0);
@@ -112,8 +112,28 @@ vec3	calculatePressureForce(int particleIndex)
 
 					dir = positionWater - position;
 					dst = vecLength(dir);
-					if (dst == 0.0)
-						dir = vec3(0.0, 1.0, 0.0);
+					if (dst < 0.1)
+					{
+						weirdDirection = waterId % 5;
+						switch (weirdDirection )
+						{
+							case 0:
+								dir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 1:
+								dir = vec3(1.0, 0.0, 0.0);
+								break;
+							case 2:
+								dir = vec3(-1.0, 0.0, 0.0);
+								break;
+							case 3:
+								dir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 4:
+								dir = vec3(0.0, 0.0, -1.0);
+								break;
+						}
+					}
 					else
 						dir /= dst;
 					slope = smoothingKernelDerivate(dst);
@@ -130,7 +150,7 @@ vec3	calculatePressureForce(int particleIndex)
 vec3	calculateViscosityForce(int particleIndex)
 {
 	float	velocityLength, dst2, influence;
-	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId, weirdDirection;
 	vec3	viscosityForce, position, positionWater, velocity, velocityWater, velocityDir;
 
 	viscosityForce = vec3(0.0, 0.0, 0.0);
@@ -173,6 +193,28 @@ vec3	calculateViscosityForce(int particleIndex)
 
 					velocityDir = velocityWater - velocity;
 					dst2 = vecLength2(position - positionWater);
+					if (dst2 < 0.001)
+					{
+						weirdDirection = waterId % 5;
+						switch (weirdDirection  )
+						{
+							case 0:
+								velocityDir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 1:
+								velocityDir = vec3(1.0, 0.0, 0.0);
+								break;
+							case 2:
+								velocityDir = vec3(-1.0, 0.0, 0.0);
+								break;
+							case 3:
+								velocityDir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 4:
+								velocityDir = vec3(0.0, 0.0, -1.0);
+								break;
+						}
+					}
 					influence = viscositySmoothingKernel(dst2);
 					viscosityForce += velocityDir * influence;
 				}

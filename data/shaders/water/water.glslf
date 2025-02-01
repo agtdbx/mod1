@@ -232,14 +232,14 @@ s_inter_map_info	intersectWithCube(vec3 rayPos, vec3 rayDir,
 	return (result);
 }
 
-const vec3	p_luf = vec3(0.0, waterMaxY, 0.0);
-const vec3	p_ruf = vec3(waterMaxXZ, waterMaxY, 0.0);
-const vec3	p_ldf = vec3(0.0, 0.0, 0.0);
-const vec3	p_rdf = vec3(waterMaxXZ, 0.0, 0.0);
-const vec3	p_lub = vec3(0.0, waterMaxY, waterMaxXZ);
-const vec3	p_rub = vec3(waterMaxXZ, waterMaxY, waterMaxXZ);
-const vec3	p_ldb = vec3(0.0, 0.0, waterMaxXZ);
-const vec3	p_rdb = vec3(waterMaxXZ, 0.0, waterMaxXZ);
+vec3	p_luf = vec3(0.0, waterMaxY, 0.0);
+vec3	p_ruf = vec3(waterMaxXZ, waterMaxY, 0.0);
+vec3	p_ldf = vec3(0.0, 0.0, 0.0);
+vec3	p_rdf = vec3(waterMaxXZ, 0.0, 0.0);
+vec3	p_lub = vec3(0.0, waterMaxY, waterMaxXZ);
+vec3	p_rub = vec3(waterMaxXZ, waterMaxY, waterMaxXZ);
+vec3	p_ldb = vec3(0.0, 0.0, waterMaxXZ);
+vec3	p_rdb = vec3(waterMaxXZ, 0.0, waterMaxXZ);
 
 s_inter_map_info	hitMap(vec3 rayPos, vec3 rayDir)
 {
@@ -346,10 +346,10 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 	int		gx, gy, gz;
 	float	gpx, gpy, gpz, dx, dy, dz, dist, distX, distY, distZ, totalDist;
 
-	const float gridMaxX = terrainGridW * terrainCellSize;
-	const float gridMaxY = terrainGridH * terrainCellSize;
-	const float gridMaxZ = terrainGridD * terrainCellSize;
-	const float precisionLimit = 0.1;
+	float gridMaxX = terrainGridW * terrainCellSize;
+	float gridMaxY = terrainGridH * terrainCellSize;
+	float gridMaxZ = terrainGridD * terrainCellSize;
+	float precisionLimit = 0.1;
 
 	rayPos += rayDir;
 
@@ -485,10 +485,10 @@ float	getDensityAtPos(vec3 pos, float densityValue)
 	return (0.0);
 }
 
-const float	maxDensity = 10.0;
-const float	invMaxDensity = 1.0 / maxDensity;
-const float	quickRaySize = 50.0;
-const float	quickRayStep = rayStep * quickRaySize;
+float	maxDensity = 10.0;
+float	invMaxDensity = 1.0 / maxDensity;
+float	quickRaySize = 50.0;
+float	quickRayStep = rayStep * quickRaySize;
 
 float	getDensityToLight(vec3 rayPos)
 {

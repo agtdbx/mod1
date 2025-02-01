@@ -34,4 +34,8 @@ runval: all
 runvalall: all
 	cd $(MESON_BUILD_DIR) && valgrind --suppressions=vsupp --leak-check=full --show-leak-kinds=all ./$(EXECUTABLE_NAME) $(DEFAULT_MAP) || echo "Exit at 1"
 
+install:
+	@echo "$(BLUE)You need to have sudo permission$(NOC)"
+	@sudo apt-get install libglfw3 libglfw3-dev libglew-dev
+
 .PHONY: all clean fclean re run runval runvalall

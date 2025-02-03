@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 20:04:58 by gugus            ###   ########.fr       */
+/*   Updated: 2025/02/03 18:24:19 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,9 +99,11 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		//compute shader
 		shaderManager->addComputeShader("predictedPositions", "data/shaders/simulation/predictedPositions.glslc");
 		shaderManager->addComputeShader("putInGrid", "data/shaders/simulation/putInGrid.glslc");
+		shaderManager->addComputeShader("putInGridParallel", "data/shaders/simulation/putInGridParallel.glslc");
 		shaderManager->addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager->addComputeShader("mapDensities", "data/shaders/simulation/mapDensities.glslc");
 		shaderManager->addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
+		shaderManager->addComputeShader("viscosity", "data/shaders/simulation/viscosity.glslc");
 		shaderManager->addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 }
 

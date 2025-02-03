@@ -28,35 +28,55 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
-	glGenBuffers(1, &this->ssboGrid);
+	glDeleteBuffers(1, &this->textureBufferMapPressures);
+	glDeleteTextures(1, &this->textureMapPressures);
+
+	glGenBuffers(1, &this->ssboGrid1);
+	glGenBuffers(1, &this->ssboGrid2);
 }
 
 
-void	WaterSimulation::generateOffsetGrid(void)
+void	WaterSimulation::generateGridBuffer(void)
 {
-	// Default value for offsets
-	this->gridOffsetsSize = this->gridSize;
-
-	// Grid buffer
-	int	size = this->gridSize * 2500;
+	// Grid buffer size
+	int	size = this->gridSize * 1001;
 	int	bufferSize = sizeof(int) * size;
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
 	std::vector<int> initialData(size, 0);
+
+	// Grid buffer 1 init
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid1);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
 	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
+
+	// Grid buffer 2 init
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->ssboGrid2);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize, nullptr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, bufferSize, initialData.data());
+
+	this->ssboGrid1Used = true;
 }
 
 
-void	WaterSimulation::generateMapDensity(void)
+void	WaterSimulation::generateMapBuffer(void)
 {
-	std::vector<float> mapDensities;
+	std::vector<float>		mapBufferFloat;
+	std::vector<glm::vec4>	mapBufferVec4;
 
-	for (int i = 0; i < this->mapDensitySize; i++)
-		mapDensities.push_back(0.0f);
+	for (int i = 0; i < this->mapBufferSize; i++)
+	{
+		mapBufferFloat.push_back(0.0f);
+		mapBufferVec4.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	}
 
+	// Map densities
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapDensitySize,
-					mapDensities.data(), GL_STATIC_DRAW);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapBufferSize,
+					mapBufferFloat.data(), GL_STATIC_DRAW);
+
+	// Map pressures
+	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapPressures);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapBufferSize,
+					mapBufferFloat.data(), GL_STATIC_DRAW);
 }
 
 

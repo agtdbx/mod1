@@ -8,22 +8,28 @@ layout(std430, binding = 1) readonly buffer DataBuffer {
 };
 
 uniform float			smoothingRadius;
+uniform float			invSmoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
-uniform int				mapDensityCellSize;
-uniform int				mapDensityW;
-uniform int				mapDensityIdHsize;
+uniform float			targetDensity;
+uniform float			pressureMultiplier;
+uniform int				mapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferIdHsize;
+uniform int				mapBufferSize;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
 uniform int				idHsize;
-uniform int				offsetsSize;
+uniform int				gridSize;
 uniform samplerBuffer	positionsBuffer;
+
 
 float	vecLength(vec3 vec)
 {
 	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
+
 
 float	smoothingKernel(float dst)
 {
@@ -33,6 +39,7 @@ float	smoothingKernel(float dst)
 	return (pow(smoothingRadius - dst, 2) * smoothingScale);
 }
 
+
 float	calculateDensity(vec3 position)
 {
 	float	density, dst, influence;
@@ -40,9 +47,9 @@ float	calculateDensity(vec3 position)
 	vec3	pos;
 
 	density = 0.0;
-	px = int(position.x / smoothingRadius);
-	py = int(position.y / smoothingRadius);
-	pz = int(position.z / smoothingRadius);
+	px = int(position.x * invSmoothingRadius);
+	py = int(position.y * invSmoothingRadius);
+	pz = int(position.z * invSmoothingRadius);
 
 	for (int cx = -1; cx <= 1; cx++)
 	{
@@ -66,7 +73,7 @@ float	calculateDensity(vec3 position)
 				nbParticleInCell = gridBuffer[gid];
 				for (int i = 0; i < nbParticleInCell; i++)
 				{
-					gid += offsetsSize;
+					gid += gridSize;
 					waterId = gridBuffer[gid];
 					pos = texelFetch(positionsBuffer, waterId).rgb;
 					dst = vecLength(pos - position);
@@ -80,21 +87,25 @@ float	calculateDensity(vec3 position)
 	return (density);
 }
 
+
 void main()
 {
 	int		particleIndex, idXZ, x, y, z;
-	float	density;
+	float	density, pressure;
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
-	y = int(particleIndex / mapDensityIdHsize);
-	idXZ = particleIndex - (y * mapDensityIdHsize);
-	z = int(idXZ / mapDensityW);
-	x = idXZ - (z * mapDensityW);
+	if (particleIndex >= mapBufferSize)
+		return ;
 
-	position = vec3(x, y, z) * mapDensityCellSize;
+	y = int(particleIndex / mapBufferIdHsize);
+	idXZ = particleIndex - (y * mapBufferIdHsize);
+	z = int(idXZ / mapBufferW);
+	x = idXZ - (z * mapBufferW);
+
+	position = vec3(x, y, z) * mapBufferCellSize;
 	density = calculateDensity(position);
 
-	// Write the value to the buffer
+	// Write the values to the buffers
 	imageStore(mapDensitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
 }

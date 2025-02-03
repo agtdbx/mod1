@@ -8,81 +8,89 @@ layout(std430, binding = 2) readonly buffer DataBuffer {
 	int gridBuffer[];
 };
 
-uniform float			smoothingRadius;
-uniform float			smoothingScale;
-uniform float			waterMass;
 uniform float			targetDensity;
 uniform float			pressureMultiplier;
-uniform int				gridW;
-uniform int				gridH;
-uniform int				gridD;
-uniform int				idHsize;
-uniform int				offsetsSize;
+uniform int				positionsSize;
 uniform samplerBuffer	positionsBuffer;
 
-float	vecLength(vec3 vec)
-{
-	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
-}
+uniform int				mapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferH;
+uniform int				mapBufferD;
+uniform int				mapBufferIdHsize;
+uniform samplerBuffer	mapDensitiesBuffer;
 
-float	smoothingKernel(float dst)
-{
-	if (dst > smoothingRadius)
-		return (0.0);
 
-	return (pow(smoothingRadius - dst, 2) * smoothingScale);
-}
-
-float	calculateDensity(vec3 position)
-{
-	float	density, dst, influence;
-	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
-	vec3	pos;
-
-	density = 0.0;
-	px = int(position.x / smoothingRadius);
-	py = int(position.y / smoothingRadius);
-	pz = int(position.z / smoothingRadius);
-
-	for (int cx = -1; cx <= 1; cx++)
-	{
-		gx = px + cx;
-		if (gx < 0 || gx >= gridW)
-			continue;
-
-		for (int cy = -1; cy <= 1; cy++)
-		{
-			gy = py + cy;
-			if (gy < 0 || gy >= gridH)
-				continue;
-
-			for (int cz = -1; cz <= 1; cz++)
-			{
-				gz = pz + cz;
-				if (gz < 0 || gz >= gridD)
-					continue;
-
-				gid = gx + gz * gridW + gy * idHsize;
-				nbParticleInCell = gridBuffer[gid];
-				for (int i = 0; i < nbParticleInCell; i++)
-				{
-					gid += offsetsSize;
-					waterId = gridBuffer[gid];
-					pos = texelFetch(positionsBuffer, waterId).rgb;
-					dst = vecLength(pos - position);
-					influence = smoothingKernel(dst);
-					density += waterMass * influence;
-				}
-			}
-		}
-	}
-
-	return (density);
-}
-
+// Pressure function
 float	convertDensityToPressure(float density)
 {
 	return ((density - targetDensity) * pressureMultiplier);
+}
+
+// interpolate function
+float	getDensityAtMapPoint(int x, int y, int z)
+{
+	if (x >= mapBufferW || y >= mapBufferH || z >= mapBufferD)
+		return (0.0);
+
+	int	tid = x + z * mapBufferW + y * mapBufferIdHsize;
+	float density = texelFetch(mapDensitiesBuffer, tid).r;
+	return (density);
+}
+
+
+float	lerp(float start, float end, float ratio)
+{
+	return (start + (end - start) * ratio);
+}
+
+
+float	getDensityAtPos(vec3 pos)
+{
+	int		gx, gy, gz, ngx, ngy, ngz;
+	float	densityFUL, densityFUR, densityFDL, densityFDR,
+			densityBUL, densityBUR, densityBDL, densityBDR,
+			densityFU, densityFD, densityBU, densityBD,
+			densityF, densityB,
+			density,
+			dx, dy, dz;
+
+	// Get grid coordonates
+	gx = int(pos.x / mapBufferCellSize);
+	gy = int(pos.y / mapBufferCellSize);
+	gz = int(pos.z / mapBufferCellSize);
+	ngx = gx + 1;
+	ngy = gy + 1;
+	ngz = gz + 1;
+
+	// Get ratio for each axis
+	dx = (pos.x - (gx * mapBufferCellSize)) / mapBufferCellSize;
+	dy = (pos.y - (gy * mapBufferCellSize)) / mapBufferCellSize;
+	dz = (pos.z - (gz * mapBufferCellSize)) / mapBufferCellSize;
+
+	// Get density for 8 cell around pos
+	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
+	densityFUR = getDensityAtMapPoint(ngx, gy,  gz);
+	densityFDL = getDensityAtMapPoint(gx,  ngy, gz);
+	densityFDR = getDensityAtMapPoint(ngx, ngy, gz);
+	densityBUL = getDensityAtMapPoint(gx,  gy,  ngz);
+	densityBUR = getDensityAtMapPoint(ngx, gy,  ngz);
+	densityBDL = getDensityAtMapPoint(gx,  ngy, ngz);
+	densityBDR = getDensityAtMapPoint(ngx, ngy, ngz);
+
+	// Merge density on x axis
+	densityFU = lerp(densityFUL, densityFUR, dx);
+	densityFD = lerp(densityFDL, densityFDR, dx);
+	densityBU = lerp(densityBUL, densityBUR, dx);
+	densityBD = lerp(densityBDL, densityBDR, dx);
+
+	// Merge density on y axis
+	densityF = lerp(densityFU, densityFD, dy);
+	densityB = lerp(densityBU, densityBD, dy);
+
+	// Merge density on z axis
+	density = lerp(densityF, densityB, dz);
+	return (density);
 }
 
 void main()
@@ -93,9 +101,12 @@ void main()
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
+	if (particleIndex >= positionsSize)
+		return ;
+
 	position = texelFetch(positionsBuffer, particleIndex).rgb;
 
-	density = calculateDensity(position);
+	density = getDensityAtPos(position);
 	pressure = convertDensityToPressure(density);
 
 	// Write the value to the buffer

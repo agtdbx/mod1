@@ -201,14 +201,17 @@ int	main(int argc, char **argv)
 				float	density = perfLog.timeComputeDensity / perfLog.nbCall;
 				float	mapDensity = perfLog.timeComputeMapDensity / perfLog.nbCall;
 				float	pressure = perfLog.timeApplyPressure / perfLog.nbCall;
+				float	viscosity = perfLog.timeApplyViscosity / perfLog.nbCall;
 				float	updatePos = perfLog.timeUpdatePositions / perfLog.nbCall;
 				float	computeTotal = predictedPos + putInGrid + density
-										+ mapDensity + pressure + updatePos;
+										 + mapDensity + viscosity
+										 + pressure + updatePos;
 				printf(" - predicted pos %9.3f ms\n", predictedPos * 1000.0f);
 				printf(" - put in grid   %9.3f ms\n", putInGrid * 1000.0f);
-				printf(" - density       %9.3f ms\n", density * 1000.0f);
 				printf(" - map density   %9.3f ms\n", mapDensity * 1000.0f);
+				printf(" - density       %9.3f ms\n", density * 1000.0f);
 				printf(" - pressure      %9.3f ms\n", pressure * 1000.0f);
+				printf(" - viscosity     %9.3f ms\n", viscosity * 1000.0f);
 				printf(" - update pos    %9.3f ms\n", updatePos * 1000.0f);
 				printf(" - total compute %9.3f ms\n", computeTotal * 1000.0f);
 
@@ -238,6 +241,7 @@ int	main(int argc, char **argv)
 			perfLog.timeComputeDensity = 0.0;
 			perfLog.timeComputeMapDensity = 0.0;
 			perfLog.timeApplyPressure = 0.0;
+			perfLog.timeApplyViscosity = 0.0;
 			perfLog.timeUpdatePositions = 0.0;
 			// Reset draw times
 			perfLog.timeDrawTerrain = 0.0;

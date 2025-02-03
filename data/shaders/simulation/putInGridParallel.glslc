@@ -1,0 +1,105 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(std430, binding = 0) readonly buffer DataBuffer1 {
+	int gridBufferIn[];
+};
+layout(std430, binding = 1) buffer DataBuffer2 {
+	int gridBufferOut[];
+};
+
+uniform float			smoothingRadius;
+uniform int				gridW;
+uniform int				gridH;
+uniform int				gridD;
+uniform int				idHsize;
+uniform int				gridSize;
+uniform int				positionsSize;
+uniform samplerBuffer	positionsBuffer;
+
+void main()
+{
+	int		cellIndex, particleId, idXZ, px, py, pz, gx, gy, gz,
+			gInId, gOutId, particlesInCellIn, particlesInCellOut;
+	vec3	startPos, endPos, particlePos;
+
+	// Get cell index
+	cellIndex = int(gl_GlobalInvocationID.x);
+	if (cellIndex >= gridSize)
+		return ;
+
+	// Reset out grid buffer
+	if (cellIndex == 0)
+	{
+		for (int i = 0; i < gridSize; i++)
+			gridBufferOut[i] = 0;
+	}
+	memoryBarrier();
+	barrier();
+
+	// Compute cell coordonates
+	py = cellIndex / idHsize;
+	idXZ = cellIndex - (py * idHsize);
+	pz = idXZ / gridW;
+	px = idXZ - (pz * gridW);
+
+	// Compute cell world coordonates
+	startPos = vec3(px, py, pz) * smoothingRadius;
+	endPos = vec3(px + 1, py + 1, pz + 1) * smoothingRadius;
+
+	// Check all near particles
+	gOutId = cellIndex;
+	particlesInCellOut = 0;
+	for (int cx = -2; cx <= 2; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= gridW)
+			continue;
+
+		for (int cy = -2; cy <= 2; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= gridH)
+				continue;
+
+			for (int cz = -2; cz <= 2; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= gridD)
+					continue;
+
+				gInId = gx + gz * gridW + gy * idHsize;
+				particlesInCellIn = gridBufferIn[gInId];
+				for (int i = 0; i < particlesInCellIn; i++)
+				{
+					gInId += gridSize;
+					particleId = gridBufferIn[gInId];
+
+					// Get particle position
+					particlePos = texelFetch(positionsBuffer, particleId).rgb;
+
+					// Check if the particle is in cell
+					if (particlePos.x < startPos.x || particlePos.x >= endPos.x
+						|| particlePos.y < startPos.y || particlePos.y >= endPos.y
+						|| particlePos.z < startPos.z || particlePos.z >= endPos.z)
+						continue;
+
+					// Avoid overflow
+					if (particlesInCellOut >= 1000)
+					{
+						gridBufferOut[cellIndex] = 1000;
+						return ;
+					}
+
+					// Put particle into grid out
+					particlesInCellOut++;
+					gOutId += gridSize;
+					gridBufferOut[gOutId] = particleId;
+				}
+			}
+		}
+	}
+	// Put nb particles in cell into grid
+	gridBufferOut[cellIndex] = particlesInCellOut;
+}

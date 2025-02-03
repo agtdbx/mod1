@@ -24,30 +24,28 @@ WaterSimulation::WaterSimulation(void)
 	this->gridD = this->gridW;
 	this->idHsize = this->gridW * this->gridD;
 	this->gridSize = this->gridW * this->gridH * this->gridD;
-	this->gridOffsetsSize = 0;
 	this->numGroupsPutInGrid = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
-	// map density init
-	this->mapDensityW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
-	if (MAP_SIZE > MAP_DENSITY_CELL_SIZE && MAP_SIZE % MAP_DENSITY_CELL_SIZE != 0)
-		this->mapDensityW++;
-	this->mapDensityH = MAP_MAX_HEIGHT / MAP_DENSITY_CELL_SIZE;
-	if (MAP_MAX_HEIGHT > MAP_DENSITY_CELL_SIZE
-		&& (int)MAP_MAX_HEIGHT % MAP_DENSITY_CELL_SIZE != 0)
-		this->mapDensityH++;
-	this->mapDensityD = this->mapDensityW;
-	this->mapDensityIdHsize = this->mapDensityW * this->mapDensityD;
-	this->mapDensitySize = this->mapDensityW * this->mapDensityH * this->mapDensityD;
-	this->numGroupsMapDensity = (this->mapDensitySize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
-
+	// map buffer init
+	this->mapBufferW = MAP_SIZE / MAP_BUFFER_CELL_SIZE;
+	if (MAP_SIZE > MAP_BUFFER_CELL_SIZE && MAP_SIZE % MAP_BUFFER_CELL_SIZE != 0)
+		this->mapBufferW++;
+	this->mapBufferH = MAP_MAX_HEIGHT / MAP_BUFFER_CELL_SIZE;
+	if (MAP_MAX_HEIGHT > MAP_BUFFER_CELL_SIZE
+		&& (int)MAP_MAX_HEIGHT % MAP_BUFFER_CELL_SIZE != 0)
+		this->mapBufferH++;
+	this->mapBufferD = this->mapBufferW;
+	this->mapBufferIdHsize = this->mapBufferW * this->mapBufferD;
+	this->mapBufferSize = this->mapBufferW * this->mapBufferH * this->mapBufferD;
+	this->numGroupsMapBuffer = (this->mapBufferSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
-	this->generateMapDensity();
-	this->generateOffsetGrid();
+	this->generateMapBuffer();
+	this->generateGridBuffer();
 }
 
 
@@ -62,15 +60,20 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->gridW = obj.gridW;
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
-	this->gridOffsetsSize = obj.gridOffsetsSize;
+	this->numGroupsPutInGrid = obj.numGroupsPutInGrid;
+	this->mapBufferW = obj.mapBufferW;
+	this->mapBufferH = obj.mapBufferH;
+	this->mapBufferD = obj.mapBufferD;
+	this->mapBufferIdHsize = obj.mapBufferIdHsize;
+	this->mapBufferSize = obj.mapBufferSize;
+	this->numGroupsMapBuffer = obj.numGroupsMapBuffer;
 	this->numGroups = obj.numGroups;
-	this->numGroupsMapDensity = obj.numGroupsMapDensity;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
-	this->generateMapDensity();
-	this->generateOffsetGrid();
+	this->generateMapBuffer();
+	this->generateGridBuffer();
 }
 
 //---- Destructor --------------------------------------------------------------
@@ -95,9 +98,12 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
-	glDeleteBuffers(1, &this->ssboGrid);
-}
+	glDeleteBuffers(1, &this->textureBufferMapPressures);
+	glDeleteTextures(1, &this->textureMapPressures);
 
+	glDeleteBuffers(1, &this->ssboGrid1);
+	glDeleteBuffers(1, &this->ssboGrid2);
+}
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
@@ -125,7 +131,13 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	this->gridW = obj.gridW;
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
-	this->gridOffsetsSize = obj.gridOffsetsSize;
+	this->numGroupsPutInGrid = obj.numGroupsPutInGrid;
+	this->mapBufferW = obj.mapBufferW;
+	this->mapBufferH = obj.mapBufferH;
+	this->mapBufferD = obj.mapBufferD;
+	this->mapBufferIdHsize = obj.mapBufferIdHsize;
+	this->mapBufferSize = obj.mapBufferSize;
+	this->numGroupsMapBuffer = obj.numGroupsMapBuffer;
 	this->numGroups = obj.numGroups;
 	this->needToUpdateBuffers = true;
 
@@ -193,6 +205,7 @@ void	WaterSimulation::tick(
 		this->velocitiesToBuffer();
 		this->densitiesToBuffer();
 		this->pressuresToBuffer();
+		this->putParticlesInGrid(shaderManager);
 
 		this->needToUpdateBuffers = false;
 	}
@@ -210,16 +223,10 @@ void	WaterSimulation::tick(
 		perfLog->timePredictedPos += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		this->putParticlesInGrid(shaderManager); // gpu
+		this->putParticlesInGridInParallel(shaderManager); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timePutInGrid += elapsed_time / 1000000000.0;
-
-		glBeginQuery(GL_TIME_ELAPSED, query);
-		this->computeDensity(shaderManager); // gpu
-		glEndQuery(GL_TIME_ELAPSED);
-		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
-		perfLog->timeComputeDensity += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
 		this->computeMapDensity(shaderManager); // gpu
@@ -228,10 +235,22 @@ void	WaterSimulation::tick(
 		perfLog->timeComputeMapDensity += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
+		this->computeDensity(shaderManager); // gpu
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeComputeDensity += elapsed_time / 1000000000.0;
+
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timeApplyPressure += elapsed_time / 1000000000.0;
+
+		glBeginQuery(GL_TIME_ELAPSED, query);
+		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeApplyViscosity += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
 		this->updatePositions(shaderManager, terrain, delta); // gpu
@@ -242,10 +261,11 @@ void	WaterSimulation::tick(
 	else
 	{
 		this->computePredictedPositions(shaderManager, delta); // gpu
-		this->putParticlesInGrid(shaderManager); // gpu
-		this->computeDensity(shaderManager); // gpu
+		this->putParticlesInGridInParallel(shaderManager); // gpu
 		this->computeMapDensity(shaderManager); // gpu
+		this->computeDensity(shaderManager); // gpu
 		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
+		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
 		this->updatePositions(shaderManager, terrain, delta); // gpu
 	}
 }
@@ -307,11 +327,12 @@ void	WaterSimulation::draw(
 	giveVec3ToShader(shaderId, "lightColor", *lightColor);
 	giveFloatToShader(shaderId, "waterDensity", waterDensity);
 
-	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
-	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
-	giveIntToShader(shaderId, "mapDensityH", this->mapDensityH);
-	giveIntToShader(shaderId, "mapDensityD", this->mapDensityD);
-	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_BUFFER_CELL_SIZE);
+	giveFloatToShader(shaderId, "invMapBufferCellSize", INV_MAP_BUFFER_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferH", this->mapBufferH);
+	giveIntToShader(shaderId, "mapBufferD", this->mapBufferD);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
 	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 0,
 								this->textureBufferMapDensities,
 								this->textureMapDensities);
@@ -348,7 +369,7 @@ void	WaterSimulation::clear(void)
 	this->velocities.clear();
 	this->densities.clear();
 	this->needToUpdateBuffers = true;
-	this->generateMapDensity();
+	this->generateMapBuffer();
 }
 
 

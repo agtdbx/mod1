@@ -34,24 +34,25 @@ private:
 	std::vector<glm::vec4>	predictedPositions;
 	std::vector<glm::vec4>	velocities;
 	std::vector<float>		densities;
-	bool					needToUpdateBuffers;
+	bool					needToUpdateBuffers, ssboGrid1Used;
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
-							gridOffsetsSize, idHsize, numGroups,
-							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize, mapDensitySize,
-							numGroupsPutInGrid, numGroupsMapDensity;
+							idHsize, numGroups,
+							mapBufferW, mapBufferH, mapBufferD, mapBufferIdHsize,
+							mapBufferSize, numGroupsPutInGrid, numGroupsMapBuffer;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
 							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
-							ssboGrid;
+							textureBufferMapPressures, textureMapPressures,
+							ssboCurrent, ssboGrid1, ssboGrid2;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
-	void		generateOffsetGrid(void);
-	void		generateMapDensity(void);
+	void		generateGridBuffer(void);
+	void		generateMapBuffer(void);
 
 	void		positionsToBuffer(void);
 	void		positionsFromBuffer(void);
@@ -65,9 +66,12 @@ private:
 
 	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
-	void		computeDensity(ShaderManager *shaderManager);
+	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
+	void		computeDensity(ShaderManager *shaderManager);
+	void		computeMapPressureAcceleration(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
+	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };
 

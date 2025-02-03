@@ -11,13 +11,14 @@ uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform float			collisionEnergyKeep;
 uniform float			collisionRepulsionForce;
-uniform float			terrainCellSize;
+uniform float			invTerrainCellSize;
 uniform int				terrainGridW;
 uniform int				terrainGridH;
 uniform int				terrainGridD;
 uniform int				terrainIdHsize;
 uniform int				terrainGridSize;
 uniform int				terrainOffsetsSize;
+uniform int				positionsSize;
 uniform samplerBuffer	terrainDataBuffer;
 uniform samplerBuffer	terrainGridBuffer;
 uniform samplerBuffer	terrainOffsetsBuffer;
@@ -35,9 +36,9 @@ int	checkCollisionWithTerrain(vec3 position)
 	vec3	rectPos, vecX, vecZ, posFromRect, posOnRect;
 	float	minY, maxY, a, b;
 
-	px = int(position.x / terrainCellSize);
-	py = int(position.y / terrainCellSize);
-	pz = int(position.z / terrainCellSize);
+	px = int(position.x * invTerrainCellSize);
+	py = int(position.y * invTerrainCellSize);
+	pz = int(position.z * invTerrainCellSize);
 
 	for (int cx = -1; cx < 2; cx++)
 	{
@@ -111,25 +112,32 @@ int	checkCollisionWithTerrain(vec3 position)
 
 void main()
 {
-	int		particleIndex = int(gl_GlobalInvocationID.x);
-	vec3	position = imageLoad(positionsBuffer, particleIndex).rgb;
-	vec3	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
-	bool	needUpdateVelocity = false;
+	int		particleIndex, terrainCollisionId;
+	float	velocityLength;
+	vec3	position, velocity, newPosition, velocityDir, normal;
+	bool	needUpdateVelocity;
 
-	vec3	newPosition = position + velocity * delta;
+	particleIndex = int(gl_GlobalInvocationID.x);
+	if (particleIndex >= positionsSize)
+		return ;
+
+	position = imageLoad(positionsBuffer, particleIndex).rgb;
+	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
+	newPosition = position + velocity * delta;
+	needUpdateVelocity = false;
 
 	// Check terrain collision
-	int	terrainCollisionId = checkCollisionWithTerrain(newPosition);
+	terrainCollisionId = checkCollisionWithTerrain(newPosition);
 
-	// Make particule bounce
+	// Make particule bounce in case of collision
 	if (terrainCollisionId != -1)
 	{
-		float	velocityLength = vecLength(velocity);
-		vec3	velocityDir = vec3(0.0, -1.0, 0.0);
+		velocityLength = vecLength(velocity);
+		velocityDir = vec3(0.0, -1.0, 0.0);
 		if (velocityLength != 0.0)
 			velocityDir = velocity / velocityLength;
 
-		vec3	normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
+		normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
 		velocityDir -= normal * 2 * dot(velocityDir, normal);
 		velocityDir = normalize(velocityDir);
 		velocity = velocityDir * velocityLength;

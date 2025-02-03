@@ -19,11 +19,12 @@ uniform vec3			waterColor;
 uniform vec3			lightColor;
 uniform float			waterDensity;
 
-uniform int				mapDensityCellSize;
-uniform int				mapDensityW;
-uniform int				mapDensityH;
-uniform int				mapDensityD;
-uniform int				mapDensityIdHsize;
+uniform int				mapBufferCellSize;
+uniform float			invMapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferH;
+uniform int				mapBufferD;
+uniform int				mapBufferIdHsize;
 uniform samplerBuffer	mapDensitiesBuffer;
 
 uniform int				terrainCellSize;
@@ -421,10 +422,10 @@ float hitTriangleTerrain(vec3 rayPos, vec3 rayDir, float startDist, float maxDis
 // Get density
 float	getDensityAtMapPoint(int x, int y, int z)
 {
-	if (x >= mapDensityW || y >= mapDensityH || z >= mapDensityD)
+	if (x >= mapBufferW || y >= mapBufferH || z >= mapBufferD)
 		return (0.0);
 
-	int	tid = x + z * mapDensityW + y * mapDensityIdHsize;
+	int	tid = x + z * mapBufferW + y * mapBufferIdHsize;
 	float density = texelFetch(mapDensitiesBuffer, tid).r;
 	return (density);
 }
@@ -447,17 +448,17 @@ float	getDensityAtPos(vec3 pos, float densityValue)
 			dx, dy, dz;
 
 	// Get grid coordonates
-	gx = int(pos.x / mapDensityCellSize);
-	gy = int(pos.y / mapDensityCellSize);
-	gz = int(pos.z / mapDensityCellSize);
+	gx = int(pos.x * invMapBufferCellSize);
+	gy = int(pos.y * invMapBufferCellSize);
+	gz = int(pos.z * invMapBufferCellSize);
 	ngx = gx + 1;
 	ngy = gy + 1;
 	ngz = gz + 1;
 
 	// Get ratio for each axis
-	dx = (pos.x - (gx * mapDensityCellSize)) / mapDensityCellSize;
-	dy = (pos.y - (gy * mapDensityCellSize)) / mapDensityCellSize;
-	dz = (pos.z - (gz * mapDensityCellSize)) / mapDensityCellSize;
+	dx = (pos.x - (gx * mapBufferCellSize)) * invMapBufferCellSize;
+	dy = (pos.y - (gy * mapBufferCellSize)) * invMapBufferCellSize;
+	dz = (pos.z - (gz * mapBufferCellSize)) * invMapBufferCellSize;
 
 	// Get density for 8 cell around pos
 	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);
@@ -481,7 +482,6 @@ float	getDensityAtPos(vec3 pos, float densityValue)
 
 	// Merge density on z axis
 	density = lerp(densityF, densityB, dz);
-	// return (density);
 	if (density > waterDensity)
 		return (densityValue);
 	return (0.0);

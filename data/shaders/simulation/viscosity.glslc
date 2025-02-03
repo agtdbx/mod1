@@ -9,9 +9,11 @@ layout(std430, binding = 1) readonly buffer DataBuffer {
 
 uniform float			delta;
 uniform float			smoothingRadius;
+uniform float			smoothingRadius2;
 uniform float			invSmoothingRadius;
-uniform float			smoothingDerivateScale;
-uniform float			waterMass;
+uniform float			smoothingViscosityScale;
+uniform float			waterRadius2;
+uniform float			viscosityStrength;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
@@ -20,7 +22,6 @@ uniform int				gridSize;
 uniform int				positionsSize;
 uniform samplerBuffer	predictedPositionsBuffer;
 uniform samplerBuffer	densitiesBuffer;
-uniform samplerBuffer	pressuresBuffer;
 
 
 float	vecLength(vec3 vec)
@@ -29,32 +30,34 @@ float	vecLength(vec3 vec)
 }
 
 
-float	smoothingKernelDerivate(float dst)
+float	vecLength2(vec3 vec)
 {
-	if (dst > smoothingRadius)
+	return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
+
+float	viscositySmoothingKernel(float dst2)
+{
+	float	value;
+
+	if (dst2 > smoothingRadius2)
 		return (0.0);
 
-	return ((dst - smoothingRadius) * smoothingDerivateScale);
+	value = waterRadius2 - dst2;
+	return ((value * value * value) * smoothingViscosityScale);
 }
 
 
-float	calculateSharedPressure(float pressureA, float pressureB)
+vec3	calculateViscosityForce(int particleIndex)
 {
-	return ((pressureA + pressureB) * 0.5);
-}
+	float	velocityLength, dst2, influence;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
+	vec3	viscosityForce, position, positionWater, velocity, velocityWater, velocityDir;
 
-
-vec3	calculatePressureForce(int particleIndex, float invDensity)
-{
-	float	pressure, pressureWater,
-			dst, slope, sharedPressure;
-	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId, weirdDirection;
-	vec3	pressureForce, position, positionWater, dir;
-
-	pressureForce = vec3(0.0, 0.0, 0.0);
+	viscosityForce = vec3(0.0, 0.0, 0.0);
 
 	position = texelFetch(predictedPositionsBuffer, particleIndex).rgb;
-	pressure = texelFetch(pressuresBuffer, particleIndex).r;
+	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
 	px = int(position.x * invSmoothingRadius);
 	py = int(position.y * invSmoothingRadius);
 	pz = int(position.z * invSmoothingRadius);
@@ -87,51 +90,47 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 						continue;
 
 					positionWater = texelFetch(predictedPositionsBuffer, waterId).rgb;
-					pressureWater = texelFetch(pressuresBuffer, waterId).r;
+					velocityWater = imageLoad(velocitiesBuffer, waterId).rgb;
 
-					dir = positionWater - position;
-					dst = vecLength(dir);
-					if (dst < 0.1)
+					velocityDir = velocityWater - velocity;
+					dst2 = vecLength2(position - positionWater);
+					if (dst2 < 0.001)
 					{
-						weirdDirection = waterId % 5;
-						switch (weirdDirection )
+						switch (waterId % 5)
 						{
 							case 0:
-								dir = vec3(0.0, 0.0, 1.0);
+								velocityDir = vec3(0.0, 0.0, 1.0);
 								break;
 							case 1:
-								dir = vec3(1.0, 0.0, 0.0);
+								velocityDir = vec3(1.0, 0.0, 0.0);
 								break;
 							case 2:
-								dir = vec3(-1.0, 0.0, 0.0);
+								velocityDir = vec3(-1.0, 0.0, 0.0);
 								break;
 							case 3:
-								dir = vec3(0.0, 0.0, 1.0);
+								velocityDir = vec3(0.0, 0.0, 1.0);
 								break;
 							case 4:
-								dir = vec3(0.0, 0.0, -1.0);
+								velocityDir = vec3(0.0, 0.0, -1.0);
 								break;
 						}
 					}
-					else
-						dir /= dst;
-					slope = smoothingKernelDerivate(dst);
-					sharedPressure = calculateSharedPressure(pressure, pressureWater);
-					pressureForce += sharedPressure * dir * slope;
+
+					influence = viscositySmoothingKernel(dst2);
+					viscosityForce += velocityDir * influence;
 				}
 			}
 		}
 	}
 
-	return (pressureForce * waterMass * invDensity);
+	return (viscosityForce * viscosityStrength);
 }
-
 
 void main()
 {
 	int		particleIndex;
-	float	density, invDensity;
-	vec3	position, velocity, pressureForce, pressureAcceleration, viscosityForce;
+	float	density;
+	vec3	velocity, pressureForce, pressureAcceleration, viscosityForce;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
 	if (particleIndex >= positionsSize)
@@ -141,13 +140,9 @@ void main()
 
 	if (density != 0.0)
 	{
-		invDensity = 1.0 / density;
 		velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
-
-		pressureForce = calculatePressureForce(particleIndex, invDensity);
-		pressureAcceleration = pressureForce * invDensity;
-
-		velocity += pressureAcceleration * delta;
+		viscosityForce = calculateViscosityForce(particleIndex);
+		velocity += viscosityForce * delta;
 	}
 	else
 		velocity = vec3(0.0, 0.0, 0.0);

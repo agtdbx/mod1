@@ -51,19 +51,19 @@ void main()
 	// Check all near particles
 	gOutId = cellIndex;
 	particlesInCellOut = 0;
-	for (int cx = -4; cx <= 4; cx++)
+	for (int cx = -2; cx <= 2; cx++)
 	{
 		gx = px + cx;
 		if (gx < 0 || gx >= gridW)
 			continue;
 
-		for (int cy = -4; cy <= 4; cy++)
+		for (int cy = -2; cy <= 2; cy++)
 		{
 			gy = py + cy;
 			if (gy < 0 || gy >= gridH)
 				continue;
 
-			for (int cz = -4; cz <= 4; cz++)
+			for (int cz = -2; cz <= 2; cz++)
 			{
 				gz = pz + cz;
 				if (gz < 0 || gz >= gridD)

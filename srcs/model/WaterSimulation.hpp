@@ -69,6 +69,7 @@ private:
 	void		computeMapDensity(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
+	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
 };
 

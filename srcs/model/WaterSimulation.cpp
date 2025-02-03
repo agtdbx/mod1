@@ -246,6 +246,12 @@ void	WaterSimulation::tick(
 		perfLog->timeApplyPressure += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
+		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeApplyViscosity += elapsed_time / 1000000000.0;
+
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		this->updatePositions(shaderManager, terrain, delta); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
@@ -259,6 +265,7 @@ void	WaterSimulation::tick(
 		this->computeMapDensity(shaderManager); // gpu
 		this->computeDensity(shaderManager); // gpu
 		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
+		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
 		this->updatePositions(shaderManager, terrain, delta); // gpu
 	}
 }

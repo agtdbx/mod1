@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/01/29 16:19:15 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/03 12:27:18 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ typedef struct s_performanceLog
 	double	timeComputeDensity;
 	double	timeComputeMapDensity;
 	double	timeApplyPressure;
+	double	timeApplyViscosity;
 	double	timeUpdatePositions;
 
 	// Draw stats

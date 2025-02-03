@@ -98,9 +98,6 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
-	glDeleteBuffers(1, &this->textureBufferMapPressures);
-	glDeleteTextures(1, &this->textureMapPressures);
-
 	glDeleteBuffers(1, &this->ssboGrid1);
 	glDeleteBuffers(1, &this->ssboGrid2);
 }

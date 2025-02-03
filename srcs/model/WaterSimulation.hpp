@@ -46,7 +46,6 @@ private:
 							textureBufferDensities, textureDensities,
 							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
-							textureBufferMapPressures, textureMapPressures,
 							ssboCurrent, ssboGrid1, ssboGrid2;
 
 	void		generateTextureBuffer(void);

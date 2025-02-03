@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/03 18:15:48 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/03 23:28:51 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@
 # define NB_MAX_PARTICLES 150000
 # define GRAVITY_FORCE 10.0f
 # define WATER_MASS 1.0f
-# define COLLISION_ENERGY_KEEP 0.5
+# define COLLISION_ENERGY_KEEP 0.3
 # define COLLISION_REPULSION_FORCE 0.1f
 # define SMOOTHING_RADIUS 3.0f
 # define TARGET_DENSITY 0.01f

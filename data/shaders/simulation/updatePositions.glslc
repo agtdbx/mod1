@@ -26,7 +26,7 @@ uniform samplerBuffer	terrainOffsetsBuffer;
 
 float	vecLength(vec3 vec)
 {
-	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+	return sqrt((vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
 
 
@@ -115,16 +115,17 @@ void main()
 	int		particleIndex, terrainCollisionId;
 	float	velocityLength;
 	vec3	position, velocity, newPosition, velocityDir, normal;
-	bool	needUpdateVelocity;
+	bool	needUpdateVelocity, skipCollisionLoose;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
 	if (particleIndex >= positionsSize)
 		return ;
 
-	position = imageLoad(positionsBuffer, particleIndex).rgb;
 	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
+	position = imageLoad(positionsBuffer, particleIndex).rgb;
 	newPosition = position + velocity * delta;
 	needUpdateVelocity = false;
+	skipCollisionLoose = false;
 
 	// Check terrain collision
 	terrainCollisionId = checkCollisionWithTerrain(newPosition);
@@ -133,9 +134,9 @@ void main()
 	if (terrainCollisionId != -1)
 	{
 		velocityLength = vecLength(velocity);
-		velocityDir = vec3(0.0, -1.0, 0.0);
-		if (velocityLength != 0.0)
-			velocityDir = velocity / velocityLength;
+		velocityDir = velocity / velocityLength;
+		if (velocityLength < 5.0 && velocityLength > 0.5)
+			skipCollisionLoose = true;
 
 		normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
 		velocityDir -= normal * 2 * dot(velocityDir, normal);
@@ -191,7 +192,8 @@ void main()
 	// Update density if needed
 	if (needUpdateVelocity)
 	{
-		velocity *= collisionEnergyKeep;
+		if (!skipCollisionLoose)
+			velocity *= collisionEnergyKeep;
 		imageStore(velocitiesBuffer, particleIndex, vec4(velocity, 1.0));
 	}
 

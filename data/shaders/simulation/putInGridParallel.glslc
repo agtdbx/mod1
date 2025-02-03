@@ -29,15 +29,6 @@ void main()
 	if (cellIndex >= gridSize)
 		return ;
 
-	// Reset out grid buffer
-	if (cellIndex == 0)
-	{
-		for (int i = 0; i < gridSize; i++)
-			gridBufferOut[i] = 0;
-	}
-	memoryBarrier();
-	barrier();
-
 	// Compute cell coordonates
 	py = cellIndex / idHsize;
 	idXZ = cellIndex - (py * idHsize);

@@ -11,7 +11,7 @@ uniform float			waterMaxXZ;
 uniform float			waterMaxY;
 uniform float			collisionEnergyKeep;
 uniform float			collisionRepulsionForce;
-uniform float			terrainCellSize;
+uniform float			invTerrainCellSize;
 uniform int				terrainGridW;
 uniform int				terrainGridH;
 uniform int				terrainGridD;
@@ -36,9 +36,9 @@ int	checkCollisionWithTerrain(vec3 position)
 	vec3	rectPos, vecX, vecZ, posFromRect, posOnRect;
 	float	minY, maxY, a, b;
 
-	px = int(position.x / terrainCellSize);
-	py = int(position.y / terrainCellSize);
-	pz = int(position.z / terrainCellSize);
+	px = int(position.x * invTerrainCellSize);
+	py = int(position.y * invTerrainCellSize);
+	pz = int(position.z * invTerrainCellSize);
 
 	for (int cx = -1; cx < 2; cx++)
 	{

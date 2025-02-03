@@ -10,6 +10,7 @@ layout(std430, binding = 1) readonly buffer DataBuffer {
 uniform float			delta;
 uniform float			smoothingRadius;
 uniform float			smoothingRadius2;
+uniform float			invSmoothingRadius;
 uniform float			smoothingViscosityScale;
 uniform float			waterRadius2;
 uniform float			viscosityStrength;
@@ -57,9 +58,9 @@ vec3	calculateViscosityForce(int particleIndex)
 
 	position = texelFetch(predictedPositionsBuffer, particleIndex).rgb;
 	velocity = imageLoad(velocitiesBuffer, particleIndex).rgb;
-	px = int(position.x / smoothingRadius);
-	py = int(position.y / smoothingRadius);
-	pz = int(position.z / smoothingRadius);
+	px = int(position.x * invSmoothingRadius);
+	py = int(position.y * invSmoothingRadius);
+	pz = int(position.z * invSmoothingRadius);
 
 	for (int cx = -1; cx <= 1; cx++)
 	{

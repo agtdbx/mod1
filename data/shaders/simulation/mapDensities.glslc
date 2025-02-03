@@ -3,12 +3,12 @@
 layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 
 layout(r32f, binding = 0) uniform imageBuffer mapDensitiesBuffer;
-layout(r32f, binding = 1) uniform imageBuffer mapPressuresBuffer;
-layout(std430, binding = 2) readonly buffer DataBuffer {
+layout(std430, binding = 1) readonly buffer DataBuffer {
 	int gridBuffer[];
 };
 
 uniform float			smoothingRadius;
+uniform float			invSmoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
 uniform float			targetDensity;
@@ -47,9 +47,9 @@ float	calculateDensity(vec3 position)
 	vec3	pos;
 
 	density = 0.0;
-	px = int(position.x / smoothingRadius);
-	py = int(position.y / smoothingRadius);
-	pz = int(position.z / smoothingRadius);
+	px = int(position.x * invSmoothingRadius);
+	py = int(position.y * invSmoothingRadius);
+	pz = int(position.z * invSmoothingRadius);
 
 	for (int cx = -1; cx <= 1; cx++)
 	{
@@ -88,13 +88,6 @@ float	calculateDensity(vec3 position)
 }
 
 
-// Pressure function
-float	convertDensityToPressure(float density)
-{
-	return ((density - targetDensity) * pressureMultiplier);
-}
-
-
 void main()
 {
 	int		particleIndex, idXZ, x, y, z;
@@ -112,9 +105,7 @@ void main()
 
 	position = vec3(x, y, z) * mapBufferCellSize;
 	density = calculateDensity(position);
-	pressure = convertDensityToPressure(density);
 
 	// Write the values to the buffers
 	imageStore(mapDensitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
-	imageStore(mapPressuresBuffer, particleIndex, vec4(pressure, 0.0, 0.0, 1.0));
 }

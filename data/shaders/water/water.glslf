@@ -19,6 +19,7 @@ uniform vec3			waterColor;
 uniform float			waterDensity;
 
 uniform int				mapBufferCellSize;
+uniform float			invMapBufferCellSize;
 uniform int				mapBufferW;
 uniform int				mapBufferH;
 uniform int				mapBufferD;
@@ -446,17 +447,17 @@ float	getDensityAtPos(vec3 pos, float densityValue)
 			dx, dy, dz;
 
 	// Get grid coordonates
-	gx = int(pos.x / mapBufferCellSize);
-	gy = int(pos.y / mapBufferCellSize);
-	gz = int(pos.z / mapBufferCellSize);
+	gx = int(pos.x * invMapBufferCellSize);
+	gy = int(pos.y * invMapBufferCellSize);
+	gz = int(pos.z * invMapBufferCellSize);
 	ngx = gx + 1;
 	ngy = gy + 1;
 	ngz = gz + 1;
 
 	// Get ratio for each axis
-	dx = (pos.x - (gx * mapBufferCellSize)) / mapBufferCellSize;
-	dy = (pos.y - (gy * mapBufferCellSize)) / mapBufferCellSize;
-	dz = (pos.z - (gz * mapBufferCellSize)) / mapBufferCellSize;
+	dx = (pos.x - (gx * mapBufferCellSize)) * invMapBufferCellSize;
+	dy = (pos.y - (gy * mapBufferCellSize)) * invMapBufferCellSize;
+	dz = (pos.z - (gz * mapBufferCellSize)) * invMapBufferCellSize;
 
 	// Get density for 8 cell around pos
 	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);

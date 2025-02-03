@@ -7,6 +7,7 @@ layout(std430, binding = 0) buffer DataBuffer {
 };
 
 uniform float			smoothingRadius;
+uniform float			invSmoothingRadius;
 uniform int				gridW;
 uniform int				idHsize;
 uniform int				gridSize;
@@ -26,9 +27,9 @@ void main()
 	{
 		particlePos = texelFetch(positionsBuffer, i).rgb;
 
-		gx = int(particlePos.x / smoothingRadius);
-		gy = int(particlePos.y / smoothingRadius);
-		gz = int(particlePos.z / smoothingRadius);
+		gx = int(particlePos.x * invSmoothingRadius);
+		gy = int(particlePos.y * invSmoothingRadius);
+		gz = int(particlePos.z * invSmoothingRadius);
 		gid = gx + gz * gridW + gy * idHsize;
 
 		particlesInCell = gridBuffer[gid];

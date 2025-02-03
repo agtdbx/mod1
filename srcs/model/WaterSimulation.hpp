@@ -47,8 +47,6 @@ private:
 							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
 							textureBufferMapPressures, textureMapPressures,
-							textureBufferMapPressureAcceleration,
-							textureMapPressureAcceleration,
 							ssboCurrent, ssboGrid1, ssboGrid2;
 
 	void		generateTextureBuffer(void);
@@ -71,6 +69,7 @@ private:
 	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
+	void		computeMapPressureAcceleration(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);

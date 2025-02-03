@@ -202,8 +202,8 @@ int	main(int argc, char **argv)
 				float	viscosity = perfLog.timeApplyViscosity / perfLog.nbCall;
 				float	updatePos = perfLog.timeUpdatePositions / perfLog.nbCall;
 				float	computeTotal = predictedPos + putInGrid + density
-										+ viscosity + mapDensity
-										+ pressure + updatePos;
+										 + mapDensity + viscosity
+										 + pressure + updatePos;
 				printf(" - predicted pos %9.3f ms\n", predictedPos * 1000.0f);
 				printf(" - put in grid   %9.3f ms\n", putInGrid * 1000.0f);
 				printf(" - map density   %9.3f ms\n", mapDensity * 1000.0f);

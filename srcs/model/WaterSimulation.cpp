@@ -26,13 +26,13 @@ WaterSimulation::WaterSimulation(void)
 	this->gridSize = this->gridW * this->gridH * this->gridD;
 	this->numGroupsPutInGrid = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
-	// map density init
-	this->mapBufferW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
-	if (MAP_SIZE > MAP_DENSITY_CELL_SIZE && MAP_SIZE % MAP_DENSITY_CELL_SIZE != 0)
+	// map buffer init
+	this->mapBufferW = MAP_SIZE / MAP_BUFFER_CELL_SIZE;
+	if (MAP_SIZE > MAP_BUFFER_CELL_SIZE && MAP_SIZE % MAP_BUFFER_CELL_SIZE != 0)
 		this->mapBufferW++;
-	this->mapBufferH = MAP_MAX_HEIGHT / MAP_DENSITY_CELL_SIZE;
-	if (MAP_MAX_HEIGHT > MAP_DENSITY_CELL_SIZE
-		&& (int)MAP_MAX_HEIGHT % MAP_DENSITY_CELL_SIZE != 0)
+	this->mapBufferH = MAP_MAX_HEIGHT / MAP_BUFFER_CELL_SIZE;
+	if (MAP_MAX_HEIGHT > MAP_BUFFER_CELL_SIZE
+		&& (int)MAP_MAX_HEIGHT % MAP_BUFFER_CELL_SIZE != 0)
 		this->mapBufferH++;
 	this->mapBufferD = this->mapBufferW;
 	this->mapBufferIdHsize = this->mapBufferW * this->mapBufferD;
@@ -101,14 +101,9 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapPressures);
 	glDeleteTextures(1, &this->textureMapPressures);
 
-	glDeleteBuffers(1, &this->textureBufferMapPressureAcceleration);
-	glDeleteTextures(1, &this->textureMapPressureAcceleration);
-
-
 	glDeleteBuffers(1, &this->ssboGrid1);
 	glDeleteBuffers(1, &this->ssboGrid2);
 }
-
 
 //**** ACCESSORS ***************************************************************
 //---- Getters -----------------------------------------------------------------
@@ -228,7 +223,6 @@ void	WaterSimulation::tick(
 		perfLog->timePredictedPos += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		// this->putParticlesInGrid(shaderManager); // gpu
 		this->putParticlesInGridInParallel(shaderManager); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
@@ -267,7 +261,6 @@ void	WaterSimulation::tick(
 	else
 	{
 		this->computePredictedPositions(shaderManager, delta); // gpu
-		// this->putParticlesInGrid(shaderManager); // gpu
 		this->putParticlesInGridInParallel(shaderManager); // gpu
 		this->computeMapDensity(shaderManager); // gpu
 		this->computeDensity(shaderManager); // gpu
@@ -332,7 +325,8 @@ void	WaterSimulation::draw(
 	giveVec3ToShader(shaderId, "waterColor", *waterColor);
 	giveFloatToShader(shaderId, "waterDensity", waterDensity);
 
-	giveIntToShader(shaderId, "mapBufferCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_BUFFER_CELL_SIZE);
+	giveFloatToShader(shaderId, "invMapBufferCellSize", INV_MAP_BUFFER_CELL_SIZE);
 	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
 	giveIntToShader(shaderId, "mapBufferH", this->mapBufferH);
 	giveIntToShader(shaderId, "mapBufferD", this->mapBufferD);

@@ -38,20 +38,23 @@ private:
 	float					triangleOverScreen[12];
 	int						nbParticules, gridSize, gridW, gridH, gridD,
 							idHsize, numGroups,
-							mapDensityW, mapDensityH, mapDensityD, mapDensityIdHsize,
-							mapDensitySize, numGroupsPutInGrid, numGroupsMapDensity;
+							mapBufferW, mapBufferH, mapBufferD, mapBufferIdHsize,
+							mapBufferSize, numGroupsPutInGrid, numGroupsMapBuffer;
 	GLuint					textureBufferPositions, texturePositions,
 							textureBufferPredictedPositions, texturePredictedPositions,
 							textureBufferVelocities, textureVelocities,
 							textureBufferDensities, textureDensities,
 							textureBufferPressures, texturePressures,
 							textureBufferMapDensities, textureMapDensities,
+							textureBufferMapPressures, textureMapPressures,
+							textureBufferMapPressureAcceleration,
+							textureMapPressureAcceleration,
 							ssboCurrent, ssboGrid1, ssboGrid2;
 
 	void		generateTextureBuffer(void);
 	void		generateTriangleOverScreen(void);
 	void		generateGridBuffer(void);
-	void		generateMapDensity(void);
+	void		generateMapBuffer(void);
 
 	void		positionsToBuffer(void);
 	void		positionsFromBuffer(void);

@@ -27,24 +27,24 @@ WaterSimulation::WaterSimulation(void)
 	this->numGroupsPutInGrid = (this->gridSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
 	// map density init
-	this->mapDensityW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
+	this->mapBufferW = MAP_SIZE / MAP_DENSITY_CELL_SIZE;
 	if (MAP_SIZE > MAP_DENSITY_CELL_SIZE && MAP_SIZE % MAP_DENSITY_CELL_SIZE != 0)
-		this->mapDensityW++;
-	this->mapDensityH = MAP_MAX_HEIGHT / MAP_DENSITY_CELL_SIZE;
+		this->mapBufferW++;
+	this->mapBufferH = MAP_MAX_HEIGHT / MAP_DENSITY_CELL_SIZE;
 	if (MAP_MAX_HEIGHT > MAP_DENSITY_CELL_SIZE
 		&& (int)MAP_MAX_HEIGHT % MAP_DENSITY_CELL_SIZE != 0)
-		this->mapDensityH++;
-	this->mapDensityD = this->mapDensityW;
-	this->mapDensityIdHsize = this->mapDensityW * this->mapDensityD;
-	this->mapDensitySize = this->mapDensityW * this->mapDensityH * this->mapDensityD;
-	this->numGroupsMapDensity = (this->mapDensitySize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
+		this->mapBufferH++;
+	this->mapBufferD = this->mapBufferW;
+	this->mapBufferIdHsize = this->mapBufferW * this->mapBufferD;
+	this->mapBufferSize = this->mapBufferW * this->mapBufferH * this->mapBufferD;
+	this->numGroupsMapBuffer = (this->mapBufferSize + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 
 	this->numGroups = (this->nbParticules + WORK_GROUP_SIZE - 1) / WORK_GROUP_SIZE;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
-	this->generateMapDensity();
+	this->generateMapBuffer();
 	this->generateGridBuffer();
 }
 
@@ -61,18 +61,18 @@ WaterSimulation::WaterSimulation(const WaterSimulation &obj)
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
 	this->numGroupsPutInGrid = obj.numGroupsPutInGrid;
-	this->mapDensityW = obj.mapDensityW;
-	this->mapDensityH = obj.mapDensityH;
-	this->mapDensityD = obj.mapDensityD;
-	this->mapDensityIdHsize = obj.mapDensityIdHsize;
-	this->mapDensitySize = obj.mapDensitySize;
-	this->numGroupsMapDensity = obj.numGroupsMapDensity;
+	this->mapBufferW = obj.mapBufferW;
+	this->mapBufferH = obj.mapBufferH;
+	this->mapBufferD = obj.mapBufferD;
+	this->mapBufferIdHsize = obj.mapBufferIdHsize;
+	this->mapBufferSize = obj.mapBufferSize;
+	this->numGroupsMapBuffer = obj.numGroupsMapBuffer;
 	this->numGroups = obj.numGroups;
 	this->needToUpdateBuffers = true;
 
 	this->generateTextureBuffer();
 	this->generateTriangleOverScreen();
-	this->generateMapDensity();
+	this->generateMapBuffer();
 	this->generateGridBuffer();
 }
 
@@ -97,6 +97,13 @@ WaterSimulation::~WaterSimulation()
 
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
+
+	glDeleteBuffers(1, &this->textureBufferMapPressures);
+	glDeleteTextures(1, &this->textureMapPressures);
+
+	glDeleteBuffers(1, &this->textureBufferMapPressureAcceleration);
+	glDeleteTextures(1, &this->textureMapPressureAcceleration);
+
 
 	glDeleteBuffers(1, &this->ssboGrid1);
 	glDeleteBuffers(1, &this->ssboGrid2);
@@ -130,12 +137,12 @@ WaterSimulation	&WaterSimulation::operator=(const WaterSimulation &obj)
 	this->gridH = obj.gridH;
 	this->gridD = obj.gridD;
 	this->numGroupsPutInGrid = obj.numGroupsPutInGrid;
-	this->mapDensityW = obj.mapDensityW;
-	this->mapDensityH = obj.mapDensityH;
-	this->mapDensityD = obj.mapDensityD;
-	this->mapDensityIdHsize = obj.mapDensityIdHsize;
-	this->mapDensitySize = obj.mapDensitySize;
-	this->numGroupsMapDensity = obj.numGroupsMapDensity;
+	this->mapBufferW = obj.mapBufferW;
+	this->mapBufferH = obj.mapBufferH;
+	this->mapBufferD = obj.mapBufferD;
+	this->mapBufferIdHsize = obj.mapBufferIdHsize;
+	this->mapBufferSize = obj.mapBufferSize;
+	this->numGroupsMapBuffer = obj.numGroupsMapBuffer;
 	this->numGroups = obj.numGroups;
 	this->needToUpdateBuffers = true;
 
@@ -325,11 +332,11 @@ void	WaterSimulation::draw(
 	giveVec3ToShader(shaderId, "waterColor", *waterColor);
 	giveFloatToShader(shaderId, "waterDensity", waterDensity);
 
-	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
-	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
-	giveIntToShader(shaderId, "mapDensityH", this->mapDensityH);
-	giveIntToShader(shaderId, "mapDensityD", this->mapDensityD);
-	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferH", this->mapBufferH);
+	giveIntToShader(shaderId, "mapBufferD", this->mapBufferD);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
 	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 0,
 								this->textureBufferMapDensities,
 								this->textureMapDensities);
@@ -366,7 +373,7 @@ void	WaterSimulation::clear(void)
 	this->velocities.clear();
 	this->densities.clear();
 	this->needToUpdateBuffers = true;
-	this->generateMapDensity();
+	this->generateMapBuffer();
 }
 
 

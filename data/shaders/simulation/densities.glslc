@@ -21,11 +21,11 @@ uniform int				gridSize;
 uniform int				positionsSize;
 uniform samplerBuffer	positionsBuffer;
 
-uniform int				mapDensityCellSize;
-uniform int				mapDensityW;
-uniform int				mapDensityH;
-uniform int				mapDensityD;
-uniform int				mapDensityIdHsize;
+uniform int				mapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferH;
+uniform int				mapBufferD;
+uniform int				mapBufferIdHsize;
 uniform samplerBuffer	mapDensitiesBuffer;
 
 
@@ -100,10 +100,10 @@ float	convertDensityToPressure(float density)
 // interpolate function
 float	getDensityAtMapPoint(int x, int y, int z)
 {
-	if (x >= mapDensityW || y >= mapDensityH || z >= mapDensityD)
+	if (x >= mapBufferW || y >= mapBufferH || z >= mapBufferD)
 		return (0.0);
 
-	int	tid = x + z * mapDensityW + y * mapDensityIdHsize;
+	int	tid = x + z * mapBufferW + y * mapBufferIdHsize;
 	float density = texelFetch(mapDensitiesBuffer, tid).r;
 	return (density);
 }
@@ -126,17 +126,17 @@ float	getDensityAtPos(vec3 pos)
 			dx, dy, dz;
 
 	// Get grid coordonates
-	gx = int(pos.x / mapDensityCellSize);
-	gy = int(pos.y / mapDensityCellSize);
-	gz = int(pos.z / mapDensityCellSize);
+	gx = int(pos.x / mapBufferCellSize);
+	gy = int(pos.y / mapBufferCellSize);
+	gz = int(pos.z / mapBufferCellSize);
 	ngx = gx + 1;
 	ngy = gy + 1;
 	ngz = gz + 1;
 
 	// Get ratio for each axis
-	dx = (pos.x - (gx * mapDensityCellSize)) / mapDensityCellSize;
-	dy = (pos.y - (gy * mapDensityCellSize)) / mapDensityCellSize;
-	dz = (pos.z - (gz * mapDensityCellSize)) / mapDensityCellSize;
+	dx = (pos.x - (gx * mapBufferCellSize)) / mapBufferCellSize;
+	dy = (pos.y - (gy * mapBufferCellSize)) / mapBufferCellSize;
+	dz = (pos.z - (gz * mapBufferCellSize)) / mapBufferCellSize;
 
 	// Get density for 8 cell around pos
 	densityFUL = getDensityAtMapPoint(gx,  gy,  gz);

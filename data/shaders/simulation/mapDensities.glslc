@@ -3,17 +3,20 @@
 layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 
 layout(r32f, binding = 0) uniform imageBuffer mapDensitiesBuffer;
-layout(std430, binding = 1) readonly buffer DataBuffer {
+layout(r32f, binding = 1) uniform imageBuffer mapPressuresBuffer;
+layout(std430, binding = 2) readonly buffer DataBuffer {
 	int gridBuffer[];
 };
 
 uniform float			smoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
-uniform int				mapDensityCellSize;
-uniform int				mapDensityW;
-uniform int				mapDensityIdHsize;
-uniform int				mapDensitySize;
+uniform float			targetDensity;
+uniform float			pressureMultiplier;
+uniform int				mapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferIdHsize;
+uniform int				mapBufferSize;
 uniform int				gridW;
 uniform int				gridH;
 uniform int				gridD;
@@ -21,10 +24,12 @@ uniform int				idHsize;
 uniform int				gridSize;
 uniform samplerBuffer	positionsBuffer;
 
+
 float	vecLength(vec3 vec)
 {
 	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
+
 
 float	smoothingKernel(float dst)
 {
@@ -33,6 +38,7 @@ float	smoothingKernel(float dst)
 
 	return (pow(smoothingRadius - dst, 2) * smoothingScale);
 }
+
 
 float	calculateDensity(vec3 position)
 {
@@ -81,24 +87,34 @@ float	calculateDensity(vec3 position)
 	return (density);
 }
 
+
+// Pressure function
+float	convertDensityToPressure(float density)
+{
+	return ((density - targetDensity) * pressureMultiplier);
+}
+
+
 void main()
 {
 	int		particleIndex, idXZ, x, y, z;
-	float	density;
+	float	density, pressure;
 	vec3	position;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
-	if (particleIndex >= mapDensitySize)
+	if (particleIndex >= mapBufferSize)
 		return ;
 
-	y = int(particleIndex / mapDensityIdHsize);
-	idXZ = particleIndex - (y * mapDensityIdHsize);
-	z = int(idXZ / mapDensityW);
-	x = idXZ - (z * mapDensityW);
+	y = int(particleIndex / mapBufferIdHsize);
+	idXZ = particleIndex - (y * mapBufferIdHsize);
+	z = int(idXZ / mapBufferW);
+	x = idXZ - (z * mapBufferW);
 
-	position = vec3(x, y, z) * mapDensityCellSize;
+	position = vec3(x, y, z) * mapBufferCellSize;
 	density = calculateDensity(position);
+	pressure = convertDensityToPressure(density);
 
-	// Write the value to the buffer
+	// Write the values to the buffers
 	imageStore(mapDensitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
+	imageStore(mapPressuresBuffer, particleIndex, vec4(pressure, 0.0, 0.0, 1.0));
 }

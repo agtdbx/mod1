@@ -28,6 +28,12 @@ void	WaterSimulation::generateTextureBuffer(void)
 	glGenBuffers(1, &this->textureBufferMapDensities);
 	glGenTextures(1, &this->textureMapDensities);
 
+	glDeleteBuffers(1, &this->textureBufferMapPressures);
+	glDeleteTextures(1, &this->textureMapPressures);
+
+	glDeleteBuffers(1, &this->textureBufferMapPressureAcceleration);
+	glDeleteTextures(1, &this->textureMapPressureAcceleration);
+
 	glGenBuffers(1, &this->ssboGrid1);
 	glGenBuffers(1, &this->ssboGrid2);
 }
@@ -54,15 +60,15 @@ void	WaterSimulation::generateGridBuffer(void)
 }
 
 
-void	WaterSimulation::generateMapDensity(void)
+void	WaterSimulation::generateMapBuffer(void)
 {
 	std::vector<float> mapDensities;
 
-	for (int i = 0; i < this->mapDensitySize; i++)
+	for (int i = 0; i < this->mapBufferSize; i++)
 		mapDensities.push_back(0.0f);
 
 	glBindBuffer(GL_TEXTURE_BUFFER, this->textureBufferMapDensities);
-	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapDensitySize,
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * this->mapBufferSize,
 					mapDensities.data(), GL_STATIC_DRAW);
 }
 

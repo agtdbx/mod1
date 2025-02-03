@@ -142,26 +142,30 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
 	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
-	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
-	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
-	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
-	giveIntToShader(shaderId, "mapDensitySize", this->mapDensitySize);
+	giveFloatToShader(shaderId, "targetDensity", TARGET_DENSITY);
+	giveFloatToShader(shaderId, "pressureMultiplier", PRESSURE_MULTIPLIER);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
+	giveIntToShader(shaderId, "mapBufferSize", this->mapBufferSize);
 	giveIntToShader(shaderId, "gridW", this->gridW);
 	giveIntToShader(shaderId, "gridH", this->gridH);
 	giveIntToShader(shaderId, "gridD", this->gridD);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
 	giveIntToShader(shaderId, "gridSize", this->gridSize);
-	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 3,
 								this->textureBufferPredictedPositions,
 								this->texturePredictedPositions);
 
 	// Compute shader output setup
 	giveFloatTextureInputToShader(0, false, this->textureBufferMapDensities,
 									this->textureMapDensities);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboCurrent);
+	giveFloatTextureInputToShader(1, false, this->textureBufferMapPressures,
+									this->textureMapPressures);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboCurrent);
 
 	// Run compute shader
-	glDispatchCompute((unsigned int)this->numGroupsMapDensity, 1, 1);
+	glDispatchCompute((unsigned int)this->numGroupsMapBuffer, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
@@ -196,11 +200,11 @@ void	WaterSimulation::computeDensity(
 								this->textureBufferPredictedPositions,
 								this->texturePredictedPositions);
 
-	giveIntToShader(shaderId, "mapDensityCellSize", MAP_DENSITY_CELL_SIZE);
-	giveIntToShader(shaderId, "mapDensityW", this->mapDensityW);
-	giveIntToShader(shaderId, "mapDensityH", this->mapDensityH);
-	giveIntToShader(shaderId, "mapDensityD", this->mapDensityD);
-	giveIntToShader(shaderId, "mapDensityIdHsize", this->mapDensityIdHsize);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_DENSITY_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferH", this->mapBufferH);
+	giveIntToShader(shaderId, "mapBufferD", this->mapBufferD);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
 	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 4,
 								this->textureBufferMapDensities,
 								this->textureMapDensities);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/04 23:11:33 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/04 23:45:37 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ void	moveFillingPannel(void *arg);
 void	moveSettingsPannel(void *arg);
 void	moveLightPannel(void *arg);
 void	moveGeneratePannel(void *arg);
+void	moveBlackHolePannel(void *arg);
 void	resetPool(void *arg);
 
 #endif

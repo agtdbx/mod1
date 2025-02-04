@@ -148,10 +148,11 @@ int	main(int argc, char **argv)
 				inputManager.mouse.setVisible(context.window, false);
 				inputManager.mouse.goTo(context.window, WIN_W / 2, WIN_H / 2);
 				sVar.pannelVector[0].setPosToGo(WIN_W, 0.0f);
-				sVar.pannelVector[1].addPosToGo(120, 0);
+				sVar.pannelVector[1].addPosToGo(230, 0);
 				sVar.pannelVector[2].addPosToGo(-120, 0);
 				sVar.pannelVector[3].addPosToGo(-120, 0);
 				sVar.pannelVector[6].addPosToGo(-240, 0);
+				sVar.pannelVector[8].addPosToGo(240, 0);
 				sVar.pannelVector[4].addPosToGo(0, -58);
 				sVar.pannelVector[5].addPosToGo(0, 300);
 				sVar.pannelVector[7].addPosToGo(0, 170);
@@ -160,10 +161,11 @@ int	main(int argc, char **argv)
 			{
 				inputManager.mouse.setVisible(context.window, true);
 				sVar.pannelVector[0].setPosToGo(WIN_W - 230, 0.0f);
-				sVar.pannelVector[1].addPosToGo(-120, 0);
+				sVar.pannelVector[1].addPosToGo(-230, 0);
 				sVar.pannelVector[2].addPosToGo(120, 0);
 				sVar.pannelVector[3].addPosToGo(120, 0);
 				sVar.pannelVector[6].addPosToGo(240, 0);
+				sVar.pannelVector[8].addPosToGo(-240, 0);
 				sVar.pannelVector[4].addPosToGo(0, 58);
 				sVar.pannelVector[5].addPosToGo(0, -300);
 				sVar.pannelVector[7].addPosToGo(0, -170);
@@ -229,6 +231,10 @@ int	main(int argc, char **argv)
 				// Total stats
 				float	totalTime = computeTotal + drawTotal;
 				printf("Total time per tick %9.3f ms\n\n", totalTime * 1000.0f);
+
+				std::cout << "black hole enable : " << sVar.holeInfo.enable << std::endl;
+				std::cout << "black hole radius : " << sVar.holeInfo.radius << std::endl;
+				std::cout << "black hole position : " << sVar.holeInfo.position.x <<  " " << sVar.holeInfo.position.y << std::endl;
 			}
 
 			// Reset main times

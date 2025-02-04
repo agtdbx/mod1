@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/30 18:36:54 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/04 23:45:27 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,9 +172,9 @@ void	moveWavePannel(void *arg)
 
 	isHide = !isHide;
 	if (isHide)
-		pannel->addPosToGo(120, 0);
+		pannel->addPosToGo(230, 0);
 	else
-		pannel->addPosToGo(-120, 0);
+		pannel->addPosToGo(-230, 0);
 }
 
 
@@ -255,7 +255,19 @@ void	moveGeneratePannel(void *arg)
 	if (isHide)
 		pannel->addPosToGo(-240, 0);
 	else
-		pannel->addPosToGo(240, -0);
+		pannel->addPosToGo(240, 0);
+}
+
+void	moveBlackHolePannel(void *arg)
+{
+	static bool isHide = true;
+	Pannel *pannel = (Pannel *)arg;
+
+	isHide = !isHide;
+	if (isHide)
+		pannel->addPosToGo(240, 0);
+	else
+		pannel->addPosToGo(-240, 0);
 }
 
 

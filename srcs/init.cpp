@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/03 18:24:19 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/04 13:48:01 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,9 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("blue", "data/textures/blue.png");
 		textureManager->addTexture("sprintSpeed", "data/textures/sprintSpeed.png");
 		textureManager->addTexture("waterDensity", "data/textures/waterDensity.png");
+		textureManager->addTexture("lightColor", "data/textures/lightColor.png");
+		textureManager->addTexture("lightIcon", "data/textures/lightIcon.png");
+		
 
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
@@ -239,7 +242,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[5][8].desactive();
 	sVar->pannelVector[5].addSlider(Slider(240, 120, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[5][5.0f].setValue(0.5);
-	sVar->pannelVector[5].addButton(Button(310, 150, 30, 30, moveLightPannel, sVar, textureManager->getTexture("noTexture")));
+	sVar->pannelVector[5].addButton(Button(310, 150, 30, 30, moveLightPannel, sVar, textureManager->getTexture("lightIcon")));
 	sVar->pannelVector[5][9].setSwitchMode(true);
 
 	//filling pannel content
@@ -269,7 +272,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[6][4].desactive();
 
 	//light pannel content
-	sVar->pannelVector[7].addButton(Button(100, 10, 150, 50,NULL, NULL, textureManager->getTexture("waterColor"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[7].addButton(Button(100, 10, 150, 50,NULL, NULL, textureManager->getTexture("lightColor"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[7][0].desactive();
 	sVar->pannelVector[7].addButton(Button(25, 50, 80, 50,NULL, NULL, textureManager->getTexture("red"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[7][1].desactive();

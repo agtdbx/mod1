@@ -90,22 +90,24 @@ float	calculateDensity(vec3 position)
 
 void main()
 {
-	int		particleIndex, idXZ, x, y, z;
+	int		cellIndex, idXZ, x, y, z;
 	float	density, pressure;
 	vec3	position;
 
-	particleIndex = int(gl_GlobalInvocationID.x);
-	if (particleIndex >= mapBufferSize)
+	cellIndex = int(gl_GlobalInvocationID.x);
+	if (cellIndex >= mapBufferSize)
 		return ;
 
-	y = int(particleIndex / mapBufferIdHsize);
-	idXZ = particleIndex - (y * mapBufferIdHsize);
+	// Get cell pos in grid with cellIndex
+	y = int(cellIndex / mapBufferIdHsize);
+	idXZ = cellIndex - (y * mapBufferIdHsize);
 	z = int(idXZ / mapBufferW);
 	x = idXZ - (z * mapBufferW);
 
+	// Get cell world position
 	position = vec3(x, y, z) * mapBufferCellSize;
 	density = calculateDensity(position);
 
 	// Write the values to the buffers
-	imageStore(mapDensitiesBuffer, particleIndex, vec4(density, 0.0, 0.0, 1.0));
+	imageStore(mapDensitiesBuffer, cellIndex, vec4(density, 0.0, 0.0, 1.0));
 }

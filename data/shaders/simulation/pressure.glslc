@@ -48,7 +48,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 {
 	float	pressure, pressureWater,
 			dst, slope, sharedPressure;
-	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId, weirdDirection;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
 	vec3	pressureForce, position, positionWater, dir;
 
 	pressureForce = vec3(0.0, 0.0, 0.0);
@@ -93,8 +93,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 					dst = vecLength(dir);
 					if (dst < 0.1)
 					{
-						weirdDirection = waterId % 5;
-						switch (weirdDirection)
+						switch (waterId % 5)
 						{
 							case 0:
 								dir = vec3(0.0, 0.0, 1.0);

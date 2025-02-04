@@ -24,12 +24,6 @@ uniform samplerBuffer	predictedPositionsBuffer;
 uniform samplerBuffer	densitiesBuffer;
 
 
-float	vecLength(vec3 vec)
-{
-	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
-}
-
-
 float	vecLength2(vec3 vec)
 {
 	return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);

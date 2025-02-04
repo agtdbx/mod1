@@ -27,6 +27,7 @@ float	convertDensityToPressure(float density)
 	return ((density - targetDensity) * pressureMultiplier);
 }
 
+
 // interpolate function
 float	getDensityAtMapPoint(int x, int y, int z)
 {

@@ -14,6 +14,7 @@ public:
 	Point(Vec3 pos, Vec3 normal);
 	Point(Vec3 pos, double r, double g, double b);
 	Point(Vec3 pos, Vec3 normal, double r, double g, double b);
+	Point(Vec3 pos, Vec3 normal, Vec3 color);
 	Point(const Point &obj);
 	~Point();
 

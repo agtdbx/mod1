@@ -53,6 +53,16 @@ Point::Point(Vec3 pos, Vec3 normal, double r, double g, double b)
 }
 
 
+Point::Point(Vec3 pos, Vec3 normal, Vec3 color)
+{
+	this->pos = pos;
+	this->normal = normal;
+	this->r = color.x;
+	this->g = color.y;
+	this->b = color.z;
+}
+
+
 Point::Point(const Point &obj)
 {
 	this->pos = obj.pos;

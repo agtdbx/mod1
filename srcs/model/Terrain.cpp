@@ -36,6 +36,12 @@ static float	max4(float a, float b, float c, float d)
 	return (maxi);
 }
 
+
+static Vec3	lerp(Vec3 a, Vec3 b, float r)
+{
+	return (a + (b - a) * r);
+}
+
 //**** INITIALISION ************************************************************
 //---- Constructors ------------------------------------------------------------
 
@@ -201,16 +207,18 @@ void	Terrain::initEmptyMap(void)
 }
 
 
-
 void	Terrain::createMesh(void)
 {
 	std::vector<t_tri_id>	indices;
 	std::vector<bool>		isInRectangle;
-	double					r, g, b, height;
-	Vec3					p1, p2, p3, A, B, normal;
+	double					r, g, b, height, brownRatio;
+	Vec3					p1, p2, p3, A, B, top, normal, color, brown;
 	int						yId, nyId, nx, area, maxArea,
 							maxAreaX, maxAreaY, minLineX;
 	unsigned int			vIds[4];
+
+	top = Vec3(0, -1, 0);
+	brown = Vec3(0.345, 0.223, 0.152);
 
 	this->vertices.clear();
 	// Vertices creation
@@ -224,12 +232,11 @@ void	Terrain::createMesh(void)
 			r = height / (double)MAX_HEIGHT;
 			g = 0.8;
 			b = r;
+			color = Vec3(r, g, b);
 
 			// Compute normal
 			if (y == MAP_SIZE -1 || x == MAP_SIZE - 1)
-			{
-				normal = Vec3(0, -1, 0);
-			}
+				normal = top;
 			else
 			{
 				p1 = Vec3(x, height, y);
@@ -243,7 +250,10 @@ void	Terrain::createMesh(void)
 				normal.normalize();
 			}
 
-			this->vertices.push_back(Point(Vec3(x, height, y), normal, r, g, b));
+			brownRatio = 1.0 - top.dot(normal);
+			color = lerp(color, brown, brownRatio);
+
+			this->vertices.push_back(Point(Vec3(x, height, y), normal, color));
 		}
 	}
 

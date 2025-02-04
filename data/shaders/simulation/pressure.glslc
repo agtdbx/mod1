@@ -94,7 +94,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 					if (dst < 0.1)
 					{
 						weirdDirection = waterId % 5;
-						switch (weirdDirection )
+						switch (weirdDirection)
 						{
 							case 0:
 								dir = vec3(0.0, 0.0, 1.0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   uiTick.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:28:30 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 20:06:54 by gugus            ###   ########.fr       */
+/*   Updated: 2025/02/05 00:32:57 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,28 @@ void	uiTick(t_simulationVariable *sVar)
 								sVar->pannelVector[7][2.0f].getValue());
 	sVar->pannelVector[7][4].setColor(sVar->lightcolor, BUTTON_BASE_COLOR_TYPE);
 
+
+	//blackHole parameter
+	sVar->holeInfo.radius =  sVar->pannelVector[8][0.0f].getValue() * 4 * BLACK_HOLE_RADIUS;
+	if (sVar->pannelVector[8][(char) 0].getValue().size())
+	{
+		sVar->holeInfo.position.x = std::stoi(sVar->pannelVector[8][(char) 0].getValue());
+		if (sVar->holeInfo.position.x >= MAP_SIZE)
+			sVar->holeInfo.position.x = MAP_SIZE - BLACK_HOLE_RADIUS;
+	}
+	else
+	{
+		sVar->holeInfo.position.x = BLACK_HOLE_RADIUS;
+	}
+	if (sVar->pannelVector[8][(char) 1].getValue().size())
+	{
+		sVar->holeInfo.position.y = std::stoi(sVar->pannelVector[8][(char) 1].getValue());
+		if (sVar->holeInfo.position.y >= MAP_SIZE)
+			sVar->holeInfo.position.y = MAP_SIZE - BLACK_HOLE_RADIUS;
+	}
+	else
+	{
+		sVar->holeInfo.position.y = BLACK_HOLE_RADIUS;
+	}
+	
 }

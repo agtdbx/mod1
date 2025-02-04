@@ -6,7 +6,7 @@
 /*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/04 23:56:17 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/05 00:37:36 by lflandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,10 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("lightColor", "data/textures/lightColor.png");
 		textureManager->addTexture("lightIcon", "data/textures/lightIcon.png");
 
+		//generate pannel texture
+		textureManager->addTexture("curby", "data/textures/curby.png");
+		textureManager->addTexture("curbyPower", "data/textures/curbyPower.png");
+
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
 
@@ -162,7 +166,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[0].addButton(Button(120, 70, 100, 50,moveGeneratePannel, &sVar->pannelVector[6], textureManager->getTexture("generate")));
 	sVar->pannelVector[0][4].setSwitchMode(true);
 	sVar->pannelVector[0].addButton(Button(120, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
-	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveBlackHolePannel, &sVar->pannelVector[8], textureManager->getTexture("generate")));
+	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveBlackHolePannel, &sVar->pannelVector[8], textureManager->getTexture("curby")));
 	sVar->pannelVector[0][6].setSwitchMode(true);
 	
 	//wave pannel content
@@ -299,28 +303,20 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[7][4].desactive();
 
 	//blackhole pannel content
-	sVar->pannelVector[8].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("generate"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("curby"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][0].desactive();
 	sVar->pannelVector[8].addButton(Button(70, 70, 100, 50,changeBoolStatus, &sVar->holeInfo.enable, textureManager->getTexture("active")));
 	sVar->pannelVector[8][1].setSwitchMode(true);
-	sVar->pannelVector[8].addTextEntry(TextEntry(40, 220, 30, 30));
-	sVar->pannelVector[8][(char) 0].setValue(std::to_string((int) sVar->generatePos.x));
-	sVar->pannelVector[8].addTextEntry(TextEntry(120, 220, 30, 30));
-	sVar->pannelVector[8][(char) 1].setValue(std::to_string((int) sVar->generatePos.y));
-	sVar->pannelVector[8].addTextEntry(TextEntry(200, 220, 30, 30));
-	sVar->pannelVector[8][(char) 2].setValue(std::to_string((int) sVar->generatePos.z));
-	sVar->pannelVector[8].addButton(Button(10, 130, 100, 50,NULL, NULL, textureManager->getTexture("generateIntensity"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addTextEntry(TextEntry(70, 220, 30, 30));
+	sVar->pannelVector[8][(char) 0].setValue(std::to_string((int) sVar->holeInfo.position.x));
+	sVar->pannelVector[8].addTextEntry(TextEntry(170, 220, 30, 30));
+	sVar->pannelVector[8][(char) 1].setValue(std::to_string((int) sVar->holeInfo.position.y));
+	sVar->pannelVector[8].addButton(Button(70, 130, 100, 50,NULL, NULL, textureManager->getTexture("curbyPower"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][2].desactive();
-	sVar->pannelVector[8].addSlider(Slider(10, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar->pannelVector[8][0.0f].setValue(0.5);
-	sVar->pannelVector[8].addButton(Button(130, 130, 100, 50,NULL, NULL, textureManager->getTexture("generateDelay"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addSlider(Slider(70, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
+	sVar->pannelVector[8][0.0f].setValue(0.25);
+	sVar->pannelVector[8].addButton(Button(40, 222, 20, 30,NULL, NULL, textureManager->getTexture("X"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][3].desactive();
-	sVar->pannelVector[8].addSlider(Slider(130, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
-	sVar->pannelVector[8][1.0f].setValue(0.5);
-	sVar->pannelVector[8].addButton(Button(10, 222, 20, 30,NULL, NULL, textureManager->getTexture("X"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar->pannelVector[8][2].desactive();
-	sVar->pannelVector[8].addButton(Button(90, 222, 20, 30,NULL, NULL, textureManager->getTexture("Y"), PANNEL_COLOR, PANNEL_COLOR));
-	sVar->pannelVector[8][3].desactive();
-	sVar->pannelVector[8].addButton(Button(170, 222, 20, 30,NULL, NULL, textureManager->getTexture("Z"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addButton(Button(140, 222, 20, 30,NULL, NULL, textureManager->getTexture("Z"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][4].desactive();
 }

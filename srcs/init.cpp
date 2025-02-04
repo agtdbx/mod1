@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/04 23:56:17 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/05 00:32:53 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,9 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->waterDensity = WATER_DENSITY;
 
 	// hole info
-	sVar->holeInfo.enable = false; 
+	sVar->holeInfo.enable = false;
 	sVar->holeInfo.radius = BLACK_HOLE_RADIUS;
+	sVar->holeInfo.radius2 = BLACK_HOLE_RADIUS * BLACK_HOLE_RADIUS;
 	sVar->holeInfo.position = BLACK_HOLE_COOR;
 
 	//pannel
@@ -164,7 +165,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[0].addButton(Button(120, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
 	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveBlackHolePannel, &sVar->pannelVector[8], textureManager->getTexture("generate")));
 	sVar->pannelVector[0][6].setSwitchMode(true);
-	
+
 	//wave pannel content
 	sVar->pannelVector[1].addButton(Button(10, 10, 100, 50,generateWaveNorth, sVar, textureManager->getTexture("North")));
 	sVar->pannelVector[1].addButton(Button(120, 10, 100, 50,generateWaveWest, sVar, textureManager->getTexture("West")));

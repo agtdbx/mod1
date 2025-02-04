@@ -6,7 +6,7 @@ layout(rgba32f, binding = 0) uniform imageBuffer predictedPositionBuffer;
 layout(rgba32f, binding = 1) uniform imageBuffer velocitiesBuffer;
 
 uniform bool			holeEnable;
-uniform float			holeRadius;
+uniform float			holeRadius2;
 uniform vec2			holePosition;
 uniform float			delta;
 uniform float			waterRadius;
@@ -19,6 +19,8 @@ uniform samplerBuffer	positionsBuffer;
 void main()
 {
 	int		particleIndex;
+	float	holeDst2;
+	vec2	holeDir;
 	vec3	position, velocity, predictedPosition;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
@@ -38,7 +40,17 @@ void main()
 
 	// Check if particule is out of the map on y axis
 	if (predictedPosition.y < waterRadius)
-		predictedPosition.y = waterRadius;
+	{
+		if (holeEnable)
+		{
+			holeDir = holePosition - vec2(predictedPosition.x, predictedPosition.z);
+			holeDst2 = holeDir.x * holeDir.x + holeDir.y * holeDir.y;
+			if (holeDst2 > holeRadius2)
+				predictedPosition.y = waterRadius;
+		}
+		else
+			predictedPosition.y = waterRadius;
+	}
 	else if (predictedPosition.y >= waterMaxY)
 		predictedPosition.y = waterMaxY;
 

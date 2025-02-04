@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/04 23:56:49 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/05 00:32:03 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@
 # define WAVE_VELOCITY 42
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
-# define BLACK_HOLE_RADIUS 5.0f
+# define BLACK_HOLE_RADIUS 25.0f
 # define BLACK_HOLE_COOR glm::vec2(5.0f, 5.0f)
 
 # define COLOR_000000 glm::vec3(0.0f, 0.0f, 0.0f)
@@ -153,6 +153,7 @@ typedef struct s_holeInfo
 {
 	bool		enable;
 	float		radius;
+	float		radius2;
 	glm::vec2	position;
 }	t_holeInfo;
 

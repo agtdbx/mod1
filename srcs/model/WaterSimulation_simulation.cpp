@@ -22,6 +22,9 @@ void	WaterSimulation::computePredictedPositions(
 	computeShader->use();
 
 	// Compute shader inputs setup
+	giveBoolToShader(shaderId, "holeEnable", holeInfo->enable);
+	giveFloatToShader(shaderId, "holeRadius2", holeInfo->radius2);
+	giveVec2ToShader(shaderId, "holePosition", holeInfo->position);
 	giveFloatToShader(shaderId, "delta", delta);
 	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
 	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);
@@ -70,7 +73,7 @@ void	WaterSimulation::putParticlesInGrid(
 								this->texturePositions);
 
 	// Compute shader output setup
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this->ssboGrid1);
+	giveSSBBOInputToShader(0, this->ssboGrid1);
 	this->ssboCurrent = this->ssboGrid1;
 	this->ssboGrid1Used = true;
 
@@ -108,15 +111,15 @@ void	WaterSimulation::putParticlesInGridInParallel(
 	// Compute shader output setup
 	if (this->ssboGrid1Used)
 	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this->ssboGrid1);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboGrid2);
+		giveSSBBOInputToShader(0, this->ssboGrid1);
+		giveSSBBOInputToShader(1, this->ssboGrid2);
 		this->ssboCurrent = this->ssboGrid2;
 		this->ssboGrid1Used = false;
 	}
 	else
 	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this->ssboGrid2);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboGrid1);
+		giveSSBBOInputToShader(0, this->ssboGrid2);
+		giveSSBBOInputToShader(1, this->ssboGrid1);
 		this->ssboCurrent = this->ssboGrid1;
 		this->ssboGrid1Used = true;
 	}
@@ -163,7 +166,7 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 	// Compute shader output setup
 	giveFloatTextureInputToShader(0, false, this->textureBufferMapDensities,
 									this->textureMapDensities);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboCurrent);
+	giveSSBBOInputToShader(1, this->ssboCurrent);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroupsMapBuffer, 1, 1);
@@ -207,7 +210,7 @@ void	WaterSimulation::computeDensity(
 									this->textureDensities);
 	giveFloatTextureInputToShader(1, false, this->textureBufferPressures,
 									this->texturePressures);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->ssboCurrent);
+	giveSSBBOInputToShader(2, this->ssboCurrent);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
@@ -256,7 +259,7 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	// Compute shader output setup
 	giveVec4TextureInputToShader(0, true, this->textureBufferVelocities,
 									this->textureVelocities);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboCurrent);
+	giveSSBBOInputToShader(1, this->ssboCurrent);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
@@ -304,7 +307,7 @@ void	WaterSimulation::calculatesAndApplyViscosity(
 	// Compute shader output setup
 	giveVec4TextureInputToShader(0, true, this->textureBufferVelocities,
 									this->textureVelocities);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->ssboCurrent);
+	giveSSBBOInputToShader(1, this->ssboCurrent);
 
 	// Run compute shader
 	glDispatchCompute((unsigned int)this->numGroups, 1, 1);
@@ -345,6 +348,9 @@ void	WaterSimulation::updatePositions(
 	terrain->getGridSize(sizes);
 
 	// Compute shader inputs setup
+	giveBoolToShader(shaderId, "holeEnable", holeInfo->enable);
+	giveFloatToShader(shaderId, "holeRadius2", holeInfo->radius2);
+	giveVec2ToShader(shaderId, "holePosition", holeInfo->position);
 	giveFloatToShader(shaderId, "delta", delta);
 	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
 	giveFloatToShader(shaderId, "waterMaxXZ", WATER_MAX_XZ);

@@ -96,6 +96,7 @@ void	giveVec4TextureInputToShader(int textureId, bool readable,
 							GL_WRITE_ONLY, GL_RGBA32F);
 }
 
+
 void	giveSSBBOInputToShader(int bufferId, GLuint ssbo)
 {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bufferId, ssbo);

@@ -193,7 +193,8 @@ void	WaterSimulation::tick(
 			ShaderManager *shaderManager,
 			Terrain *terrain,
 			t_performanceLog *perfLog,
-			float delta)
+			float delta,
+			t_holeInfo *holeInfo)
 {
 	if (this->needToUpdateBuffers == true)
 	{
@@ -214,7 +215,7 @@ void	WaterSimulation::tick(
 		glGenQueries(1, &query);
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		this->computePredictedPositions(shaderManager, delta); // gpu
+		this->computePredictedPositions(shaderManager, delta, holeInfo); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timePredictedPos += elapsed_time / 1000000000.0;
@@ -250,20 +251,20 @@ void	WaterSimulation::tick(
 		perfLog->timeApplyViscosity += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		this->updatePositions(shaderManager, terrain, delta); // gpu
+		this->updatePositions(shaderManager, terrain, delta, holeInfo); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timeUpdatePositions += elapsed_time / 1000000000.0;
 	}
 	else
 	{
-		this->computePredictedPositions(shaderManager, delta); // gpu
+		this->computePredictedPositions(shaderManager, delta, holeInfo); // gpu
 		this->putParticlesInGridInParallel(shaderManager); // gpu
 		this->computeMapDensity(shaderManager); // gpu
 		this->computeDensity(shaderManager); // gpu
 		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
 		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
-		this->updatePositions(shaderManager, terrain, delta); // gpu
+		this->updatePositions(shaderManager, terrain, delta, holeInfo); // gpu
 	}
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/04 13:48:01 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/04 23:13:32 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("7", "data/textures/7.png");
 		textureManager->addTexture("8", "data/textures/8.png");
 		textureManager->addTexture("9", "data/textures/9.png");
-
 
 		//terrain texture
 		textureManager->addTexture("dirt", "data/textures/dirt.png");
@@ -88,7 +87,6 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("waterDensity", "data/textures/waterDensity.png");
 		textureManager->addTexture("lightColor", "data/textures/lightColor.png");
 		textureManager->addTexture("lightIcon", "data/textures/lightIcon.png");
-		
 
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
@@ -135,6 +133,11 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->generateDelay = GENERATE_TIME_BEFORE_NEW_PARTICULE;
 	sVar->generatePos = Vec3(GENERATE_START_POS);
 	sVar->waterDensity = WATER_DENSITY;
+
+	// hole info
+	sVar->holeInfo.enable = true; // TODO CHANGE THIS;
+	sVar->holeInfo.radius = 5.0f;
+	sVar->holeInfo.position = glm::vec2(5.0f, 5.0f);
 
 	//pannel
 	sVar->pannelVector.push_back(Pannel(WIN_W, 0.0f, 230, 250, textureManager->getTexture("noTexture"), PANNEL_COLOR));				//main pannel

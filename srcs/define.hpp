@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/04 19:43:28 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/04 23:07:48 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,5 +146,12 @@ typedef struct s_performanceLog
 	double	timeSwapBuffer;
 
 }	t_performanceLog;
+
+typedef struct s_holeInfo
+{
+	bool		enable;
+	float		radius;
+	glm::vec2	position;
+}	t_holeInfo;
 
 #endif

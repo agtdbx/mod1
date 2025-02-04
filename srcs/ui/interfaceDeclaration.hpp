@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   interfaceDeclaration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 16:06:48 by lflandri          #+#    #+#             */
-/*   Updated: 2025/01/29 20:06:01 by gugus            ###   ########.fr       */
+/*   Updated: 2025/02/04 23:11:33 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_simulationVariable
 	glm::vec3			watercolor;
 	glm::vec3			lightcolor;
 	float				waterDensity;
+	t_holeInfo			holeInfo;
 }	t_simulationVariable;
 
 void	uiTick(t_simulationVariable *sVar);

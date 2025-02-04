@@ -7,7 +7,8 @@
 
 void	WaterSimulation::computePredictedPositions(
 			ShaderManager *shaderManager,
-			float delta)
+			float delta,
+			t_holeInfo *holeInfo)
 {
 	ComputeShader	*computeShader;
 	unsigned int	shaderId;
@@ -314,7 +315,8 @@ void	WaterSimulation::calculatesAndApplyViscosity(
 void	WaterSimulation::updatePositions(
 							ShaderManager *shaderManager,
 							Terrain *terrain,
-							float delta)
+							float delta,
+							t_holeInfo *holeInfo)
 {
 	ComputeShader	*computeShader;
 	unsigned int	shaderId;

@@ -24,7 +24,7 @@ public:
 	void	addWater(glm::vec3 position);
 	void	addWater(glm::vec3 position, glm::vec3 velociy);
 	void	tick(ShaderManager *shaderManager, Terrain *terrain,
-					t_performanceLog *perfLog, float delta);
+					t_performanceLog *perfLog, float delta, t_holeInfo *holeInfo);
 	void	draw(Camera *camera, ShaderManager *shaderManager,
 					Terrain *terrain, glm::vec3 *waterColor,glm::vec3 *lightColor, float waterDensity);
 	void	clear(void);
@@ -63,7 +63,8 @@ private:
 	void		densitiesFromBuffer(void);
 	void		pressuresToBuffer(void);
 
-	void		computePredictedPositions(ShaderManager *shaderManager, float delta);
+	void		computePredictedPositions(ShaderManager *shaderManager,
+											float delta, t_holeInfo *holeInfo);
 	void		putParticlesInGrid(ShaderManager *shaderManager);
 	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
@@ -71,7 +72,8 @@ private:
 	void		computeMapPressureAcceleration(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
 	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);
-	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain, float delta);
+	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain,
+									float delta, t_holeInfo *holeInfo);
 };
 
 #endif

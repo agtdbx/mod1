@@ -5,7 +5,10 @@ layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
 layout(rgba32f, binding = 0) uniform imageBuffer predictedPositionBuffer;
 layout(rgba32f, binding = 1) uniform imageBuffer velocitiesBuffer;
 
-uniform	float			delta;
+uniform bool			holeEnable;
+uniform float			holeRadius;
+uniform vec2			holePosition;
+uniform float			delta;
 uniform float			waterRadius;
 uniform float			waterMaxXZ;
 uniform float			waterMaxY;

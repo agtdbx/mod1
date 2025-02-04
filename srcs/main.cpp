@@ -372,7 +372,7 @@ static void	computation(
 	}
 
 	if (!sVar->isStopped || sVar->needStep)
-		simulation->tick(shaderManager, terrain, perfLog, delta);
+		simulation->tick(shaderManager, terrain, perfLog, delta, &sVar->holeInfo);
 	if (sVar->needStep)
 		sVar->needStep = false;
 }

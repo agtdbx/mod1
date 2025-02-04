@@ -2,6 +2,13 @@
 
 //**** FUNCTIONS ***************************************************************
 
+void	giveBoolToShader(int shaderId, const char *variableName, bool value)
+{
+	int variableLoc = glGetUniformLocation(shaderId, variableName);
+	glUniform1i(variableLoc, value);
+}
+
+
 void	giveIntToShader(int shaderId, const char *variableName, int value)
 {
 	int variableLoc = glGetUniformLocation(shaderId, variableName);
@@ -13,6 +20,13 @@ void	giveFloatToShader(int shaderId, const char *variableName, float value)
 {
 	int variableLoc = glGetUniformLocation(shaderId, variableName);
 	glUniform1f(variableLoc, value);
+}
+
+
+void	giveVec2ToShader(int shaderId, const char *variableName, glm::vec2 value)
+{
+	int variableLoc = glGetUniformLocation(shaderId, variableName);
+	glUniform2fv(variableLoc, 1, glm::value_ptr(value));
 }
 
 
@@ -80,4 +94,9 @@ void	giveVec4TextureInputToShader(int textureId, bool readable,
 	else
 		glBindImageTexture(textureId, texture, 0, GL_FALSE, 0,
 							GL_WRITE_ONLY, GL_RGBA32F);
+}
+
+void	giveSSBBOInputToShader(int bufferId, GLuint ssbo)
+{
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bufferId, ssbo);
 }

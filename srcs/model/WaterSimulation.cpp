@@ -371,6 +371,35 @@ void	WaterSimulation::clear(void)
 }
 
 
+void	WaterSimulation::removeHoledParticles(void)
+{
+	int	i;
+
+	if (this->needToUpdateBuffers == false)
+	{
+		this->positionsFromBuffer();
+		this->predictedPositionsFromBuffer();
+		this->velocitiesFromBuffer();
+		this->densitiesFromBuffer();
+	}
+
+	i = 0;
+	while (i < this->nbParticules)
+	{
+		if (this->positions[i].y <= 0.0f)
+		{
+			this->positions.erase(this->positions.begin() + i);
+			this->predictedPositions.erase(this->predictedPositions.begin() + i);
+			this->velocities.erase(this->velocities.begin() + i);
+			this->densities.erase(this->densities.begin() + i);
+			this->nbParticules--;
+			this->needToUpdateBuffers = true;
+		}
+		else
+			i++;
+	}
+}
+
 //**** PRIVATE METHODS *********************************************************
 
 void	WaterSimulation::generateTriangleOverScreen(void)

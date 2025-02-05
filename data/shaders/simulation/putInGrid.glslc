@@ -27,6 +27,9 @@ void main()
 	{
 		particlePos = texelFetch(positionsBuffer, i).rgb;
 
+		if (particlePos.y <= 0.0)
+			continue;
+
 		gx = int(particlePos.x * invSmoothingRadius);
 		gy = int(particlePos.y * invSmoothingRadius);
 		gz = int(particlePos.z * invSmoothingRadius);

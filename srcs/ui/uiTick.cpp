@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   uiTick.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 20:28:30 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/05 00:32:57 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/05 00:41:23 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	uiTick(t_simulationVariable *sVar)
 
 	//blackHole parameter
 	sVar->holeInfo.radius =  sVar->pannelVector[8][0.0f].getValue() * 4 * BLACK_HOLE_RADIUS;
+	sVar->holeInfo.radius2 =  sVar->holeInfo.radius * sVar->holeInfo.radius;
 	if (sVar->pannelVector[8][(char) 0].getValue().size())
 	{
 		sVar->holeInfo.position.x = std::stoi(sVar->pannelVector[8][(char) 0].getValue());
@@ -107,5 +108,5 @@ void	uiTick(t_simulationVariable *sVar)
 	{
 		sVar->holeInfo.position.y = BLACK_HOLE_RADIUS;
 	}
-	
+
 }

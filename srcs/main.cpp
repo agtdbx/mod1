@@ -287,6 +287,7 @@ static void	computation(
 	static double	timeRainningParticuleAdd = 0.0;
 	static double	timeFillingParticuleAdd = 0.0;
 	static double	timeGenerateParticuleAdd = 0.0;
+	static double	timeHoleParticule = 0.0;
 	double			cameraSpeed;
 
 	for (Pannel & pannel : sVar->pannelVector)
@@ -354,6 +355,7 @@ static void	computation(
 	else
 		delta *= 1.5f;
 
+	// Rain particles creations
 	timeRainningParticuleAdd += delta;
 	if (timeRainningParticuleAdd >= sVar->rainDelay)
 	{
@@ -362,6 +364,7 @@ static void	computation(
 			updateRain(simulation, sVar);
 	}
 
+	// Filling particles creations
 	timeFillingParticuleAdd += delta;
 	if (timeFillingParticuleAdd >= sVar->fillingDelay)
 	{
@@ -369,6 +372,8 @@ static void	computation(
 		if (sVar->isFilling && (!sVar->isStopped || sVar->needStep))
 			fillingPool(simulation, sVar);
 	}
+
+	// Generate particles creations
 	timeGenerateParticuleAdd += delta;
 	if (timeGenerateParticuleAdd >= sVar->generateDelay)
 	{
@@ -377,6 +382,23 @@ static void	computation(
 			generateAt(simulation, sVar);
 	}
 
+	// Hole particles eating by kirby
+	if (sVar->holeInfo.enable)
+	{
+		timeHoleParticule += delta;
+		if (timeHoleParticule >= BLACK_HOLE_PARTICLES_CLEAR_TIME)
+		{
+			timeHoleParticule -= BLACK_HOLE_PARTICLES_CLEAR_TIME;
+			simulation->removeHoledParticles();
+		}
+	}
+	else if (timeHoleParticule != 0.0f)
+	{
+		timeHoleParticule = 0.0f;
+		simulation->removeHoledParticles();
+	}
+
+	// Simulation step
 	if (!sVar->isStopped || sVar->needStep)
 		simulation->tick(shaderManager, terrain, perfLog, delta, &sVar->holeInfo);
 	if (sVar->needStep)

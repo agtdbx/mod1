@@ -28,6 +28,7 @@ public:
 	void	draw(Camera *camera, ShaderManager *shaderManager,
 					Terrain *terrain, glm::vec3 *waterColor,glm::vec3 *lightColor, float waterDensity);
 	void	clear(void);
+	void	removeHoledParticles(void);
 
 private:
 	std::vector<glm::vec4>	positions;

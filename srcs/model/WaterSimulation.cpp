@@ -384,20 +384,34 @@ void	WaterSimulation::removeHoledParticles(void)
 	}
 
 	i = 0;
+	int	tkt = 0;
 	while (i < this->nbParticules)
 	{
-		if (this->positions[i].y <= 0.0f)
+		if (this->positions[i].y < WATER_RADIUS)
 		{
 			this->positions.erase(this->positions.begin() + i);
 			this->predictedPositions.erase(this->predictedPositions.begin() + i);
 			this->velocities.erase(this->velocities.begin() + i);
 			this->densities.erase(this->densities.begin() + i);
+
+			// this->positions[i] = this->positions.back();
+			// this->positions.pop_back();
+			// this->predictedPositions[i] = this->predictedPositions.back();
+			// this->predictedPositions.pop_back();
+			// this->velocities[i] = this->velocities.back();
+			// this->velocities.pop_back();
+			// this->densities[i] = this->densities.back();
+			// this->densities.pop_back();
+
 			this->nbParticules--;
 			this->needToUpdateBuffers = true;
+			tkt++;
 		}
 		else
 			i++;
 	}
+
+	printf("Kirby eats %i particles\n", tkt);
 }
 
 //**** PRIVATE METHODS *********************************************************

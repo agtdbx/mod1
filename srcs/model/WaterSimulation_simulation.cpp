@@ -64,6 +64,7 @@ void	WaterSimulation::putParticlesInGrid(
 	// Compute shader inputs setup
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "invSmoothingRadius", INV_SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "waterRadius", WATER_RADIUS);
 	giveIntToShader(shaderId, "gridW", this->gridW);
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
 	giveIntToShader(shaderId, "gridSize", this->gridSize);
@@ -220,7 +221,8 @@ void	WaterSimulation::computeDensity(
 
 void	WaterSimulation::calculatesAndApplyPressure(
 			ShaderManager *shaderManager,
-			float delta)
+			float delta,
+			t_holeInfo *holeInfo)
 {
 	ComputeShader	*computeShader;
 	unsigned int	shaderId;
@@ -234,6 +236,7 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	computeShader->use();
 
 	// Compute shader inputs setup
+	giveBoolToShader(shaderId, "holeEnable", holeInfo->enable);
 	giveFloatToShader(shaderId, "delta", delta);
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "invSmoothingRadius", INV_SMOOTHING_RADIUS);

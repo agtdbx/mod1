@@ -239,7 +239,7 @@ void	WaterSimulation::tick(
 		perfLog->timeComputeDensity += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
+		this->calculatesAndApplyPressure(shaderManager, delta, holeInfo); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timeApplyPressure += elapsed_time / 1000000000.0;
@@ -262,7 +262,7 @@ void	WaterSimulation::tick(
 		this->putParticlesInGridInParallel(shaderManager); // gpu
 		this->computeMapDensity(shaderManager); // gpu
 		this->computeDensity(shaderManager); // gpu
-		this->calculatesAndApplyPressure(shaderManager, delta); // gpu
+		this->calculatesAndApplyPressure(shaderManager, delta, holeInfo); // gpu
 		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
 		this->updatePositions(shaderManager, terrain, delta, holeInfo); // gpu
 	}
@@ -389,19 +389,14 @@ void	WaterSimulation::removeHoledParticles(void)
 	{
 		if (this->positions[i].y < WATER_RADIUS)
 		{
-			this->positions.erase(this->positions.begin() + i);
-			this->predictedPositions.erase(this->predictedPositions.begin() + i);
-			this->velocities.erase(this->velocities.begin() + i);
-			this->densities.erase(this->densities.begin() + i);
-
-			// this->positions[i] = this->positions.back();
-			// this->positions.pop_back();
-			// this->predictedPositions[i] = this->predictedPositions.back();
-			// this->predictedPositions.pop_back();
-			// this->velocities[i] = this->velocities.back();
-			// this->velocities.pop_back();
-			// this->densities[i] = this->densities.back();
-			// this->densities.pop_back();
+			this->positions[i] = this->positions.back();
+			this->positions.pop_back();
+			this->predictedPositions[i] = this->predictedPositions.back();
+			this->predictedPositions.pop_back();
+			this->velocities[i] = this->velocities.back();
+			this->velocities.pop_back();
+			this->densities[i] = this->densities.back();
+			this->densities.pop_back();
 
 			this->nbParticules--;
 			this->needToUpdateBuffers = true;

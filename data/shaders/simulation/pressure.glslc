@@ -7,6 +7,7 @@ layout(std430, binding = 1) readonly buffer DataBuffer {
 	int gridBuffer[];
 };
 
+uniform bool			holeEnable;
 uniform float			delta;
 uniform float			smoothingRadius;
 uniform float			invSmoothingRadius;
@@ -26,6 +27,12 @@ uniform samplerBuffer	pressuresBuffer;
 float	vecLength(vec3 vec)
 {
 	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+}
+
+
+float	vecLength2(vec3 vec)
+{
+	return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 
@@ -129,7 +136,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 void main()
 {
 	int		particleIndex;
-	float	density, invDensity;
+	float	density, invDensity, pressureSpeedAcceleration;
 	vec3	position, velocity, pressureForce, pressureAcceleration, viscosityForce;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
@@ -145,6 +152,13 @@ void main()
 
 		pressureForce = calculatePressureForce(particleIndex, invDensity);
 		pressureAcceleration = pressureForce * invDensity;
+
+		if (holeEnable)
+		{
+			pressureSpeedAcceleration = vecLength2(pressureAcceleration);
+			if (pressureSpeedAcceleration > 40000.0)
+				pressureAcceleration *= 200.0 / sqrt(pressureSpeedAcceleration);
+		}
 
 		velocity += pressureAcceleration * delta;
 	}

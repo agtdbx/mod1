@@ -230,7 +230,7 @@ void	Terrain::createMesh(void)
 
 			// Compute basic color
 			r = height / (double)MAX_HEIGHT;
-			g = 0.8;
+			g = max(0.8, r);
 			b = r;
 			color = Vec3(r, g, b);
 

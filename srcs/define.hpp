@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/05 00:55:41 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/05 14:24:37 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@
 # define GENERATE_MAX_Z MAP_SIZE - GENERATE_PADDING
 # define GENERATE_MIN_X GENERATE_PADDING
 # define GENERATE_MIN_Z GENERATE_PADDING
-# define WAVE_VELOCITY 42
+# define WAVE_VELOCITY 21
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
 # define BLACK_HOLE_RADIUS 25.0f

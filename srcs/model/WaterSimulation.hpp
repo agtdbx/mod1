@@ -71,7 +71,7 @@ private:
 	void		computeMapDensity(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
 	void		computeMapPressureAcceleration(ShaderManager *shaderManager);
-	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float delta);
+	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float deltal, t_holeInfo *holeInfo);
 	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);
 	void		updatePositions(ShaderManager *shaderManager, Terrain *terrain,
 									float delta, t_holeInfo *holeInfo);

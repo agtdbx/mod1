@@ -95,7 +95,7 @@ void main()
 	vec3	position;
 
 	cellIndex = int(gl_GlobalInvocationID.x);
-	if (cellIndex >= mapBufferSize)
+	if (cellIndex >= mapBufferSize || mapBufferIdHsize == 0 || mapBufferW == 0)
 		return ;
 
 	// Get cell pos in grid with cellIndex

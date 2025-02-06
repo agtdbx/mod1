@@ -26,7 +26,7 @@ void main()
 
 	// Get cell index
 	cellIndex = int(gl_GlobalInvocationID.x);
-	if (cellIndex >= gridSize)
+	if (cellIndex >= gridSize || idHsize == 0 || gridW == 0)
 		return ;
 
 	// Compute cell coordonates

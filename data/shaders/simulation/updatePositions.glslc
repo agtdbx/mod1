@@ -138,17 +138,20 @@ void main()
 	if (terrainCollisionId != -1)
 	{
 		velocityLength = vecLength(velocity);
-		velocityDir = velocity / velocityLength;
-		if (velocityLength < 5.0 && velocityLength > 0.5)
-			skipCollisionLoose = true;
+		if (velocityLength != 0.0)
+		{
+			velocityDir = velocity / velocityLength;
+			if (velocityLength < 5.0 && velocityLength > 0.5)
+				skipCollisionLoose = true;
 
-		normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
-		velocityDir -= normal * 2 * dot(velocityDir, normal);
-		velocityDir = normalize(velocityDir);
-		velocity = velocityDir * velocityLength;
+			normal = texelFetch(terrainDataBuffer, terrainCollisionId * 5 + 4).rgb;
+			velocityDir -= normal * 2 * dot(velocityDir, normal);
+			velocityDir = normalize(velocityDir);
+			velocity = velocityDir * velocityLength;
 
-		newPosition = position + velocity * delta;
-		needUpdateVelocity = true;
+			newPosition = position + velocity * delta;
+			needUpdateVelocity = true;
+		}
 	}
 
 	// Check if particule is out of the map on x axis
@@ -180,9 +183,9 @@ void main()
 			}
 			else
 			{
-				if (newPosition.y < -10.0)
+				if (newPosition.y < -3.0)
 				{
-					newPosition.y = -10.0;
+					newPosition.y = -3.0;
 					velocity *= vec3(0.0, 0.0, 0.0);
 					needUpdateVelocity = true;
 				}

@@ -410,26 +410,6 @@ void	WaterSimulation::removeHoledParticles(void)
 	}
 }
 
-
-void	WaterSimulation::printParticlesInfo(void) // TODO: REMOVE
-{
-	if (this->needToUpdateBuffers == false)
-	{
-		this->positionsFromBuffer();
-		this->predictedPositionsFromBuffer();
-		this->velocitiesFromBuffer();
-		this->densitiesFromBuffer();
-	}
-
-	for (int i = 0; i < this->nbParticules; i++)
-	{
-		printf("pos(%6.2f,%6.2f,%6.2f) vel(%+7.2f,%+7.2f,%+7.2f), den (%6.4f)\n",
-				this->positions[i].x, this->positions[i].y, this->positions[i].z,
-				this->velocities[i].x, this->velocities[i].y, this->velocities[i].z,
-				this->densities[i]);
-	}
-}
-
 //**** PRIVATE METHODS *********************************************************
 
 void	WaterSimulation::generateTriangleOverScreen(void)

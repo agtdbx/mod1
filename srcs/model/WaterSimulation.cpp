@@ -98,6 +98,9 @@ WaterSimulation::~WaterSimulation()
 	glDeleteBuffers(1, &this->textureBufferMapDensities);
 	glDeleteTextures(1, &this->textureMapDensities);
 
+	glDeleteBuffers(1, &this->textureBufferMapViscosities);
+	glDeleteTextures(1, &this->textureMapViscosities);
+
 	glDeleteBuffers(1, &this->ssboGrid1);
 	glDeleteBuffers(1, &this->ssboGrid2);
 }
@@ -245,6 +248,12 @@ void	WaterSimulation::tick(
 		perfLog->timeApplyPressure += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
+		this->computeMapViscosity(shaderManager); // gpu
+		glEndQuery(GL_TIME_ELAPSED);
+		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
+		perfLog->timeComputeMapViscosity += elapsed_time / 1000000000.0;
+
+		glBeginQuery(GL_TIME_ELAPSED, query);
 		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
@@ -263,6 +272,7 @@ void	WaterSimulation::tick(
 		this->computeMapDensity(shaderManager); // gpu
 		this->computeDensity(shaderManager); // gpu
 		this->calculatesAndApplyPressure(shaderManager, delta, holeInfo); // gpu
+		this->computeMapViscosity(shaderManager); // gpu
 		this->calculatesAndApplyViscosity(shaderManager, delta); // gpu
 		this->updatePositions(shaderManager, terrain, delta, holeInfo); // gpu
 	}

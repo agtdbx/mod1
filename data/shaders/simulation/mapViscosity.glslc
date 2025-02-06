@@ -1,0 +1,214 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 1, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform imageBuffer mapViscositiesBuffer;
+layout(std430, binding = 1) readonly buffer DataBuffer {
+	int gridBuffer[];
+};
+
+uniform float			smoothingRadius;
+uniform float			smoothingRadius2;
+uniform float			invSmoothingRadius;
+uniform float			smoothingScale;
+uniform float			smoothingViscosityScale;
+uniform float			waterRadius2;
+uniform float			viscosityStrength;
+uniform int				mapBufferCellSize;
+uniform int				mapBufferW;
+uniform int				mapBufferIdHsize;
+uniform int				mapBufferSize;
+uniform int				gridW;
+uniform int				gridH;
+uniform int				gridD;
+uniform int				idHsize;
+uniform int				gridSize;
+uniform samplerBuffer	positionsBuffer;
+uniform samplerBuffer	velocitiesBuffer;
+uniform samplerBuffer	densitiesBuffer;
+uniform samplerBuffer	mapDensitiesBuffer;
+
+
+float	vecLength2(vec3 vec)
+{
+	return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
+
+float	smoothingKernel(float dst2)
+{
+	if (dst2 > smoothingRadius2)
+		return (0.0);
+
+	return (pow(smoothingRadius - sqrt(dst2), 2) * smoothingScale);
+}
+
+
+float	viscositySmoothingKernel(float dst2)
+{
+	float	value;
+
+	if (dst2 > smoothingRadius2)
+		return (0.0);
+
+	value = waterRadius2 - dst2;
+	return ((value * value * value) * smoothingViscosityScale);
+}
+
+
+vec3	calculateVelocityAtMapPos(vec3 position)
+{
+	float	dst2, influence;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
+	vec3	velocity, waterVelocity, waterPosition;
+
+	velocity = vec3(0.0, 0.0, 0.0);
+	px = int(position.x * invSmoothingRadius);
+	py = int(position.y * invSmoothingRadius);
+	pz = int(position.z * invSmoothingRadius);
+
+	for (int cx = -1; cx <= 1; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= gridW)
+			continue;
+
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= gridD)
+					continue;
+
+				gid = gx + gz * gridW + gy * idHsize;
+				nbParticleInCell = gridBuffer[gid];
+				for (int i = 0; i < nbParticleInCell; i++)
+				{
+					gid += gridSize;
+					waterId = gridBuffer[gid];
+
+					waterPosition = texelFetch(positionsBuffer, waterId).rgb;
+					waterVelocity = texelFetch(velocitiesBuffer, waterId).rgb;
+
+					dst2 = vecLength2(waterPosition - position);
+					influence = smoothingKernel(dst2);
+					velocity += waterVelocity * influence;
+				}
+			}
+		}
+	}
+
+	return (velocity);
+}
+
+
+vec3	calculateViscosityForce(vec3 position, vec3 velocity)
+{
+	float	velocityLength, dst2, influence;
+	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
+	vec3	viscosityForce, positionWater, velocityWater, velocityDir;
+
+	viscosityForce = vec3(0.0, 0.0, 0.0);
+
+	px = int(position.x * invSmoothingRadius);
+	py = int(position.y * invSmoothingRadius);
+	pz = int(position.z * invSmoothingRadius);
+
+	for (int cx = -1; cx <= 1; cx++)
+	{
+		gx = px + cx;
+		if (gx < 0 || gx >= gridW)
+			continue;
+
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			gy = py + cy;
+			if (gy < 0 || gy >= gridH)
+				continue;
+
+			for (int cz = -1; cz <= 1; cz++)
+			{
+				gz = pz + cz;
+				if (gz < 0 || gz >= gridD)
+					continue;
+
+				gid = gx + gz * gridW + gy * idHsize;
+				nbParticleInCell = gridBuffer[gid];
+				for (int i = 0; i < nbParticleInCell; i++)
+				{
+					gid += gridSize;
+					waterId = gridBuffer[gid];
+
+					positionWater = texelFetch(positionsBuffer, waterId).rgb;
+					velocityWater = texelFetch(velocitiesBuffer, waterId).rgb;
+
+					velocityDir = velocityWater - velocity;
+					dst2 = vecLength2(position - positionWater);
+					if (dst2 < 0.001)
+					{
+						switch (waterId % 5)
+						{
+							case 0:
+								velocityDir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 1:
+								velocityDir = vec3(1.0, 0.0, 0.0);
+								break;
+							case 2:
+								velocityDir = vec3(-1.0, 0.0, 0.0);
+								break;
+							case 3:
+								velocityDir = vec3(0.0, 0.0, 1.0);
+								break;
+							case 4:
+								velocityDir = vec3(0.0, 0.0, -1.0);
+								break;
+						}
+					}
+
+					influence = viscositySmoothingKernel(dst2);
+					viscosityForce += velocityDir * influence;
+				}
+			}
+		}
+	}
+
+	return (viscosityForce * viscosityStrength);
+}
+
+void main()
+{
+	int		cellIndex, idXZ, x, y, z;
+	float	density;
+	vec3	position, velocity, viscosityForce;
+
+	cellIndex = int(gl_GlobalInvocationID.x);
+	if (cellIndex >= mapBufferSize || mapBufferIdHsize == 0 || mapBufferW == 0)
+		return ;
+
+	// Get cell pos in grid with cellIndex
+	y = int(cellIndex / mapBufferIdHsize);
+	idXZ = cellIndex - (y * mapBufferIdHsize);
+	z = int(idXZ / mapBufferW);
+	x = idXZ - (z * mapBufferW);
+
+	// Get cell world position
+	position = vec3(x, y, z) * mapBufferCellSize;
+	density = texelFetch(mapDensitiesBuffer, cellIndex).r;
+
+	if (density != 0.0)
+	{
+		velocity = calculateVelocityAtMapPos(position);
+		viscosityForce = calculateViscosityForce(position, velocity);
+	}
+	else
+		viscosityForce = vec3(0.0, 0.0, 0.0);
+
+	// Write the value to the buffer
+	imageStore(mapViscositiesBuffer, cellIndex, vec4(viscosityForce, 1.0));
+}

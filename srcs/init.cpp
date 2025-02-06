@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/06 16:18:43 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/06 20:41:05 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		shaderManager->addComputeShader("densities", "data/shaders/simulation/densities.glslc");
 		shaderManager->addComputeShader("mapDensities", "data/shaders/simulation/mapDensities.glslc");
 		shaderManager->addComputeShader("pressure", "data/shaders/simulation/pressure.glslc");
+		shaderManager->addComputeShader("mapViscosity", "data/shaders/simulation/mapViscosity.glslc");
 		shaderManager->addComputeShader("viscosity", "data/shaders/simulation/viscosity.glslc");
 		shaderManager->addComputeShader("updatePositions", "data/shaders/simulation/updatePositions.glslc");
 }

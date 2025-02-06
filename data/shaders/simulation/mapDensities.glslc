@@ -8,6 +8,7 @@ layout(std430, binding = 1) readonly buffer DataBuffer {
 };
 
 uniform float			smoothingRadius;
+uniform float			smoothingRadius2;
 uniform float			invSmoothingRadius;
 uniform float			smoothingScale;
 uniform float			waterMass;
@@ -25,26 +26,26 @@ uniform int				gridSize;
 uniform samplerBuffer	positionsBuffer;
 
 
-float	vecLength(vec3 vec)
+float	vecLength2(vec3 vec)
 {
-	return (sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
+	return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 
-float	smoothingKernel(float dst)
+float	smoothingKernel(float dst2)
 {
-	if (dst > smoothingRadius)
+	if (dst2 > smoothingRadius2)
 		return (0.0);
 
-	return (pow(smoothingRadius - dst, 2) * smoothingScale);
+	return (pow(smoothingRadius - sqrt(dst2), 2) * smoothingScale);
 }
 
 
 float	calculateDensity(vec3 position)
 {
-	float	density, dst, influence;
+	float	density, dst2, influence;
 	int		px, py, pz, gx, gy, gz, gid, nbParticleInCell, waterId;
-	vec3	pos;
+	vec3	positionWater;
 
 	density = 0.0;
 	px = int(position.x * invSmoothingRadius);
@@ -75,9 +76,11 @@ float	calculateDensity(vec3 position)
 				{
 					gid += gridSize;
 					waterId = gridBuffer[gid];
-					pos = texelFetch(positionsBuffer, waterId).rgb;
-					dst = vecLength(pos - position);
-					influence = smoothingKernel(dst);
+
+					positionWater = texelFetch(positionsBuffer, waterId).rgb;
+
+					dst2 = vecLength2(positionWater - position);
+					influence = smoothingKernel(dst2);
 					density += waterMass * influence;
 				}
 			}

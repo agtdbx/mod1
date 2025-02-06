@@ -146,6 +146,7 @@ void	WaterSimulation::computeMapDensity(ShaderManager *shaderManager)
 
 	// Compute shader inputs setup
 	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingRadius2", SMOOTHING_RADIUS2);
 	giveFloatToShader(shaderId, "invSmoothingRadius", INV_SMOOTHING_RADIUS);
 	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
 	giveFloatToShader(shaderId, "waterMass", WATER_MASS);
@@ -270,6 +271,61 @@ void	WaterSimulation::calculatesAndApplyPressure(
 }
 
 
+void	WaterSimulation::computeMapViscosity(ShaderManager *shaderManager)
+{
+	ComputeShader	*computeShader;
+	unsigned int	shaderId;
+
+	// Get the compute shader
+	computeShader = shaderManager->getComputeShader("mapViscosity");
+	if (!computeShader)
+		return ;
+	shaderId = computeShader->getShaderId();
+
+	computeShader->use();
+
+	// Compute shader inputs setup
+	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingRadius2", SMOOTHING_RADIUS2);
+	giveFloatToShader(shaderId, "invSmoothingRadius", INV_SMOOTHING_RADIUS);
+	giveFloatToShader(shaderId, "smoothingScale", SMOOTHING_SCALE);
+	giveFloatToShader(shaderId, "smoothingViscosityScale",
+						SMOOTHING_VISCOSITY_SCALE);
+	giveFloatToShader(shaderId, "waterRadius2", WATER_RADIUS2);
+	giveFloatToShader(shaderId, "viscosityStrength", VISCOSITY_FORCE);
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_BUFFER_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
+	giveIntToShader(shaderId, "mapBufferSize", this->mapBufferSize);
+	giveIntToShader(shaderId, "gridW", this->gridW);
+	giveIntToShader(shaderId, "gridH", this->gridH);
+	giveIntToShader(shaderId, "gridD", this->gridD);
+	giveIntToShader(shaderId, "idHsize", this->idHsize);
+	giveIntToShader(shaderId, "gridSize", this->gridSize);
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
+								this->textureBufferPredictedPositions,
+								this->texturePredictedPositions);
+	giveVec4TextureToShader(shaderId, "velocitiesBuffer", 3,
+								this->textureBufferVelocities,
+								this->textureVelocities);
+	giveFloatTextureToShader(shaderId, "densitiesBuffer", 4,
+								this->textureBufferDensities,
+								this->textureDensities);
+	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 5,
+								this->textureBufferMapDensities,
+								this->textureMapDensities);
+
+	// Compute shader output setup
+	giveVec4TextureInputToShader(0, true, this->textureBufferMapViscosities,
+									this->textureMapViscosities);
+	giveSSBBOInputToShader(1, this->ssboCurrent);
+
+	// Run compute shader
+	glDispatchCompute((unsigned int)this->numGroupsMapBuffer, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+}
+
+
 void	WaterSimulation::calculatesAndApplyViscosity(
 			ShaderManager *shaderManager,
 			float delta)
@@ -287,18 +343,6 @@ void	WaterSimulation::calculatesAndApplyViscosity(
 
 	// Compute shader inputs setup
 	giveFloatToShader(shaderId, "delta", delta);
-	giveFloatToShader(shaderId, "smoothingRadius", SMOOTHING_RADIUS);
-	giveFloatToShader(shaderId, "smoothingRadius2", SMOOTHING_RADIUS2);
-	giveFloatToShader(shaderId, "invSmoothingRadius", INV_SMOOTHING_RADIUS);
-	giveFloatToShader(shaderId, "smoothingViscosityScale",
-						SMOOTHING_VISCOSITY_SCALE);
-	giveFloatToShader(shaderId, "waterRadius2", WATER_RADIUS2);
-	giveFloatToShader(shaderId, "viscosityStrength", VISCOSITY_FORCE);
-	giveIntToShader(shaderId, "gridW", this->gridW);
-	giveIntToShader(shaderId, "gridH", this->gridH);
-	giveIntToShader(shaderId, "gridD", this->gridD);
-	giveIntToShader(shaderId, "idHsize", this->idHsize);
-	giveIntToShader(shaderId, "gridSize", this->gridSize);
 	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
 	giveVec4TextureToShader(shaderId, "predictedPositionsBuffer", 2,
 								this->textureBufferPredictedPositions,
@@ -306,6 +350,15 @@ void	WaterSimulation::calculatesAndApplyViscosity(
 	giveFloatTextureToShader(shaderId, "densitiesBuffer", 3,
 								this->textureBufferDensities,
 								this->textureDensities);
+
+	giveIntToShader(shaderId, "mapBufferCellSize", MAP_BUFFER_CELL_SIZE);
+	giveIntToShader(shaderId, "mapBufferW", this->mapBufferW);
+	giveIntToShader(shaderId, "mapBufferH", this->mapBufferH);
+	giveIntToShader(shaderId, "mapBufferD", this->mapBufferD);
+	giveIntToShader(shaderId, "mapBufferIdHsize", this->mapBufferIdHsize);
+	giveVec4TextureToShader(shaderId, "mapViscositiesBuffer", 4,
+								this->textureBufferMapViscosities,
+								this->textureMapViscosities);
 
 	// Compute shader output setup
 	giveVec4TextureInputToShader(0, true, this->textureBufferVelocities,

@@ -405,8 +405,6 @@ void	WaterSimulation::removeHoledParticles(void)
 		else
 			i++;
 	}
-
-	printf("Kirby eats %i particles\n", tkt);
 }
 
 //**** PRIVATE METHODS *********************************************************

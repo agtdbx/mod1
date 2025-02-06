@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:45:12 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/05 00:40:03 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/06 16:18:43 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,8 @@ void	loadTexture(TextureManager *textureManager, ShaderManager *shaderManager)
 		textureManager->addTexture("lightIcon", "data/textures/lightIcon.png");
 
 		//generate pannel texture
-		textureManager->addTexture("curby", "data/textures/curby.png");
-		textureManager->addTexture("curbyPower", "data/textures/curbyPower.png");
+		textureManager->addTexture("kirby", "data/textures/kirby.png");
+		textureManager->addTexture("kirbyPower", "data/textures/kirbyPower.png");
 
 		//terrain shader
 		shaderManager->addShader("terrain", "data/shaders/terrain/terrain.glslv", "data/shaders/terrain/terrain.glslf");
@@ -167,7 +167,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[0].addButton(Button(120, 70, 100, 50,moveGeneratePannel, &sVar->pannelVector[6], textureManager->getTexture("generate")));
 	sVar->pannelVector[0][4].setSwitchMode(true);
 	sVar->pannelVector[0].addButton(Button(120, 190, 100, 50,resetPool, simulation, textureManager->getTexture("reset")));
-	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveBlackHolePannel, &sVar->pannelVector[8], textureManager->getTexture("curby")));
+	sVar->pannelVector[0].addButton(Button(70, 130, 100, 50,moveBlackHolePannel, &sVar->pannelVector[8], textureManager->getTexture("kirby")));
 	sVar->pannelVector[0][6].setSwitchMode(true);
 
 	//wave pannel content
@@ -304,7 +304,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[7][4].desactive();
 
 	//blackhole pannel content
-	sVar->pannelVector[8].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("curby"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addButton(Button(70, 10, 100, 50,NULL, NULL, textureManager->getTexture("kirby"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][0].desactive();
 	sVar->pannelVector[8].addButton(Button(70, 70, 100, 50,changeBoolStatus, &sVar->holeInfo.enable, textureManager->getTexture("active")));
 	sVar->pannelVector[8][1].setSwitchMode(true);
@@ -312,7 +312,7 @@ void	initUi(t_simulationVariable	*sVar, TextureManager *textureManager, WaterSim
 	sVar->pannelVector[8][(char) 0].setValue(std::to_string((int) sVar->holeInfo.position.x));
 	sVar->pannelVector[8].addTextEntry(TextEntry(170, 220, 30, 30));
 	sVar->pannelVector[8][(char) 1].setValue(std::to_string((int) sVar->holeInfo.position.y));
-	sVar->pannelVector[8].addButton(Button(70, 130, 100, 50,NULL, NULL, textureManager->getTexture("curbyPower"), PANNEL_COLOR, PANNEL_COLOR));
+	sVar->pannelVector[8].addButton(Button(45, 130, 150, 50, NULL, NULL, textureManager->getTexture("kirbyPower"), PANNEL_COLOR, PANNEL_COLOR));
 	sVar->pannelVector[8][2].desactive();
 	sVar->pannelVector[8].addSlider(Slider(70, 190, 100, 10, COLOR_29266F, COLOR_2C26E4));
 	sVar->pannelVector[8][0.0f].setValue(0.25);

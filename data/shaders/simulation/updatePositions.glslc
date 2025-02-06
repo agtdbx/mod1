@@ -178,6 +178,15 @@ void main()
 				velocity.y *= -1.0;
 				needUpdateVelocity = true;
 			}
+			else
+			{
+				if (newPosition.y < -10.0)
+				{
+					newPosition.y = -10.0;
+					velocity *= vec3(0.0, 0.0, 0.0);
+					needUpdateVelocity = true;
+				}
+			}
 		}
 		else
 		{

@@ -30,6 +30,7 @@ public:
 					float waterDensity, t_holeInfo *holeInfo);
 	void	clear(void);
 	void	removeHoledParticles(void);
+	void	printParticlesInfo(void); // TODO: REMOVE
 
 private:
 	std::vector<glm::vec4>	positions;

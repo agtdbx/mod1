@@ -235,6 +235,8 @@ int	main(int argc, char **argv)
 				std::cout << "black hole enable : " << sVar.holeInfo.enable << std::endl;
 				std::cout << "black hole radius : " << sVar.holeInfo.radius << std::endl;
 				std::cout << "black hole position : " << sVar.holeInfo.position.x <<  " " << sVar.holeInfo.position.y << std::endl;
+
+				simulation.printParticlesInfo();
 			}
 
 			// Reset main times

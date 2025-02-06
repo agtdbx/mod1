@@ -6,7 +6,7 @@
 /*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/06 16:40:36 by aderouba         ###   ########.fr       */
+/*   Updated: 2025/02/06 17:05:37 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,8 @@
 # define WAVE_THICKNESS 10
 # define WAVE_HEIGHT 10
 # define BLACK_HOLE_RADIUS 25.0f
-# define BLACK_HOLE_COOR glm::vec2(5.0f, 5.0f)
+# define BLACK_HOLE_COOR glm::vec2(100.0f, 100.0f)
+// # define BLACK_HOLE_COOR glm::vec2(5.0f, 5.0f)
 # define BLACK_HOLE_PARTICLES_CLEAR_TIME 1.0f
 
 # define COLOR_000000 glm::vec3(0.0f, 0.0f, 0.0f)

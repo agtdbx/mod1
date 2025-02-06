@@ -572,7 +572,7 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	vec3	colorOnLight = lightColor;
 	vec3	colorDiff = waterColor - colorOnLight;
 	vec4	pixelColor = vec4(0, 0, 0, 0);
-	vec4	holeColor = vec4(clearColor, 1.0);
+	vec4	holeColor = vec4(clearColor, 0.8);
 
 	while (dist <= maxDist)
 	{
@@ -608,15 +608,17 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	}
 
 	// if hole enable and the ray hit the ground
-	if (holeEnable && rayPos.y <= 0.1 && densityAlongRay != maxDensity)
+	if (holeEnable && rayPos.y <= 0.1)
 	{
 		posForHole = vec2(rayPos.x, rayPos.z);
 		dirToHole = holePosition - posForHole;
 		dstToHole2 = dirToHole.x * dirToHole.x + dirToHole.y * dirToHole.y;
 		if (dstToHole2 <= holeRadius2)
 		{
-			ratio = pixelColor.a / 0.8;
+			ratio = pixelColor.a;
 			pixelColor = holeColor + (pixelColor - holeColor) * ratio;
+			color = vec3(pixelColor.r, pixelColor.g, pixelColor.b);
+			pixelColor = vec4(color * 0.8 + clearColor * 0.2, 1.0);
 		}
 	}
 

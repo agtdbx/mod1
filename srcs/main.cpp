@@ -416,7 +416,7 @@ static void	draw(
 				WaterSimulation	*simulation)
 {
 	// Clear window
-	glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
+	glClearColor(CLEAR_COLOR.x, CLEAR_COLOR.y, CLEAR_COLOR.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (Pannel & pannel : sVar->pannelVector)
@@ -437,7 +437,8 @@ static void	draw(
 		perfLog->timeDrawTerrain += elapsed_time / 1000000000.0;
 
 		glBeginQuery(GL_TIME_ELAPSED, query);
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, &sVar->lightcolor, sVar->waterDensity);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor,
+							&sVar->lightcolor, sVar->waterDensity, &sVar->holeInfo);
 		glEndQuery(GL_TIME_ELAPSED);
 		glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsed_time);
 		perfLog->timeDrawWater += elapsed_time / 1000000000.0;
@@ -451,7 +452,8 @@ static void	draw(
 	else
 	{
 		terrain->renderMesh(camera, shaderManager);
-		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor, &sVar->lightcolor, sVar->waterDensity);
+		simulation->draw(camera, shaderManager, terrain, &sVar->watercolor,
+						&sVar->lightcolor, sVar->waterDensity, &sVar->holeInfo);
 		glfwSwapBuffers(window);
 	}
 }

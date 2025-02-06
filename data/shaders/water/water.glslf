@@ -27,6 +27,11 @@ uniform int				mapBufferD;
 uniform int				mapBufferIdHsize;
 uniform samplerBuffer	mapDensitiesBuffer;
 
+uniform bool			holeEnable;
+uniform float			holeRadius2;
+uniform vec2			holePosition;
+uniform vec3			clearColor;
+
 uniform int				terrainCellSize;
 uniform int				terrainGridW;
 uniform int				terrainGridH;
@@ -561,11 +566,14 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 	distTerrain = min(distGround, distTriangle);
 
 	densityAlongRay = 0.0;
-	float	density, densityToLight;
+	float	density, densityToLight, dstToHole2, ratio;
+	vec2	posForHole, dirToHole;
 	vec3	color;
 	vec3	colorOnLight = lightColor;
 	vec3	colorDiff = waterColor - colorOnLight;
 	vec4	pixelColor = vec4(0, 0, 0, 0);
+	vec4	holeColor = vec4(clearColor, 1.0);
+
 	while (dist <= maxDist)
 	{
 		density = getDensityAtPos(rayPos, rayStep);
@@ -599,13 +607,27 @@ vec4	getPixelColor(vec3 rayPos, vec3 rayDir)
 		dist += rayStep;
 	}
 
+	// if hole enable and the ray hit the ground
+	if (holeEnable && rayPos.y <= 0.1 && densityAlongRay != maxDensity)
+	{
+		posForHole = vec2(rayPos.x, rayPos.z);
+		dirToHole = holePosition - posForHole;
+		dstToHole2 = dirToHole.x * dirToHole.x + dirToHole.y * dirToHole.y;
+		if (dstToHole2 <= holeRadius2)
+		{
+			ratio = pixelColor.a / 0.8;
+			pixelColor = holeColor + (pixelColor - holeColor) * ratio;
+		}
+	}
+
 	return (pixelColor);
 }
 
 
 void main()
 {
-	vec3	rayPos = cameraPos - (cameraRight * planeWidth * pointPos.x) + (cameraUp * planeHeight * pointPos.y);
+	vec3	rayPos = cameraPos - (cameraRight * planeWidth * pointPos.x)
+								+ (cameraUp * planeHeight * pointPos.y);
 	vec3	fakeCameraPos = cameraPos - cameraFront * 2;
 	vec3	rayDir = normalize(rayPos - fakeCameraPos);
 

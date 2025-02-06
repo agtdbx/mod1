@@ -275,7 +275,8 @@ void	WaterSimulation::draw(
 			Terrain *terrain,
 			glm::vec3 *waterColor,
 			glm::vec3 *lightColor,
-			float waterDensity)
+			float waterDensity,
+			t_holeInfo *holeInfo)
 {
 	WaterShader *shader;
 	int			shaderId;
@@ -283,9 +284,6 @@ void	WaterSimulation::draw(
 	GLuint		terrainBufferTextureDataGrid, terrainTextureDataGrid,
 				terrainBufferTextureFlatGrid, terrainTextureFlatGrid,
 				terrainBufferTextureOffsets, terrainTextureOffsets;
-
-	if (this->nbParticules == 0)
-		return ;
 
 	// Get terrain data
 	terrainBufferTextureDataGrid = terrain->getTextureBufferTerrainGridData();
@@ -334,6 +332,11 @@ void	WaterSimulation::draw(
 	giveFloatTextureToShader(shaderId, "mapDensitiesBuffer", 0,
 								this->textureBufferMapDensities,
 								this->textureMapDensities);
+
+	giveBoolToShader(shaderId, "holeEnable", holeInfo->enable);
+	giveFloatToShader(shaderId, "holeRadius2", holeInfo->radius2);
+	giveVec2ToShader(shaderId, "holePosition", holeInfo->position);
+	giveVec3ToShader(shaderId, "clearColor", CLEAR_COLOR);
 
 	giveIntToShader(shaderId, "terrainCellSize", TERRAIN_CELL_SIZE);
 	giveIntToShader(shaderId, "terrainGridW", sizes[0]);

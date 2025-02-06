@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   define.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
+/*   By: aderouba <aderouba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:55:17 by aderouba          #+#    #+#             */
-/*   Updated: 2025/02/05 14:24:37 by gugus            ###   ########.fr       */
+/*   Updated: 2025/02/06 16:40:36 by aderouba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@
 # define COLOR_0000CC glm::vec3(0.0, 0.0, 0.8)
 # define COLOR_29266F glm::vec3(0.160784314f, 0.149019608f, 0.435294118f)
 # define COLOR_2C26E4 glm::vec3(0.17254902f, 0.149019608f, 0.894117647f)
+# define COLOR_334C66 glm::vec3(0.2, 0.3, 0.4)
 # define COLOR_3366FF glm::vec3(0.2, 0.4, 1.0)
 # define COLOR_3EAFDF glm::vec3(0.243137255f, 0.68627451f, 0.874509804f)
 # define COLOR_666666 glm::vec3(0.4f, 0.4f, 0.4f)
@@ -107,6 +108,7 @@
 # define PANNEL_COLOR COLOR_6C3737
 # define PANNEL_MOVE_SPEED 200
 
+const glm::vec3	CLEAR_COLOR = COLOR_334C66;
 const float		WIN_RATIO = (float)WIN_W/(float)WIN_H;
 const float		INV_TERRAIN_CELL_SIZE = 1.0f / TERRAIN_CELL_SIZE;
 const float		INV_MAP_BUFFER_CELL_SIZE =  1.0f / (float)MAP_BUFFER_CELL_SIZE;

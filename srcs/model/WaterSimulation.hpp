@@ -26,7 +26,8 @@ public:
 	void	tick(ShaderManager *shaderManager, Terrain *terrain,
 					t_performanceLog *perfLog, float delta, t_holeInfo *holeInfo);
 	void	draw(Camera *camera, ShaderManager *shaderManager,
-					Terrain *terrain, glm::vec3 *waterColor,glm::vec3 *lightColor, float waterDensity);
+					Terrain *terrain, glm::vec3 *waterColor,glm::vec3 *lightColor,
+					float waterDensity, t_holeInfo *holeInfo);
 	void	clear(void);
 	void	removeHoledParticles(void);
 

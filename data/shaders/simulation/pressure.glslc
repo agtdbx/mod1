@@ -19,7 +19,7 @@ uniform int				gridD;
 uniform int				idHsize;
 uniform int				gridSize;
 uniform int				positionsSize;
-uniform samplerBuffer	predictedPositionsBuffer;
+uniform samplerBuffer	positionsBuffer;
 uniform samplerBuffer	densitiesBuffer;
 uniform samplerBuffer	pressuresBuffer;
 
@@ -60,7 +60,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 
 	pressureForce = vec3(0.0, 0.0, 0.0);
 
-	position = texelFetch(predictedPositionsBuffer, particleIndex).rgb;
+	position = texelFetch(positionsBuffer, particleIndex).rgb;
 	pressure = texelFetch(pressuresBuffer, particleIndex).r;
 	px = int(position.x * invSmoothingRadius);
 	py = int(position.y * invSmoothingRadius);
@@ -93,7 +93,7 @@ vec3	calculatePressureForce(int particleIndex, float invDensity)
 					if (waterId == particleIndex)
 						continue;
 
-					positionWater = texelFetch(predictedPositionsBuffer, waterId).rgb;
+					positionWater = texelFetch(positionsBuffer, waterId).rgb;
 					pressureWater = texelFetch(pressuresBuffer, waterId).r;
 
 					dir = positionWater - position;
@@ -137,7 +137,7 @@ void main()
 {
 	int		particleIndex;
 	float	density, invDensity, pressureSpeedAcceleration;
-	vec3	position, velocity, pressureForce, pressureAcceleration, viscosityForce;
+	vec3	position, velocity, pressureForce, pressureAcceleration;
 
 	particleIndex = int(gl_GlobalInvocationID.x);
 	if (particleIndex >= positionsSize)
@@ -156,8 +156,8 @@ void main()
 		if (holeEnable)
 		{
 			pressureSpeedAcceleration = vecLength2(pressureAcceleration);
-			if (pressureSpeedAcceleration > 40000.0)
-				pressureAcceleration *= 200.0 / sqrt(pressureSpeedAcceleration);
+			if (pressureSpeedAcceleration > 10000.0)
+				pressureAcceleration *= 100.0 / sqrt(pressureSpeedAcceleration);
 		}
 
 		velocity += pressureAcceleration * delta;

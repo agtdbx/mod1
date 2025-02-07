@@ -72,7 +72,6 @@ private:
 	void		putParticlesInGridInParallel(ShaderManager *shaderManager);
 	void		computeMapDensity(ShaderManager *shaderManager);
 	void		computeDensity(ShaderManager *shaderManager);
-	void		computeMapPressureAcceleration(ShaderManager *shaderManager);
 	void		calculatesAndApplyPressure(ShaderManager *shaderManager, float deltal, t_holeInfo *holeInfo);
 	void		computeMapViscosity(ShaderManager *shaderManager);
 	void		calculatesAndApplyViscosity(ShaderManager *shaderManager, float delta);

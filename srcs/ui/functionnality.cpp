@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functionnality.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lflandri <lflandri@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gugus <gugus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:02:44 by lflandri          #+#    #+#             */
-/*   Updated: 2025/02/04 23:45:27 by lflandri         ###   ########.fr       */
+/*   Updated: 2025/02/07 15:50:58 by gugus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,10 @@ void	generateWaveWest(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
-	for (float x = 0; x < MAP_SIZE - SMOOTHING_RADIUS; x += SMOOTHING_RADIUS) 
+	if (sVar->isStopped)
+		return ;
+
+	for (float x = 0; x < MAP_SIZE - SMOOTHING_RADIUS; x += SMOOTHING_RADIUS)
 	{
 		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS )
 		{
@@ -99,6 +102,9 @@ void	generateWaveEst(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
+
+	if (sVar->isStopped)
+		return ;
 
 	for (float x = 0; x < MAP_SIZE - SMOOTHING_RADIUS; x += SMOOTHING_RADIUS)
 	{
@@ -120,6 +126,9 @@ void	generateWaveNorth(void *arg)
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
 
+	if (sVar->isStopped)
+		return ;
+
 	for (float z = 0; z < MAP_SIZE - SMOOTHING_RADIUS; z += SMOOTHING_RADIUS)
 	{
 		for (float y = 0; y < sVar->waveHeight; y += SMOOTHING_RADIUS)
@@ -140,6 +149,9 @@ void	generateWaveSouth(void *arg)
 {
 	t_simulationVariable *sVar = ((t_simulationVariable *)(arg));
 	WaterSimulation *simulation = ((WaterSimulation *)(sVar->simulation));
+
+	if (sVar->isStopped)
+		return ;
 
 	for (float z = 0; z < MAP_SIZE - SMOOTHING_RADIUS; z += SMOOTHING_RADIUS)
 	{

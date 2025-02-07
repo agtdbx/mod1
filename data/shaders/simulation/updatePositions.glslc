@@ -177,7 +177,7 @@ void main()
 			holeDst2 = holeDir.x * holeDir.x + holeDir.y * holeDir.y;
 			if (holeDst2 > holeRadius2)
 			{
-				newPosition.y = waterRadius + collisionRepulsionForce;
+				newPosition.y = waterRadius;
 				velocity.y *= -1.0;
 				needUpdateVelocity = true;
 			}

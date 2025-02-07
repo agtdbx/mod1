@@ -250,7 +250,7 @@ void	WaterSimulation::calculatesAndApplyPressure(
 	giveIntToShader(shaderId, "idHsize", this->idHsize);
 	giveIntToShader(shaderId, "gridSize", this->gridSize);
 	giveIntToShader(shaderId, "positionsSize", this->nbParticules);
-	giveVec4TextureToShader(shaderId, "predictedPositionsBuffer", 2,
+	giveVec4TextureToShader(shaderId, "positionsBuffer", 2,
 								this->textureBufferPredictedPositions,
 								this->texturePredictedPositions);
 	giveFloatTextureToShader(shaderId, "densitiesBuffer", 3,

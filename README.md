@@ -5,6 +5,10 @@ Il permet de visualiser des phénomènes tels que des vagues, tsunamis ou pluies
 
 ---
 
+![mod1](https://github.com/user-attachments/assets/e066c1a6-cf86-40de-8239-1c4adb3418ff)
+
+---
+
 ## 🧩 Table des matières
 
 - [Aperçu](#aperçu)

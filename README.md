@@ -1,99 +1,176 @@
-# mod1
+# 🌊 mod1 — Water Flow Simulator
 
-**mod1** est un projet de simulation graphique en **3D** représentant une surface sur laquelle circule de l’eau.  
-Il permet de visualiser des phénomènes tels que des vagues, tsunamis ou pluies, à l’aide de calculs physiques et d’un rendu OpenGL.
-
----
-
-![mod1](https://github.com/user-attachments/assets/e066c1a6-cf86-40de-8239-1c4adb3418ff)
+<p align="center">
+  <strong>Simulation graphique temps réel d'écoulements d'eau sur surface 3D</strong><br>
+  Projet algorithmique de l'école 42 | C++ • OpenGL • GPU Computing
+</p>
 
 ---
 
-## 🧩 Table des matières
+## 📖 Vue d'ensemble
 
-- [Aperçu](#aperçu)
-- [Fonctionnalités](#fonctionnalités)
-- [Structure du projet](#structure-du-projet)
-- [Installation](#installation)
-- [Utilisation](#utilisation)
-- [Contribuer](#contribuer)
-- [Licence](#licence)
+**mod1** est un simulateur hydrodynamique en temps réel qui génère une surface 3D à partir de points de contrôle épars, puis simule différents comportements d'écoulement d'eau sur cette surface.
 
----
+Le projet repose sur trois piliers techniques :
 
-## 🌊 Aperçu
-
-Le projet **mod1** simule le comportement de l’eau sur un terrain 3D, en prenant en compte la topographie et la physique des fluides de manière simplifiée.  
-Il s’agit d’un projet éducatif et technique, combinant **modélisation physique**, **rendu 3D temps réel**, et **programmation bas niveau** en C/C++.
+1. **Interpolation de surface** — Génération d'un maillage 3D lisse à partir de quelques points de contrôle
+2. **Simulation physique** — Calcul temps réel de la physique de l'eau (montée progressive, vagues, pluie)
+3. **Rendu GPU** — Visualisation OpenGL avec calculs sur carte graphique
 
 ---
 
-## ⚙️ Fonctionnalités
+## 🖼️ Screenshots
 
-- Simulation d’une **surface 3D** dynamique.  
-- Représentation visuelle de **l’écoulement de l’eau**.  
-- Gestion de plusieurs phénomènes :
-  - 🌧️ pluie
-  - 🌊 vagues
-  - 🌪️ tsunamis
-- Rendu temps réel via **OpenGL**.
-- Gestion du **maillage** et du **relief** du terrain.
-- Possibilité de charger ou modifier des cartes de hauteur.
+![Simulation de vague](readme_data/waves.gif)
+*Vague déferlante en temps réel*
 
----
+![Pluie sur cratère](readme_data/rain.gif)
+*Simulation de pluie avec accumulation dans un cratère*
 
-## 📁 Structure du projet
-```
-├── 2d_sim/ # Simulation 2D ou calculs physiques de base
-├── data/ # Données (textures, cartes, etc.)
-├── flood/ # Gestion de l’inondation et propagation d’eau
-├── map/ # Cartes topographiques, maillages
-├── srcs/ # Code source principal (C/C++, OpenGL)
-├── subprojects/ # Dépendances externes éventuelles
-├── vsupp/ # Fichiers utilitaires et de support
-├── Makefile # Script de compilation alternatif
-├── meson.build # Configuration du build Meson
-└── README.md # Ce fichier
-```
+![Trou dans le terrain](readme_data/hole.gif)
+*Simulation de l'ouverture puis la fermeture d'un trou dans le terrain*
 
 ---
 
-## 🧰 Installation
+## ✨ Fonctionnalités
 
-### Prérequis
+### Partie obligatoire
 
-Avant de compiler, assure-toi d’avoir installé :
+- ✅ **Génération de surface** — Interpolation d'une topographie 3D à partir de fichiers `.mod1`
+- ✅ **Montée d'eau progressive** — Simulation d'inondation uniforme recouvrant graduellement le terrain
+- ✅ **Vague déferlante** — Vague arrivant latéralement et submergeant la surface
+- ✅ **Pluie** — Simulation de précipitations avec accumulation progressive
 
-- Un compilateur C++ compatible (C++17 minimum)
-- [Meson](https://mesonbuild.com/) et [Ninja](https://ninja-build.org/)
-- OpenGL et les bibliothèques associées (GLFW, GLEW, etc.)
-- (Optionnel) Python 3 pour certains utilitaires
+### Bonus implémentés
 
-### Compilation avec Makefile et Meson
+- 🎨 **Interface 3D interactive** — Navigation caméra libre, contrôles intuitifs
+- 🌊 **Modes supplémentaires** — Génération d'eau à un point précis, écoulement via un trou
+- ⚡ **Calculs GPU** — Simulation physique entièrement calculée sur carte graphique (GLSL shaders)
+- 🎥 **Contrôle de caméra avancé** — Rotation, zoom, panoramique temps réel
+- 🎛️ **Paramètres ajustables** — Pause/Replay, avancement image par image, couleur de l'eau, précision du rendu
+
+---
+
+## 🎮 Utilisation
+
+### Compilation
+
+Prérequis : **C++17**, **OpenGL**, **GLFW**, **Meson**, **Ninja**
 
 ```bash
 # Cloner le dépôt
 git clone https://github.com/agtdbx/mod1.git
 cd mod1
 
-# Compiler le projet
+# Compiler avec Makefile (wrapper Meson)
 make
-
-# Aller au binaire
-cd release
 ```
---
 
-## 🚀 Utilisation
+### Lancement
 
-Après compilation, l’exécutable principal (souvent nommé mod1) se trouve dans le dossier builddir ou bin.
-
-Exemple d’exécution :
+```bash
+# Depuis le répertoire release/
+./mod1 path/to/map.mod1
 ```
-./mod1 <path/to/map.mod1>
+
+### Contrôles
+
+| Touche            | Action                                        |
+|-------------------|-----------------------------------------------|
+| **Souris**        | Rotation de la caméra                         |
+| **Tab**           | Activer / désactiver le menu                  |
+| **WASD**          | Mouvements basiques                           |
+| **Espace/Lshift** | Mouvements sur l'axe Y                        |
+| **Lctrl**         | Sprint                                        |
+| **Flèches**       | Rotation de la caméra                         |
+| **ESC**           | Quitter                                       |
+
+---
+
+## 📂 Structure du projet
+
+```text
+mod1/
+├── 2d_sim/             # Version 2D de la simulation en python
+├── data/               # Shaders et textures
+├── flood/              # Algo de génération de
+├── map/                # Fichiers .mod1 de test
+├── srcs/               # Code source C++
+├── subprojects/        # Dépendances (GLFW, GLM, etc.)
+├── meson.build         # Configuration build Meson
+├── Makefile            # Wrapper de build
+├── README.md           # Ce fichier
+└── vsupp               # Ficher de suppression valgrind
 ```
---
 
-## 👨‍💻 Auteur
+---
 
-Développé par agtdbx et LekaUila
+## 🧮 Aspects techniques
+
+### Génération de surface
+
+Le maillage 3D est généré par **interpolation polynomiale** à partir des points de contrôle fournis dans le fichier `.mod1`. L'algorithme garantit :
+
+- Continuité de la surface (pas d'arêtes vives)
+- Altitude nulle aux bords de la scène
+- Résolution de grille adaptative selon la densité de points
+
+### Simulation physique
+
+L'eau est simulée en temps réel sur GPU via **compute shaders** OpenGL :
+
+- Physique de l'eau basé sur des particules
+- Interaction avec la topographie (accumulation dans les creux)
+
+### Rendu graphique
+
+Map :
+- Mesh 3D rendu via OpenGL avec (vertex/fragment shader).
+
+Eau :
+- Mélange de raycasting 3D et raytracing pour détecter le terrain (fragment shader)
+- Ray marching pour le rendu des particules d'eau (fragment shader)
+
+Menu :
+- Mesh 3D rendu via OpenGL avec (vertex/fragment shader).
+
+---
+
+## 🎯 Objectifs pédagogiques (42)
+
+Ce projet de l'école 42 vise à maîtriser :
+
+- ✅ Algorithmes d'interpolation et génération de surfaces
+- ✅ Bases de la simulation physique (fluides, gravité)
+- ✅ Programmation graphique GPU (OpenGL, shaders GLSL)
+- ✅ Gestion de projet C++ structuré (build systems, dépendances)
+- ✅ Optimisation temps réel (calculs parallèles, pipeline GPU)
+
+---
+
+## 📦 Dépendances
+
+- **OpenGL 4.3+** (compute shaders)
+- **GLFW** (gestion fenêtre et input)
+- **GLM** (mathématiques 3D)
+- **Meson + Ninja** (build system)
+- **C++17** (compilateur compatible : GCC 9+, Clang 10+)
+
+---
+
+## 📜 License
+
+Projet pédagogique école 42 — Usage éducatif uniquement.
+
+---
+
+## 👤 Auteur
+
+**Auguste Deroubaix** (agtdbx) 🔗 [GitHub](https://github.com/agtdbx) • 🎓 Étudiant 42</br>
+**Liam Flandrink** (LekaUila) 🔗 [GitHub](https://github.com/LekaUila) • 🎓 Étudiant 42
+
+---
+
+<p align="center">
+  <i>Quand l'algorithmique rencontre la physique des fluides — en temps réel sur GPU</i>
+</p>

@@ -167,7 +167,7 @@ Projet pédagogique école 42 — Usage éducatif uniquement.
 ## 👤 Auteur
 
 **Auguste Deroubaix** (agtdbx) 🔗 [GitHub](https://github.com/agtdbx) • 🎓 Étudiant 42</br>
-**Liam Flandrink** (LekaUila) 🔗 [GitHub](https://github.com/LekaUila) • 🎓 Étudiant 42
+**Liam Flandrinck** (LekaUila) 🔗 [GitHub](https://github.com/LekaUila) • 🎓 Étudiant 42
 
 ---
 

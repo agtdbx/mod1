@@ -164,13 +164,7 @@ Projet pédagogique école 42 — Usage éducatif uniquement.
 
 ---
 
-## 👤 Auteur
+## 👥 Auteurs
 
 **Auguste Deroubaix** (agtdbx) 🔗 [GitHub](https://github.com/agtdbx) • 🎓 Étudiant 42</br>
 **Liam Flandrinck** (LekaUila) 🔗 [GitHub](https://github.com/LekaUila) • 🎓 Étudiant 42
-
----
-
-<p align="center">
-  <i>Quand l'algorithmique rencontre la physique des fluides — en temps réel sur GPU</i>
-</p>

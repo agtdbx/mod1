@@ -69,6 +69,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 
+	glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 	if (!glfwInit())
 	{
 		std::cerr << "Error : Opengl init failed" << std::endl;
